@@ -309,36 +309,7 @@
   }
 }
 
-/* Fintellec cinematic entrance: exact brand palette only. */
-.fintellec-opening{position:relative;height:320vh;background:#003365;color:#EFFAFA;isolation:isolate;z-index:20}
-.fintellec-opening__sticky{position:sticky;top:0;height:100svh;min-height:560px;overflow:hidden;display:grid;place-items:center;background:radial-gradient(ellipse at 50% 53%,rgba(0,169,158,.18),transparent 38%),#003365;isolation:isolate}
-.fintellec-opening__grain{position:absolute;inset:0;pointer-events:none;opacity:.12;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.22'/%3E%3C/svg%3E")}
-.fintellec-opening__glow{position:absolute;width:min(70vw,760px);aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,rgba(99,220,211,.13),rgba(0,169,158,.06) 42%,transparent 70%);filter:blur(18px);pointer-events:none}
-.fintellec-opening__copy{position:absolute;z-index:2;top:14%;width:100%;padding:0 24px;text-align:center;will-change:transform,opacity}
-.fintellec-opening__eyebrow{margin:0 0 18px;color:#63DCD3;font-size:11px;font-weight:700;letter-spacing:.32em}
-.fintellec-opening__copy h1{margin:0;color:#EFFAFA;font-size:clamp(2.4rem,6.4vw,6rem);font-weight:550;letter-spacing:-.065em;line-height:.98}
-.fintellec-opening__copy h1 span{color:#63DCD3}
-.fintellec-opening__hint{margin:26px 0 0;color:#B8F2EC;font-size:12px;letter-spacing:.04em}
-.fintellec-opening__hint span{display:inline-block;margin-left:8px;color:#63DCD3;animation:fintellec-hint-bob 1.8s ease-in-out infinite}
-.fintellec-opening__coin{position:absolute;z-index:4;top:54%;left:50%;width:clamp(118px,19vw,220px);aspect-ratio:1;border-radius:50%;transform:translate3d(-50%,0,0);transform-style:preserve-3d;will-change:transform,opacity;filter:drop-shadow(0 24px 48px rgba(0,0,0,.25))}
-.fintellec-opening__coin-edge{position:absolute;inset:0;border-radius:50%;background:repeating-linear-gradient(90deg,#00A99E 0 2px,#63DCD3 2px 4px);box-shadow:0 0 0 2px #B8F2EC,0 0 36px rgba(99,220,211,.28)}
-.fintellec-opening__coin-face{position:absolute;inset:5px;border:1px solid rgba(255,255,255,.85);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-direction:column;background:radial-gradient(circle at 32% 22%,#EFFAFA 0%,#B8F2EC 26%,#63DCD3 57%,#00A99E 100%);box-shadow:inset 0 0 0 5px rgba(0,51,101,.08),inset 0 -14px 28px rgba(0,51,101,.18)}
-.fintellec-opening__coin-mark{color:#003365;font-family:Georgia,serif;font-size:clamp(3.5rem,8vw,6.5rem);line-height:1;text-shadow:0 1px rgba(255,255,255,.6)}
-.fintellec-opening__coin-word{margin-top:7px;color:#003365;font-size:8px;font-weight:800;letter-spacing:.24em}
-.fintellec-opening__wallet{position:absolute;z-index:3;top:57%;left:50%;width:clamp(220px,34vw,390px);height:clamp(130px,20vw,220px);opacity:0;transform:translate3d(-50%,90px,0);transform-origin:50% 55%;will-change:transform,opacity;filter:drop-shadow(0 35px 40px rgba(0,0,0,.28));perspective:900px}
-.fintellec-opening__wallet-inner{position:absolute;inset:12% 2% 0;border-radius:24px;background:linear-gradient(145deg,#B8F2EC,#63DCD3 48%,#00A99E);box-shadow:inset 0 0 0 1px rgba(255,255,255,.6)}
-.fintellec-opening__wallet-body{position:absolute;inset:28% 0 0;border-radius:24px;background:linear-gradient(145deg,#00A99E 0%,#003365 86%);border:1px solid rgba(184,242,236,.7);overflow:hidden}
-.fintellec-opening__wallet-brand{position:absolute;left:24px;top:22px;color:#B8F2EC;font-size:10px;font-weight:700;letter-spacing:.25em}
-.fintellec-opening__wallet-seam{position:absolute;left:22px;right:22px;bottom:24px;height:1px;background:rgba(184,242,236,.4)}
-.fintellec-opening__wallet-clasp{position:absolute;right:25px;top:22px;width:35px;height:24px;border-radius:7px;background:linear-gradient(135deg,#B8F2EC,#63DCD3);box-shadow:inset 0 0 0 1px rgba(255,255,255,.65)}
-.fintellec-opening__wallet-lid{position:absolute;z-index:2;left:0;right:0;top:0;height:68%;border-radius:24px 24px 18px 18px;border:1px solid rgba(255,255,255,.7);background:linear-gradient(145deg,#63DCD3 0%,#00A99E 55%,#003365 100%);transform-origin:50% 0;backface-visibility:visible;box-shadow:inset 0 1px rgba(255,255,255,.55);display:grid;place-items:center;will-change:transform}
-.fintellec-opening__wallet-lid span{font-family:Georgia,serif;font-size:clamp(2rem,5vw,4rem);color:rgba(239,250,250,.9)}
-.fintellec-opening__light{position:absolute;z-index:5;top:63%;left:50%;width:16px;height:16px;border-radius:50%;opacity:0;transform:translate(-50%,-50%) scale(.05);background:#EFFAFA;box-shadow:0 0 24px 14px #B8F2EC,0 0 70px 35px rgba(99,220,211,.8);pointer-events:none;will-change:transform,opacity}
-.fintellec-opening__progress{position:absolute;z-index:6;left:50%;bottom:26px;transform:translateX(-50%);display:flex;align-items:center;gap:12px;color:rgba(184,242,236,.7);font:10px var(--font-geist-mono),monospace;letter-spacing:.15em}
-.fintellec-opening__progress i{display:block;width:64px;height:1px;background:linear-gradient(90deg,#00A99E,#63DCD3)}
-@keyframes fintellec-hint-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(4px)}}
-@media(max-width:640px){.fintellec-opening{height:250vh}.fintellec-opening__copy{top:16%}.fintellec-opening__wallet{top:60%}.fintellec-opening__progress{bottom:18px}.fintellec-opening__copy h1{letter-spacing:-.055em}}
-@media(prefers-reduced-motion:reduce){.fintellec-opening{height:100svh}.fintellec-opening__hint span{animation:none}}
+
 
 
 /* Fintellec wallet reveal — append to app/globals.css; do not replace the file. */
