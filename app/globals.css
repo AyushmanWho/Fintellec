@@ -664,3 +664,139 @@ html.circadian-night .hero-stage {
   animation: night-ember-float 7s cubic-bezier(0.2, 0.8, 0.2, 1) infinite;
 }
 
+/* =========================================================================
+   IPHONE LIQUID GLASSMORPHISM ENGINE
+   ========================================================================= */
+
+/* Primary Liquid Glass Card Container (Hyper-Reflective, Transparent) */
+.iphone-liquid-glass {
+  position: relative;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.44) 0%,
+    rgba(240, 253, 250, 0.16) 40%,
+    rgba(184, 242, 236, 0.12) 75%,
+    rgba(255, 255, 255, 0.35) 100%
+  );
+  backdrop-filter: blur(40px) saturate(220%);
+  -webkit-backdrop-filter: blur(40px) saturate(220%);
+  border: 1.5px solid rgba(255, 255, 255, 0.85);
+  box-shadow:
+    0 24px 60px -12px rgba(0, 51, 101, 0.14),
+    0 4px 18px rgba(0, 169, 158, 0.08),
+    inset 0 1.5px 2px 0 rgba(255, 255, 255, 0.95),
+    inset 0 -2px 6px 0 rgba(0, 169, 158, 0.12),
+    inset 0 0 20px 0 rgba(255, 255, 255, 0.25);
+  transition: all 350ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.iphone-liquid-glass:hover {
+  box-shadow:
+    0 32px 75px -10px rgba(0, 51, 101, 0.18),
+    0 8px 24px rgba(99, 220, 211, 0.18),
+    inset 0 2px 3px 0 rgba(255, 255, 255, 1),
+    inset 0 -2px 8px 0 rgba(0, 169, 158, 0.18),
+    inset 0 0 25px 0 rgba(255, 255, 255, 0.35);
+  border-color: rgba(255, 255, 255, 0.95);
+}
+
+/* Diagonal Specular Sheen (Curved Glass Reflection) */
+.iphone-glass-sheen {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background: radial-gradient(
+    130% 90% at 20% 0%,
+    rgba(255, 255, 255, 0.72) 0%,
+    rgba(255, 255, 255, 0.22) 30%,
+    rgba(99, 220, 211, 0.08) 60%,
+    transparent 85%
+  );
+  opacity: 0.92;
+}
+
+/* Secondary Inset Glass (for inputs, mini-tiles, chart stage) */
+.iphone-liquid-inset {
+  background: linear-gradient(
+    140deg,
+    rgba(255, 255, 255, 0.32) 0%,
+    rgba(240, 253, 250, 0.14) 100%
+  );
+  backdrop-filter: blur(24px) saturate(190%);
+  -webkit-backdrop-filter: blur(24px) saturate(190%);
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  box-shadow:
+    inset 0 2px 4px 0 rgba(0, 51, 101, 0.05),
+    inset 0 1px 2px 0 rgba(255, 255, 255, 0.85),
+    0 2px 8px 0 rgba(0, 51, 101, 0.03);
+}
+
+/* Interactive iPhone Glass Tile (Normal vs Pressed/Active) */
+.iphone-glass-tile {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.38) 0%,
+    rgba(255, 255, 255, 0.14) 100%
+  );
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow:
+    0 4px 14px rgba(0, 51, 101, 0.05),
+    inset 0 1px 2px rgba(255, 255, 255, 0.9);
+  transition: all 220ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.iphone-glass-tile:hover {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.55) 0%,
+    rgba(240, 253, 250, 0.25) 100%
+  );
+  border-color: rgba(99, 220, 211, 0.6);
+  transform: translateY(-1px);
+  box-shadow:
+    0 8px 22px rgba(0, 51, 101, 0.08),
+    inset 0 1.5px 2px rgba(255, 255, 255, 1);
+}
+
+.iphone-glass-tile-active {
+  background: linear-gradient(
+    135deg,
+    rgba(0, 51, 101, 0.95) 0%,
+    rgba(0, 36, 78, 0.92) 100%
+  ) !important;
+  border-color: rgba(99, 220, 211, 0.85) !important;
+  color: #FFFFFF !important;
+  box-shadow:
+    0 12px 28px -4px rgba(0, 51, 101, 0.38),
+    0 0 20px rgba(99, 220, 211, 0.35),
+    inset 0 1px 2px rgba(255, 255, 255, 0.5) !important;
+}
+
+/* Liquid Aurora Mesh Behind Glass (Breathing color bodies) */
+@keyframes liquidMeshFloat1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(45px, -35px) scale(1.15); }
+}
+@keyframes liquidMeshFloat2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-40px, 40px) scale(1.1); }
+}
+@keyframes liquidMeshFloat3 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(35px, 45px) scale(1.18); }
+}
+
+.liquid-mesh-blob-1 {
+  animation: liquidMeshFloat1 14s ease-in-out infinite alternate;
+}
+.liquid-mesh-blob-2 {
+  animation: liquidMeshFloat2 18s ease-in-out infinite alternate;
+}
+.liquid-mesh-blob-3 {
+  animation: liquidMeshFloat3 12s ease-in-out infinite alternate;
+}
+
+

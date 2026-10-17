@@ -179,6 +179,47 @@ const ARCHETYPES: Record<ArchetypeKey, ArchetypeConfig> = {
   },
 }
 
+// =========================================================================
+// IPHONE LIQUID GLASS CARD CONTAINER (SPECULAR SHEEN + SPOTLIGHT CAUSTIC)
+// =========================================================================
+function LiquidGlassCard({
+  children,
+  className = '',
+}: {
+  children: React.ReactNode
+  className?: string
+}) {
+  const [mousePos, setMousePos] = useState<{ x: number; y: number } | null>(null)
+
+  return (
+    <div
+      onMouseMove={(e) => {
+        const rect = e.currentTarget.getBoundingClientRect()
+        setMousePos({ x: e.clientX - rect.left, y: e.clientY - rect.top })
+      }}
+      onMouseLeave={() => setMousePos(null)}
+      className={cn('iphone-liquid-glass group relative overflow-hidden rounded-[28px]', className)}
+    >
+      {/* Curved Apple Specular Sheen */}
+      <div className="iphone-glass-sheen" />
+
+      {/* Interactive Cursor Spotlight Caustic Refraction */}
+      {mousePos && (
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -inset-px transition-opacity duration-200 z-1"
+          style={{
+            background: `radial-gradient(460px circle at ${mousePos.x}px ${mousePos.y}px, rgba(255, 255, 255, 0.55), rgba(99, 220, 211, 0.16) 40%, transparent 70%)`,
+          }}
+        />
+      )}
+
+      {/* Card Inner Content */}
+      <div className="relative z-10 flex flex-col justify-between h-full">{children}</div>
+    </div>
+  )
+}
+
 export function FdinSimulator() {
   const [archetypeKey, setArchetypeKey] = useState<ArchetypeKey>('student')
   const config = ARCHETYPES[archetypeKey]
@@ -190,18 +231,23 @@ export function FdinSimulator() {
       className="relative py-24 md:py-36 overflow-hidden scroll-mt-20"
       style={{
         background:
-          'radial-gradient(75% 55% at 15% 30%, rgba(99, 220, 211, 0.22) 0%, transparent 70%), radial-gradient(80% 60% at 85% 70%, rgba(0, 169, 158, 0.14) 0%, transparent 70%), linear-gradient(180deg, #FFFFFF 0%, #E9F8F5 50%, #FFFFFF 100%)',
+          'radial-gradient(75% 55% at 15% 25%, rgba(99, 220, 211, 0.38) 0%, transparent 70%), radial-gradient(80% 60% at 85% 70%, rgba(0, 169, 158, 0.32) 0%, transparent 70%), linear-gradient(180deg, #F0FAF7 0%, #E3F7F3 45%, #EBF8F5 100%)',
       }}
     >
-      {/* Background Soft Ambient Light Spheres */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute left-1/2 top-10 -translate-x-1/2 w-[950px] aspect-square rounded-full bg-[radial-gradient(circle,rgba(99,220,211,0.22),transparent_70%)] blur-3xl"
-      />
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute -right-40 top-1/2 w-[600px] aspect-square rounded-full bg-[radial-gradient(circle,rgba(184,242,236,0.45),transparent_65%)] blur-3xl"
-      />
+      {/* Background Liquid Aurora Mesh Blobs (Breathing color bodies that refract through the glass) */}
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
+        {/* Floating Orb 1: Mint & Cyan */}
+        <div className="liquid-mesh-blob-1 absolute -left-20 top-24 w-[640px] h-[640px] rounded-full bg-gradient-to-tr from-[#63DCD3]/70 via-[#00A99E]/50 to-transparent blur-[90px]" />
+
+        {/* Floating Orb 2: Deep Teal & Emerald */}
+        <div className="liquid-mesh-blob-2 absolute -right-24 top-1/3 w-[700px] h-[700px] rounded-full bg-gradient-to-bl from-[#00A99E]/65 via-[#63DCD3]/50 to-[#0F766E]/40 blur-[100px]" />
+
+        {/* Floating Orb 3: Aqua Soft Center Lagoon */}
+        <div className="liquid-mesh-blob-3 absolute left-1/4 bottom-12 w-[580px] h-[580px] rounded-full bg-gradient-to-r from-[#B8F2EC]/90 via-[#63DCD3]/60 to-[#00A99E]/30 blur-[90px]" />
+
+        {/* Caustic Grid Texture */}
+        <div className="absolute inset-0 bg-[radial-gradient(rgba(0,51,101,0.06)_1px,transparent_1px)] [background-size:24px_24px] opacity-40" />
+      </div>
 
       <div className="relative mx-auto max-w-[1400px] px-6 md:px-12">
         {/* Section Header */}
@@ -220,7 +266,7 @@ export function FdinSimulator() {
           </p>
 
           {/* Apple Dynamic Island Style Segmented Control */}
-          <div className="mt-9 inline-flex p-1.5 rounded-full bg-white/75 backdrop-blur-2xl border border-white/90 shadow-[0_8px_30px_rgba(0,51,101,0.06),inset_0_1px_2px_rgba(255,255,255,0.95)]">
+          <div className="mt-9 inline-flex p-1.5 rounded-full iphone-liquid-glass shadow-[0_12px_36px_rgba(0,51,101,0.1)]">
             <button
               type="button"
               onClick={() => {
@@ -230,7 +276,7 @@ export function FdinSimulator() {
               className={cn(
                 'flex items-center gap-2.5 px-6 py-2.5 rounded-full text-xs md:text-sm font-semibold transition-all duration-300 select-none',
                 archetypeKey === 'student'
-                  ? 'bg-navy text-white shadow-[0_4px_18px_rgba(0,51,101,0.28)] border border-teal/40'
+                  ? 'bg-navy text-white shadow-[0_4px_18px_rgba(0,51,101,0.35)] border border-teal/40'
                   : 'text-steel hover:text-navy hover:bg-white/40',
               )}
             >
@@ -247,7 +293,7 @@ export function FdinSimulator() {
               className={cn(
                 'flex items-center gap-2.5 px-6 py-2.5 rounded-full text-xs md:text-sm font-semibold transition-all duration-300 select-none',
                 archetypeKey === 'professional'
-                  ? 'bg-navy text-white shadow-[0_4px_18px_rgba(0,51,101,0.28)] border border-teal/40'
+                  ? 'bg-navy text-white shadow-[0_4px_18px_rgba(0,51,101,0.35)] border border-teal/40'
                   : 'text-steel hover:text-navy hover:bg-white/40',
               )}
             >
@@ -378,6 +424,8 @@ function IphoneGlassSimulator({ config }: { config: ArchetypeConfig }) {
     .map((p, i) => `${i === 0 ? 'M' : 'L'} ${getX(i)} ${getY(p.simulated)}`)
     .join(' ')
 
+  const areaPath = `${simulatedPath} L ${getX(trajectoryData.length - 1)} ${chartH - pad.b} L ${getX(0)} ${chartH - pad.b} Z`
+
   const criticalY = getY(config.criticalBuffer)
   const activePoint = scrubIndex !== null ? trajectoryData[scrubIndex] : trajectoryData[trajectoryData.length - 1]
   const activeX = scrubIndex !== null ? getX(scrubIndex) : getX(trajectoryData.length - 1)
@@ -387,49 +435,45 @@ function IphoneGlassSimulator({ config }: { config: ArchetypeConfig }) {
       {/* --------------------------------------------------------------- */}
       {/* 1. IPHONE FROSTED TOP STATUS BAR                                */}
       {/* --------------------------------------------------------------- */}
-      <div className="flex flex-wrap items-center justify-between gap-4 p-4 md:px-6 rounded-2xl bg-white/70 backdrop-blur-2xl border border-white/80 shadow-[0_8px_24px_rgba(0,51,101,0.04),inset_0_1px_1px_rgba(255,255,255,0.95)]">
-        <div className="flex items-center gap-3">
-          <div className="size-2.5 rounded-full bg-teal animate-pulse shadow-[0_0_8px_rgba(0,169,158,0.7)]" />
-          <span className="font-mono text-xs uppercase tracking-wider text-navy font-semibold">
-            {config.pillBadge}
-          </span>
-        </div>
-
-        <div className="flex items-center gap-3">
-          {/* Financial IQ Frosted Badge */}
-          <div className="flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-white/80 backdrop-blur-md border border-white/90 text-navy text-xs font-mono font-medium shadow-xs">
-            <Sparkles className="size-3.5 text-teal" />
-            <span>Financial IQ:</span>
-            <span className="font-bold text-teal">{config.financialIQ}</span>
+      <LiquidGlassCard className="p-4 md:px-6 rounded-2xl">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="size-2.5 rounded-full bg-teal animate-pulse shadow-[0_0_10px_rgba(0,169,158,0.85)]" />
+            <span className="font-mono text-xs uppercase tracking-wider text-navy font-semibold">
+              {config.pillBadge}
+            </span>
           </div>
 
-          {/* Liquid Cash Cushion Badge */}
-          <div className="flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-navy/90 text-white text-xs font-mono font-medium shadow-sm border border-teal/30">
-            <span className="text-bright font-normal">Buffer:</span>
-            <span className="font-bold text-white">{inr(config.startingBalance)}</span>
+          <div className="flex items-center gap-3">
+            {/* Financial IQ Frosted Badge */}
+            <div className="flex items-center gap-1.5 px-3.5 py-1 rounded-full iphone-liquid-inset text-navy text-xs font-mono font-medium shadow-xs">
+              <Sparkles className="size-3.5 text-teal" />
+              <span>Financial IQ:</span>
+              <span className="font-bold text-teal">{config.financialIQ}</span>
+            </div>
+
+            {/* Liquid Cash Cushion Badge */}
+            <div className="flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-navy text-white text-xs font-mono font-medium shadow-sm border border-teal/40">
+              <span className="text-bright font-normal">Buffer:</span>
+              <span className="font-bold text-white">{inr(config.startingBalance)}</span>
+            </div>
           </div>
         </div>
-      </div>
+      </LiquidGlassCard>
 
       {/* --------------------------------------------------------------- */}
       {/* 2. MAIN 2-COLUMN GRID (DECISION BUILDER + TRAJECTORY CHART)    */}
       {/* --------------------------------------------------------------- */}
       <div className="grid gap-8 lg:grid-cols-12 items-stretch">
         {/* Left Column: Decision Builder Card (5 cols) */}
-        <div className="lg:col-span-5 relative overflow-hidden rounded-[28px] bg-white/75 backdrop-blur-2xl backdrop-saturate-150 border border-white/90 p-6 md:p-8 shadow-[0_16px_45px_rgba(0,51,101,0.06),inset_0_1px_2px_rgba(255,255,255,1),inset_0_-1px_1px_rgba(0,169,158,0.06)] flex flex-col justify-between">
-          {/* Frosted Specular Sheen */}
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute -right-16 -top-16 size-48 rounded-full bg-gradient-to-br from-white/90 via-mint/15 to-transparent blur-xl"
-          />
-
-          <div className="relative z-10">
+        <LiquidGlassCard className="lg:col-span-5 p-6 md:p-8">
+          <div>
             {/* Card Header */}
             <div className="flex items-center justify-between">
               <span className="text-[11px] font-mono uppercase tracking-[0.2em] text-steel font-semibold">
                 Decision Builder
               </span>
-              <span className="text-[10px] font-mono text-teal bg-white/80 backdrop-blur-md px-3 py-1 rounded-full border border-teal/30 font-semibold shadow-xs">
+              <span className="text-[10px] font-mono text-teal iphone-liquid-inset px-3 py-1 rounded-full font-semibold shadow-xs">
                 Real-Time Simulation
               </span>
             </div>
@@ -443,7 +487,7 @@ function IphoneGlassSimulator({ config }: { config: ArchetypeConfig }) {
                 type="text"
                 value={purchaseName}
                 onChange={(e) => setPurchaseName(e.target.value)}
-                className="mt-2 w-full rounded-2xl border border-white/80 bg-white/60 backdrop-blur-md px-4 py-3 text-sm font-medium text-navy placeholder:text-steel/50 shadow-[inset_0_1px_2px_rgba(0,0,0,0.04)] focus:bg-white/90 focus:border-teal/60 focus:outline-none focus:ring-2 focus:ring-teal/20 transition-all"
+                className="mt-2 w-full iphone-liquid-inset rounded-2xl px-4 py-3 text-sm font-semibold text-navy placeholder:text-steel/50 focus:border-teal/60 focus:outline-none focus:ring-2 focus:ring-teal/20 transition-all"
                 placeholder="e.g. Laptop, Trip, Deposit"
               />
 
@@ -461,8 +505,8 @@ function IphoneGlassSimulator({ config }: { config: ArchetypeConfig }) {
                     className={cn(
                       'rounded-full px-3 py-1 text-[11px] font-mono transition-all duration-200 select-none',
                       purchaseName === pick.name
-                        ? 'bg-teal text-white font-semibold shadow-[0_2px_10px_rgba(0,169,158,0.35)]'
-                        : 'bg-white/60 backdrop-blur-sm text-steel hover:text-navy border border-white/80 hover:bg-white/90',
+                        ? 'bg-teal text-white font-semibold shadow-[0_3px_12px_rgba(0,169,158,0.4)] border border-teal-300/50'
+                        : 'iphone-liquid-inset text-steel hover:text-navy hover:bg-white/60',
                     )}
                   >
                     {pick.name}
@@ -489,7 +533,7 @@ function IphoneGlassSimulator({ config }: { config: ArchetypeConfig }) {
                   min={config.minCost}
                   max={config.maxCost * 1.25}
                   onChange={(e) => setCost(Number(e.target.value))}
-                  className="w-full rounded-2xl border border-white/80 bg-white/60 backdrop-blur-md pl-10 pr-4 py-3 text-2xl font-bold tracking-tight text-navy shadow-[inset_0_1px_2px_rgba(0,0,0,0.04)] focus:bg-white/90 focus:border-teal/60 focus:outline-none focus:ring-2 focus:ring-teal/20 transition-all tabular-nums"
+                  className="w-full iphone-liquid-inset rounded-2xl pl-10 pr-4 py-3 text-2xl font-bold tracking-tight text-navy focus:border-teal/60 focus:outline-none focus:ring-2 focus:ring-teal/20 transition-all tabular-nums"
                 />
               </div>
 
@@ -529,10 +573,8 @@ function IphoneGlassSimulator({ config }: { config: ArchetypeConfig }) {
                       sound.snap('high')
                     }}
                     className={cn(
-                      'rounded-2xl p-3 text-left transition-all duration-200 select-none border',
-                      paymentPlan === plan.id
-                        ? 'border-teal/60 bg-navy/95 text-white shadow-[0_8px_20px_rgba(0,51,101,0.22)]'
-                        : 'border-white/80 bg-white/60 backdrop-blur-md hover:bg-white/90 hover:border-teal/30 text-navy shadow-xs',
+                      'rounded-2xl p-3.5 text-left transition-all duration-200 select-none iphone-glass-tile',
+                      paymentPlan === plan.id && 'iphone-glass-tile-active',
                     )}
                   >
                     <div className="text-xs font-semibold">{plan.label}</div>
@@ -551,7 +593,7 @@ function IphoneGlassSimulator({ config }: { config: ArchetypeConfig }) {
           </div>
 
           {/* Peer Cohort Link */}
-          <div className="relative z-10 mt-6 pt-5 border-t border-navy/10 flex items-center justify-between">
+          <div className="mt-6 pt-5 border-t border-navy/10 flex items-center justify-between">
             <span className="text-xs text-steel">Need behavioral context?</span>
             <button
               type="button"
@@ -559,23 +601,17 @@ function IphoneGlassSimulator({ config }: { config: ArchetypeConfig }) {
                 setShowCohortModal(true)
                 sound.chime()
               }}
-              className="inline-flex items-center gap-1.5 text-xs font-mono font-semibold text-teal hover:text-navy transition-colors select-none"
+              className="inline-flex items-center gap-1.5 text-xs font-mono font-semibold text-teal hover:text-navy transition-colors select-none iphone-liquid-inset px-3 py-1.5 rounded-full"
             >
               <Users className="size-3.5" />
               <span>See Cohort Insights →</span>
             </button>
           </div>
-        </div>
+        </LiquidGlassCard>
 
         {/* Right Column: Financial Trajectory Chart Card (7 cols) */}
-        <div className="lg:col-span-7 relative overflow-hidden rounded-[28px] bg-white/75 backdrop-blur-2xl backdrop-saturate-150 border border-white/90 p-6 md:p-8 shadow-[0_16px_45px_rgba(0,51,101,0.06),inset_0_1px_2px_rgba(255,255,255,1),inset_0_-1px_1px_rgba(0,169,158,0.06)] flex flex-col justify-between">
-          {/* Frosted Specular Sheen */}
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute -right-20 -top-20 size-56 rounded-full bg-gradient-to-br from-white/90 via-teal/10 to-transparent blur-xl"
-          />
-
-          <div className="relative z-10">
+        <LiquidGlassCard className="lg:col-span-7 p-6 md:p-8">
+          <div>
             {/* Card Header & Time Range Switcher */}
             <div className="flex flex-wrap items-center justify-between gap-4">
               <div>
@@ -588,7 +624,7 @@ function IphoneGlassSimulator({ config }: { config: ArchetypeConfig }) {
               </div>
 
               {/* iOS Range Switcher */}
-              <div className="flex rounded-full bg-white/60 backdrop-blur-md p-1 border border-white/80 shadow-xs">
+              <div className="flex rounded-full iphone-liquid-inset p-1 shadow-xs">
                 {(['3M', '6M', '12M'] as const).map((r) => (
                   <button
                     key={r}
@@ -612,7 +648,7 @@ function IphoneGlassSimulator({ config }: { config: ArchetypeConfig }) {
 
             {/* Interactive SVG Glass Chart Canvas */}
             <div
-              className="mt-6 relative w-full h-[270px] select-none rounded-2xl bg-white/40 backdrop-blur-md border border-white/80 p-2 shadow-[inset_0_1px_2px_rgba(255,255,255,0.8)]"
+              className="mt-6 relative w-full h-[270px] select-none rounded-2xl iphone-liquid-inset p-2 shadow-inner"
               onPointerMove={(e) => {
                 const rect = e.currentTarget.getBoundingClientRect()
                 const relX = e.clientX - rect.left
@@ -629,12 +665,20 @@ function IphoneGlassSimulator({ config }: { config: ArchetypeConfig }) {
                     <stop offset="0%" stopColor="#00A99E" />
                     <stop offset="100%" stopColor="#63DCD3" />
                   </linearGradient>
+                  <linearGradient id="sim-area" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#00A99E" stopOpacity="0.28" />
+                    <stop offset="60%" stopColor="#63DCD3" stopOpacity="0.12" />
+                    <stop offset="100%" stopColor="#63DCD3" stopOpacity="0.0" />
+                  </linearGradient>
                 </defs>
 
                 {/* Subtle Grid Guidelines */}
-                <line x1={pad.l} y1={getY(maxVal * 0.25)} x2={chartW - pad.r} y2={getY(maxVal * 0.25)} stroke="#003365" strokeOpacity="0.06" strokeDasharray="3 3" />
-                <line x1={pad.l} y1={getY(maxVal * 0.50)} x2={chartW - pad.r} y2={getY(maxVal * 0.50)} stroke="#003365" strokeOpacity="0.06" strokeDasharray="3 3" />
-                <line x1={pad.l} y1={getY(maxVal * 0.75)} x2={chartW - pad.r} y2={getY(maxVal * 0.75)} stroke="#003365" strokeOpacity="0.06" strokeDasharray="3 3" />
+                <line x1={pad.l} y1={getY(maxVal * 0.25)} x2={chartW - pad.r} y2={getY(maxVal * 0.25)} stroke="#003365" strokeOpacity="0.08" strokeDasharray="3 3" />
+                <line x1={pad.l} y1={getY(maxVal * 0.50)} x2={chartW - pad.r} y2={getY(maxVal * 0.50)} stroke="#003365" strokeOpacity="0.08" strokeDasharray="3 3" />
+                <line x1={pad.l} y1={getY(maxVal * 0.75)} x2={chartW - pad.r} y2={getY(maxVal * 0.75)} stroke="#003365" strokeOpacity="0.08" strokeDasharray="3 3" />
+
+                {/* Liquid Gradient Area Under Simulated Curve */}
+                <path d={areaPath} fill="url(#sim-area)" />
 
                 {/* Critical Safety Buffer Line */}
                 <line
@@ -726,7 +770,7 @@ function IphoneGlassSimulator({ config }: { config: ArchetypeConfig }) {
               </div>
             </div>
           </div>
-        </div>
+        </LiquidGlassCard>
       </div>
 
       {/* --------------------------------------------------------------- */}
@@ -734,20 +778,20 @@ function IphoneGlassSimulator({ config }: { config: ArchetypeConfig }) {
       {/* --------------------------------------------------------------- */}
       <div className="grid gap-8 md:grid-cols-12 items-stretch">
         {/* Goal Collision Matrix (6 cols) */}
-        <div className="md:col-span-6 relative overflow-hidden rounded-[28px] bg-white/75 backdrop-blur-2xl backdrop-saturate-150 border border-white/90 p-6 md:p-8 shadow-[0_16px_45px_rgba(0,51,101,0.06),inset_0_1px_2px_rgba(255,255,255,1),inset_0_-1px_1px_rgba(0,169,158,0.06)] flex flex-col justify-between">
+        <LiquidGlassCard className="md:col-span-6 p-6 md:p-8">
           <div>
             <div className="flex items-center justify-between">
               <h3 className="text-base font-semibold text-navy">
                 Active Goal Impacts & Delays
               </h3>
-              <span className="text-[10px] font-mono uppercase tracking-wider text-steel">
+              <span className="text-[10px] font-mono uppercase tracking-wider text-steel iphone-liquid-inset px-2.5 py-0.5 rounded-full font-semibold">
                 Collision Matrix
               </span>
             </div>
 
             <div className="mt-5 space-y-3.5">
               {/* Primary Savings Goal Impact */}
-              <div className="rounded-2xl border border-white/80 bg-white/60 backdrop-blur-md p-4 shadow-xs">
+              <div className="rounded-2xl iphone-liquid-inset p-4.5 shadow-xs">
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-semibold text-navy">
                     {goalCollisions.travelGoal.title}
@@ -756,8 +800,8 @@ function IphoneGlassSimulator({ config }: { config: ArchetypeConfig }) {
                     className={cn(
                       'rounded-full px-2.5 py-0.5 text-[10px] font-mono font-bold uppercase',
                       goalCollisions.travelGoal.delayedMonths > 0
-                        ? 'bg-amber-500/15 text-amber-800 border border-amber-500/30'
-                        : 'bg-emerald-500/15 text-emerald-800 border border-emerald-500/30',
+                        ? 'bg-amber-500/15 text-amber-900 border border-amber-500/30'
+                        : 'bg-emerald-500/15 text-emerald-900 border border-emerald-500/30',
                     )}
                   >
                     {goalCollisions.travelGoal.delayedMonths > 0
@@ -771,7 +815,7 @@ function IphoneGlassSimulator({ config }: { config: ArchetypeConfig }) {
               </div>
 
               {/* Emergency Reserve Cushion Impact */}
-              <div className="rounded-2xl border border-white/80 bg-white/60 backdrop-blur-md p-4 shadow-xs">
+              <div className="rounded-2xl iphone-liquid-inset p-4.5 shadow-xs">
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-semibold text-navy">
                     {goalCollisions.emergencyReserve.title}
@@ -780,8 +824,8 @@ function IphoneGlassSimulator({ config }: { config: ArchetypeConfig }) {
                     className={cn(
                       'rounded-full px-2.5 py-0.5 text-[10px] font-mono font-bold uppercase',
                       goalCollisions.emergencyReserve.breached
-                        ? 'bg-red-500/15 text-red-800 border border-red-500/30'
-                        : 'bg-emerald-500/15 text-emerald-800 border border-emerald-500/30',
+                        ? 'bg-red-500/15 text-red-900 border border-red-500/30'
+                        : 'bg-emerald-500/15 text-emerald-900 border border-emerald-500/30',
                     )}
                   >
                     {goalCollisions.emergencyReserve.breached ? 'Breaches Threshold' : 'Safe Cushion'}
@@ -795,23 +839,23 @@ function IphoneGlassSimulator({ config }: { config: ArchetypeConfig }) {
               </div>
             </div>
           </div>
-        </div>
+        </LiquidGlassCard>
 
         {/* Alternative Smart Paths (6 cols) */}
-        <div className="md:col-span-6 relative overflow-hidden rounded-[28px] bg-white/75 backdrop-blur-2xl backdrop-saturate-150 border border-white/90 p-6 md:p-8 shadow-[0_16px_45px_rgba(0,51,101,0.06),inset_0_1px_2px_rgba(255,255,255,1),inset_0_-1px_1px_rgba(0,169,158,0.06)] flex flex-col justify-between">
+        <LiquidGlassCard className="md:col-span-6 p-6 md:p-8">
           <div>
             <div className="flex items-center justify-between">
               <h3 className="text-base font-semibold text-navy">
                 Alternative Smart Paths
               </h3>
-              <span className="text-[10px] font-mono uppercase tracking-wider text-steel">
+              <span className="text-[10px] font-mono uppercase tracking-wider text-steel iphone-liquid-inset px-2.5 py-0.5 rounded-full font-semibold">
                 Trade-Off Engine
               </span>
             </div>
 
             <div className="mt-5 grid sm:grid-cols-2 gap-3.5">
               {/* Alternative Path 1: Timing */}
-              <div className="rounded-2xl border border-white/80 bg-white/60 backdrop-blur-md hover:border-teal/50 p-4.5 flex flex-col justify-between transition-all shadow-xs">
+              <div className="rounded-2xl iphone-liquid-inset hover:border-teal/50 p-4.5 flex flex-col justify-between transition-all shadow-xs">
                 <div>
                   <span className="text-[10px] font-mono uppercase tracking-wider text-teal font-semibold">
                     {config.smartPath1.tag}
@@ -819,7 +863,7 @@ function IphoneGlassSimulator({ config }: { config: ArchetypeConfig }) {
                   <h4 className="mt-1.5 text-sm font-semibold text-navy">
                     {config.smartPath1.title}
                   </h4>
-                  <div className="mt-2.5 inline-block rounded-md bg-emerald-500/15 text-emerald-800 border border-emerald-500/30 px-2 py-0.5 text-[10px] font-mono font-semibold">
+                  <div className="mt-2.5 inline-block rounded-md bg-emerald-500/15 text-emerald-900 border border-emerald-500/30 px-2 py-0.5 text-[10px] font-mono font-semibold">
                     {config.smartPath1.badge}
                   </div>
                   <p className="mt-2 text-xs text-steel leading-relaxed">
@@ -832,14 +876,14 @@ function IphoneGlassSimulator({ config }: { config: ArchetypeConfig }) {
                     setPaymentPlan('lockout')
                     sound.snap('high')
                   }}
-                  className="mt-4 w-full rounded-xl bg-navy hover:bg-teal text-white py-2 text-xs font-semibold transition-colors shadow-xs"
+                  className="mt-4 w-full rounded-xl bg-navy hover:bg-teal text-white py-2.5 text-xs font-semibold transition-colors shadow-xs"
                 >
                   {config.smartPath1.buttonText}
                 </button>
               </div>
 
               {/* Alternative Path 2: Tier Spec / Discount */}
-              <div className="rounded-2xl border border-white/80 bg-white/60 backdrop-blur-md hover:border-teal/50 p-4.5 flex flex-col justify-between transition-all shadow-xs">
+              <div className="rounded-2xl iphone-liquid-inset hover:border-teal/50 p-4.5 flex flex-col justify-between transition-all shadow-xs">
                 <div>
                   <span className="text-[10px] font-mono uppercase tracking-wider text-teal font-semibold">
                     {config.smartPath2.tag}
@@ -847,7 +891,7 @@ function IphoneGlassSimulator({ config }: { config: ArchetypeConfig }) {
                   <h4 className="mt-1.5 text-sm font-semibold text-navy">
                     {config.smartPath2.title} ({inr(Math.round(cost * config.smartPath2.discountFactor))})
                   </h4>
-                  <div className="mt-2.5 inline-block rounded-md bg-amber-500/15 text-amber-800 border border-amber-500/30 px-2 py-0.5 text-[10px] font-mono font-semibold">
+                  <div className="mt-2.5 inline-block rounded-md bg-amber-500/15 text-amber-900 border border-amber-500/30 px-2 py-0.5 text-[10px] font-mono font-semibold">
                     {config.smartPath2.badge}
                   </div>
                   <p className="mt-2 text-xs text-steel leading-relaxed">
@@ -860,95 +904,99 @@ function IphoneGlassSimulator({ config }: { config: ArchetypeConfig }) {
                     setCost((prev) => Math.round(prev * config.smartPath2.discountFactor))
                     sound.snap('high')
                   }}
-                  className="mt-4 w-full rounded-xl bg-navy hover:bg-teal text-white py-2 text-xs font-semibold transition-colors shadow-xs"
+                  className="mt-4 w-full rounded-xl bg-navy hover:bg-teal text-white py-2.5 text-xs font-semibold transition-colors shadow-xs"
                 >
                   {config.smartPath2.buttonText}
                 </button>
               </div>
             </div>
           </div>
-        </div>
+        </LiquidGlassCard>
       </div>
 
       {/* --------------------------------------------------------------- */}
       {/* 4. IPHONE FROSTED PEER COHORT MODAL SHEET                      */}
       {/* --------------------------------------------------------------- */}
       {showCohortModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-navy/35 backdrop-blur-md animate-in fade-in duration-200">
-          <div className="relative w-full max-w-lg rounded-[32px] bg-white/85 backdrop-blur-2xl border border-white/90 p-6 md:p-8 shadow-[0_25px_80px_rgba(0,51,101,0.25),inset_0_1px_2px_rgba(255,255,255,1)]">
-            <button
-              type="button"
-              onClick={() => setShowCohortModal(false)}
-              className="absolute top-5 right-5 size-8 rounded-full bg-white/80 hover:bg-white text-navy flex items-center justify-center border border-white/80 transition-colors shadow-xs"
-            >
-              <X className="size-4" />
-            </button>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-navy/40 backdrop-blur-md animate-in fade-in duration-200">
+          <div className="relative w-full max-w-lg rounded-[32px] iphone-liquid-glass p-6 md:p-8 shadow-[0_30px_90px_rgba(0,51,101,0.3)]">
+            <div className="iphone-glass-sheen" />
 
-            <div className="flex items-center gap-2 font-mono text-xs text-teal font-semibold">
-              <Users className="size-4" />
-              <span>{config.cohortTitle}</span>
-            </div>
-
-            <h3 className="mt-2 text-xl font-semibold text-navy">
-              Anonymized Peer Data
-            </h3>
-            <p className="text-xs text-steel mt-0.5">
-              {config.cohortSampleSize}
-            </p>
-
-            {/* Stat Callout Bubble */}
-            <div className="mt-5 rounded-2xl bg-teal/10 border border-teal/25 p-5 backdrop-blur-md">
-              <div className="text-4xl font-bold font-mono text-teal">{config.cohortRiskStat}</div>
-              <p className="mt-2 text-xs text-navy font-medium leading-relaxed">
-                {config.cohortRiskText}
-              </p>
-            </div>
-
-            {/* Outcome Distribution */}
-            <div className="mt-5">
-              <span className="text-xs font-semibold text-navy">Outcome Distribution</span>
-              <div className="mt-2 flex h-3.5 w-full rounded-full overflow-hidden shadow-inner">
-                <div className="w-[26%] bg-emerald-500" title="Met all goals" />
-                <div className="w-[46%] bg-amber-400" title="Delayed non-essential goals" />
-                <div className="w-[28%] bg-red-500" title="Regretted structure timing" />
-              </div>
-
-              <div className="mt-3 grid grid-cols-3 gap-2 text-[10px] font-mono">
-                <div>
-                  <span className="size-2 rounded-full inline-block bg-emerald-500 mr-1" />
-                  <span className="text-navy font-bold">26%</span> Met all goals
-                </div>
-                <div>
-                  <span className="size-2 rounded-full inline-block bg-amber-400 mr-1" />
-                  <span className="text-navy font-bold">46%</span> Delayed goals
-                </div>
-                <div>
-                  <span className="size-2 rounded-full inline-block bg-red-500 mr-1" />
-                  <span className="text-navy font-bold">28%</span> Felt strain
-                </div>
-              </div>
-            </div>
-
-            {/* Modal Actions */}
-            <div className="mt-7 flex gap-3">
-              <button
-                type="button"
-                onClick={() => {
-                  setPaymentPlan('3emi')
-                  setShowCohortModal(false)
-                  sound.snap('high')
-                }}
-                className="flex-1 rounded-xl bg-teal hover:bg-navy text-white py-2.5 text-xs font-semibold transition-colors shadow-sm"
-              >
-                Apply Recommendation (3-Month EMI)
-              </button>
+            <div className="relative z-10">
               <button
                 type="button"
                 onClick={() => setShowCohortModal(false)}
-                className="rounded-xl border border-white/80 bg-white/60 hover:bg-white px-4 py-2.5 text-xs font-medium text-steel hover:text-navy transition-colors shadow-xs"
+                className="absolute top-0 right-0 size-8 rounded-full iphone-liquid-inset hover:bg-white text-navy flex items-center justify-center transition-colors shadow-xs"
               >
-                Close
+                <X className="size-4" />
               </button>
+
+              <div className="flex items-center gap-2 font-mono text-xs text-teal font-semibold">
+                <Users className="size-4" />
+                <span>{config.cohortTitle}</span>
+              </div>
+
+              <h3 className="mt-2 text-xl font-semibold text-navy">
+                Anonymized Peer Data
+              </h3>
+              <p className="text-xs text-steel mt-0.5">
+                {config.cohortSampleSize}
+              </p>
+
+              {/* Stat Callout Bubble */}
+              <div className="mt-5 rounded-2xl iphone-liquid-inset border-teal/30 p-5">
+                <div className="text-4xl font-bold font-mono text-teal">{config.cohortRiskStat}</div>
+                <p className="mt-2 text-xs text-navy font-medium leading-relaxed">
+                  {config.cohortRiskText}
+                </p>
+              </div>
+
+              {/* Outcome Distribution */}
+              <div className="mt-5">
+                <span className="text-xs font-semibold text-navy">Outcome Distribution</span>
+                <div className="mt-2 flex h-3.5 w-full rounded-full overflow-hidden shadow-inner">
+                  <div className="w-[26%] bg-emerald-500" title="Met all goals" />
+                  <div className="w-[46%] bg-amber-400" title="Delayed non-essential goals" />
+                  <div className="w-[28%] bg-red-500" title="Regretted structure timing" />
+                </div>
+
+                <div className="mt-3 grid grid-cols-3 gap-2 text-[10px] font-mono">
+                  <div>
+                    <span className="size-2 rounded-full inline-block bg-emerald-500 mr-1" />
+                    <span className="text-navy font-bold">26%</span> Met all goals
+                  </div>
+                  <div>
+                    <span className="size-2 rounded-full inline-block bg-amber-400 mr-1" />
+                    <span className="text-navy font-bold">46%</span> Delayed goals
+                  </div>
+                  <div>
+                    <span className="size-2 rounded-full inline-block bg-red-500 mr-1" />
+                    <span className="text-navy font-bold">28%</span> Felt strain
+                  </div>
+                </div>
+              </div>
+
+              {/* Modal Actions */}
+              <div className="mt-7 flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setPaymentPlan('3emi')
+                    setShowCohortModal(false)
+                    sound.snap('high')
+                  }}
+                  className="flex-1 rounded-xl bg-teal hover:bg-navy text-white py-2.5 text-xs font-semibold transition-colors shadow-sm"
+                >
+                  Apply Recommendation (3-Month EMI)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowCohortModal(false)}
+                  className="rounded-xl iphone-liquid-inset hover:bg-white px-4 py-2.5 text-xs font-medium text-steel hover:text-navy transition-colors shadow-xs"
+                >
+                  Close
+                </button>
+              </div>
             </div>
           </div>
         </div>
