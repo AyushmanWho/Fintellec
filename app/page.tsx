@@ -15,7 +15,6 @@ import { SiteFooter } from '@/components/fintellec/site-footer'
 import { DigitalCrown } from '@/components/fintellec/digital-crown'
 import { PulseHud } from '@/components/fintellec/pulse-hud'
 import { CircadianProvider } from '@/components/fintellec/circadian-context'
-import { LateNightModal } from '@/components/fintellec/late-night-modal'
 import { AuthProvider, useAuth } from '@/components/fintellec/auth/auth-context'
 import { GoogleSignInModal } from '@/components/fintellec/auth/google-sign-in-modal'
 import { OnboardingModal } from '@/components/fintellec/auth/onboarding-modal'
@@ -57,7 +56,6 @@ function MainContent() {
         <SiteNav />
         <DigitalCrown />
         <PulseHud />
-        <LateNightModal />
         <main className="fintellec-main-bridge">
           <Hero />
           <TextScrub />

@@ -6,7 +6,7 @@ import { Activity, Volume2, VolumeX, ShieldCheck, Heart, X, AlertTriangle, Coffe
 import { useCircadian } from './circadian-context'
 
 export function PulseHud() {
-  const { isNight, savedTonight, setShowLateNightModal } = useCircadian()
+  const { isNight } = useCircadian()
   const [bpm, setBpm] = useState(72)
   const [isSpiking, setIsSpiking] = useState(false)
   const [audioEnabled, setAudioEnabled] = useState(true)
@@ -103,8 +103,8 @@ export function PulseHud() {
               <span className="font-mono font-bold text-teal">0 (#REF! Extinct)</span>
             </div>
             <div className="flex items-center justify-between rounded-xl bg-aqua/50 p-2 border border-mint/60">
-              <span className="text-steel">Late Night Delivery Urge:</span>
-              <span className="font-mono font-bold text-bright">Suppressed (88%)</span>
+              <span className="text-steel">Savings Rate Efficiency:</span>
+              <span className="font-mono font-bold text-teal">96.8% (Target Met)</span>
             </div>
           </div>
 
@@ -173,13 +173,13 @@ export function PulseHud() {
         <span
           className={`hidden rounded-full px-2 py-0.5 font-mono text-[9px] uppercase tracking-wider md:inline-block ${
             isNight
-              ? 'bg-amber-500/20 text-amber-300 font-semibold border border-amber-500/30'
+              ? 'bg-navy/80 text-bright font-semibold border border-teal/40'
               : isSpiking
                 ? 'bg-bright/20 text-navy font-semibold'
                 : 'bg-aqua text-teal'
           }`}
         >
-          {isNight ? `🌙 2 AM Curfew · +₹${savedTonight} Saved` : isSpiking ? 'High Velocity' : 'Vitals Stable'}
+          {isNight ? 'Dark Mode Active' : isSpiking ? 'High Velocity' : 'Vitals Stable'}
         </span>
 
         {/* Sound Quick Toggle */}

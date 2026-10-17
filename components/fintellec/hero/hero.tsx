@@ -146,7 +146,7 @@ export function Hero() {
   const stageRef = useRef<HTMLDivElement>(null)
   const [scene, setScene] = useState<SceneSet | null>(null)
   const [alive] = useState(true)
-  const { isNight, setShowLateNightModal, recordSavings } = useCircadian()
+  const { isNight } = useCircadian()
   const pointerRef = useRef<{ x: number; y: number } | null>(null)
   const ripplesRef = useRef<{ x: number; y: number; time: number }[]>([])
 
@@ -1263,11 +1263,11 @@ export function Hero() {
               data-cinematic-eyebrow
               className={cn(
                 'text-[11px] font-medium uppercase tracking-[0.32em] transition-all duration-700 ease-out',
-                isNight ? 'text-amber-400 font-bold' : 'text-teal',
+                isNight ? 'text-teal font-semibold' : 'text-teal',
                 alive ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0',
               )}
             >
-              {isNight ? '🌙 2 AM WILLPOWER LOCKOUT ACTIVE' : 'Financial clarity, reimagined.'}
+              Financial clarity, reimagined.
             </p>
 
             <h1 className="mt-5 text-[clamp(3rem,8.6vw,7.6rem)] font-medium leading-[0.9] tracking-[-0.045em]">
@@ -1287,13 +1287,12 @@ export function Hero() {
                 <span
                   data-cinematic-secondary
                   className={cn(
-                    'block transition-all duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)]',
-                    isNight ? 'text-amber-400' : 'text-teal',
+                    'block transition-all duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)] text-teal',
                     alive ? 'translate-y-0 opacity-100' : 'translate-y-[115%] opacity-0',
                   )}
                   style={{ transitionDelay: alive ? '280ms' : '0ms' }}
                 >
-                  {isNight ? 'Is under curfew.' : 'In motion.'}
+                  In motion.
                 </span>
               </span>
             </h1>
@@ -1305,9 +1304,7 @@ export function Hero() {
               )}
               style={{ transitionDelay: alive ? '440ms' : '0ms' }}
             >
-              {isNight
-                ? 'Food delivery apps locked behind high-school calculus. You do not need a 4th oversized black hoodie at 2:30 AM. Drink warm water and go to bed.'
-                : 'Understand your spending. Find your rhythm. Make your money work towards what matters.'}
+              Understand your spending. Find your rhythm. Make your money work towards what matters.
             </p>
             <div
               className={cn(
@@ -1316,44 +1313,21 @@ export function Hero() {
               )}
               style={{ transitionDelay: alive ? '580ms' : '0ms' }}
             >
-              {isNight ? (
-                <>
-                  <button
-                    type="button"
-                    onClick={() => recordSavings(540)}
-                    className="group inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-teal via-bright to-teal px-6 py-3.5 text-sm font-bold text-navy shadow-[0_18px_40px_-18px_rgba(0,169,158,0.7)] transition-all hover:scale-102"
-                  >
-                    <BedDouble className="size-4" />
-                    Lock Wallet & Sleep (Save ₹540)
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setShowLateNightModal(true)}
-                    className="group inline-flex items-center gap-2 text-sm font-semibold text-amber-400 underline-offset-4 hover:underline"
-                  >
-                    <ShieldAlert className="size-4" />
-                    Simulate 2 AM Intercept (Swiggy)
-                  </button>
-                </>
-              ) : (
-                <>
-                  <a
-                    href="#how-it-works"
-                    className="group inline-flex items-center gap-2 rounded-full bg-navy px-6 py-3.5 text-sm font-medium text-white shadow-[0_18px_40px_-18px_rgba(0,51,101,0.7)] transition-colors hover:bg-teal"
-                  >
-                    Explore Fintellec
-                    <ArrowUpRight className="size-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" aria-hidden />
-                  </a>
-                  <button
-                    type="button"
-                    onClick={goToFlow}
-                    className="group inline-flex items-center gap-2 text-sm font-medium text-navy underline-offset-4 hover:underline"
-                  >
-                    Discover the experience
-                    <ArrowDown className="size-4 transition-transform group-hover:translate-y-0.5" aria-hidden />
-                  </button>
-                </>
-              )}
+              <a
+                href="#how-it-works"
+                className="group inline-flex items-center gap-2 rounded-full bg-navy px-6 py-3.5 text-sm font-medium text-white shadow-[0_18px_40px_-18px_rgba(0,51,101,0.7)] transition-colors hover:bg-teal"
+              >
+                Explore Fintellec
+                <ArrowUpRight className="size-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" aria-hidden />
+              </a>
+              <button
+                type="button"
+                onClick={goToFlow}
+                className="group inline-flex items-center gap-2 text-sm font-medium text-navy underline-offset-4 hover:underline"
+              >
+                Discover the experience
+                <ArrowDown className="size-4 transition-transform group-hover:translate-y-0.5" aria-hidden />
+              </button>
             </div>
             <p
               className={cn(
