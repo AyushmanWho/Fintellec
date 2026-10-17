@@ -144,14 +144,7 @@ export function TextScrub() {
           </div>
         </h2>
 
-        {/* Scroll indicator prompt */}
-        <div
-          className="mt-12 flex items-center justify-center gap-2 text-xs font-mono text-steel/70 transition-opacity duration-500"
-          style={{ opacity: progress > 0.95 ? 0 : 0.8 }}
-        >
-          <span>Scroll to illuminate</span>
-          <span className="inline-block animate-bounce text-teal">↓</span>
-        </div>
+
 
         {/* Fold Money Style Witty Microcopy Footnote */}
         <div className="mt-8 inline-flex items-center gap-2 rounded-full border border-mint/80 bg-white/70 px-4 py-1.5 shadow-xs backdrop-blur-sm">

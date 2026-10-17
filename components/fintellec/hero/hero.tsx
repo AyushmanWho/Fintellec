@@ -880,19 +880,6 @@ export function Hero() {
             </h1>
           </div>
 
-          {/* Magnetic Flux Induction Field & Caustic Light Pool */}
-          <div
-            ref={magneticFieldRef}
-            className="pointer-events-none absolute left-1/2 top-[68%] z-[2] -translate-x-1/2 -translate-y-1/2 w-[clamp(240px,36vw,440px)] h-[clamp(110px,18vw,190px)] flex items-center justify-center will-change-transform"
-            aria-hidden="true"
-          >
-            <div className="absolute inset-2 rounded-full bg-radial from-teal-400/25 via-cyan-400/10 to-transparent blur-2xl" />
-            <svg className="w-full h-full overflow-visible" viewBox="0 0 240 120">
-              <ellipse cx="120" cy="60" rx="100" ry="34" fill="none" stroke="rgba(99,220,211,0.22)" strokeDasharray="5 5" />
-              <ellipse cx="120" cy="60" rx="72" ry="24" fill="none" stroke="rgba(184,242,236,0.4)" strokeWidth="1.2" />
-              <ellipse cx="120" cy="60" rx="46" ry="15" fill="none" stroke="rgba(99,220,211,0.6)" strokeWidth="1" />
-            </svg>
-          </div>
 
           {/* Dynamic Contact Drop Shadow directly below coin */}
           <div
@@ -943,10 +930,7 @@ export function Hero() {
             ))}
           </div>
 
-          {/* Wallet Scroll Meter */}
-          <div ref={meterRef} className="fintellec-wallet-reveal__scroll-meter" aria-hidden="true">
-            <span>01</span><i /><span>04</span>
-          </div>
+
         </div>
 
         {/* ==================================================== */}
@@ -1403,46 +1387,7 @@ export function Hero() {
           ))}
         </div>
 
-        {/* Scroll progress */}
-        <div
-          ref={progressFooterRef}
-          className="pointer-events-none absolute inset-x-0 bottom-6 z-[4] mx-auto flex max-w-[1440px] items-center gap-5 px-6 md:bottom-8 md:px-12 transition-opacity duration-300"
-          style={{ opacity: 0, visibility: 'hidden' }}
-        >
-          <ol className="flex gap-4 md:gap-6" aria-label="Story progress">
-            {STEPS.map((label, i) => (
-              <li
-                key={label}
-                ref={(el) => { steps.current[i] = el }}
-                data-active={i === 0}
-                className="font-mono text-[10px] uppercase tracking-[0.2em] text-steel/50 transition-colors duration-500 data-[active=true]:text-navy"
-              >
-                <button
-                  type="button"
-                  onClick={() => {
-                    fromTopRef.current = false
-                    snappedRef.current = true
-                    const sec = sectionRef.current
-                    if (!sec) return
-                    const total = sec.offsetHeight - window.innerHeight
-                    const targetP = HERO_START + HERO_SPAN * KEYS[i]
-                    window.scrollTo({
-                      top: sec.offsetTop + total * targetP,
-                      behavior: reduced ? 'auto' : 'smooth',
-                    })
-                  }}
-                  className="pointer-events-auto hover:text-navy cursor-pointer transition-colors"
-                >
-                  <span className="hidden md:inline">{`0${i + 1} `}</span>
-                  {label}
-                </button>
-              </li>
-            ))}
-          </ol>
-          <span className="relative hidden h-px flex-1 overflow-hidden bg-navy/10 md:block">
-            <span ref={progressBar} className="absolute inset-0 origin-left scale-x-0 bg-teal" />
-          </span>
-        </div>
+
       </div>
     </section>
   )
