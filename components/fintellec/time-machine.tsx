@@ -79,7 +79,11 @@ export function TimeMachine() {
     <section
       id="time-machine"
       aria-labelledby="time-machine-title"
-      className="relative scroll-mt-24 overflow-hidden bg-gradient-to-b from-white via-aqua/60 to-white py-24 md:py-36"
+      className="relative scroll-mt-24 overflow-hidden py-24 md:py-36"
+      style={{
+        background:
+          'radial-gradient(75% 55% at 50% 30%, rgba(99, 220, 211, 0.22) 0%, transparent 70%), linear-gradient(180deg, #EAF8F5 0%, #F6FCFA 50%, #E4F7F3 100%)',
+      }}
     >
       {/* Background ambient lighting */}
       <div

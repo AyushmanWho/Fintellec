@@ -137,7 +137,14 @@ export function Insights() {
   const [hover, setHover] = useState<number | null>(null)
 
   return (
-    <section aria-labelledby="insights-title" className="relative overflow-hidden bg-gradient-to-b from-white to-aqua py-24 md:py-36">
+    <section
+      aria-labelledby="insights-title"
+      className="relative overflow-hidden py-24 md:py-36"
+      style={{
+        background:
+          'radial-gradient(70% 50% at 20% 30%, rgba(99, 220, 211, 0.24) 0%, transparent 70%), linear-gradient(180deg, #E8F7F4 0%, #F5FCFA 50%, #E5F7F4 100%)',
+      }}
+    >
       <div className="mx-auto max-w-[1400px] px-6 md:px-12">
         <div className="grid gap-8 md:grid-cols-12 md:items-end">
           <h2

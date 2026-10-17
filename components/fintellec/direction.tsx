@@ -185,7 +185,15 @@ export function Direction() {
   )
 
   return (
-    <section id="how-it-works" aria-labelledby="direction-title" className="relative scroll-mt-24 bg-white pb-24 pt-24 md:pt-36">
+    <section
+      id="how-it-works"
+      aria-labelledby="direction-title"
+      className="relative scroll-mt-24 pb-24 pt-24 md:pt-36"
+      style={{
+        background:
+          'radial-gradient(65% 50% at 50% 0%, rgba(184, 242, 236, 0.32) 0%, transparent 65%), radial-gradient(60% 50% at 85% 60%, rgba(99, 220, 211, 0.18) 0%, transparent 70%), linear-gradient(180deg, #FFFFFF 0%, #F2FBF9 50%, #E8F7F4 100%)',
+      }}
+    >
       <div className="mx-auto max-w-[1400px] px-6 md:px-12">
         <div className="grid gap-8 md:grid-cols-12">
           <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-teal md:col-span-3 md:pt-4">How it works</p>

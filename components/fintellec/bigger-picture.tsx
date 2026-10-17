@@ -92,7 +92,11 @@ export function BiggerPicture() {
     <section
       id="money-insights"
       aria-labelledby="bigger-picture-title"
-      className="relative scroll-mt-24 overflow-hidden bg-gradient-to-b from-aqua via-white to-white pb-28 pt-10 md:pb-40"
+      className="relative scroll-mt-24 overflow-hidden pb-28 pt-10 md:pb-40"
+      style={{
+        background:
+          'radial-gradient(70% 50% at 80% 25%, rgba(184, 242, 236, 0.38) 0%, transparent 65%), linear-gradient(180deg, #FFFFFF 0%, #F4FCFA 50%, #FFFFFF 100%)',
+      }}
     >
       <RibbonDivider
         className="h-28 w-full md:h-40"

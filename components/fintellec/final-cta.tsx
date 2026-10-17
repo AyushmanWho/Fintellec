@@ -48,7 +48,11 @@ export function FinalCta() {
     <section
       ref={ref}
       aria-labelledby="cta-title"
-      className="relative overflow-hidden bg-gradient-to-b from-aqua via-[#D4F6F1] to-mint"
+      className="relative overflow-hidden"
+      style={{
+        background:
+          'radial-gradient(90% 70% at 50% 0%, rgba(255, 255, 255, 0.6) 0%, transparent 70%), radial-gradient(60% 50% at 80% 80%, rgba(99, 220, 211, 0.25) 0%, transparent 70%), linear-gradient(180deg, #E4F7F3 0%, #C4ECE5 50%, #AEE6DC 100%)',
+      }}
     >
       <svg
         aria-hidden

@@ -111,7 +111,15 @@ export function Savings() {
   const monthsToGoal = amount > 0 ? Math.ceil((goal.target - goal.saved) / amount) : null
 
   return (
-    <section id="savings" aria-labelledby="savings-title" className="relative scroll-mt-24 overflow-hidden bg-aqua py-24 md:py-36">
+    <section
+      id="savings"
+      aria-labelledby="savings-title"
+      className="relative scroll-mt-24 overflow-hidden py-24 md:py-36"
+      style={{
+        background:
+          'radial-gradient(80% 60% at 50% 50%, rgba(99, 220, 211, 0.28) 0%, transparent 72%), radial-gradient(50% 40% at 85% 20%, rgba(184, 242, 236, 0.4) 0%, transparent 70%), linear-gradient(180deg, #E8F7F4 0%, #D8F4EF 50%, #EAF8F5 100%)',
+      }}
+    >
       <div
         aria-hidden
         className="pointer-events-none absolute -left-40 top-1/3 size-[640px] rounded-full bg-[radial-gradient(circle,rgba(101,222,210,0.28),transparent_65%)]"

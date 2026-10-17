@@ -49,7 +49,11 @@ export function FdinSimulator() {
     <section
       id="simulator"
       aria-labelledby="simulator-title"
-      className="relative py-24 md:py-36 bg-gradient-to-b from-white via-aqua to-white overflow-hidden scroll-mt-20"
+      className="relative py-24 md:py-36 overflow-hidden scroll-mt-20"
+      style={{
+        background:
+          'radial-gradient(75% 55% at 15% 30%, rgba(99, 220, 211, 0.22) 0%, transparent 70%), radial-gradient(80% 60% at 85% 70%, rgba(0, 169, 158, 0.14) 0%, transparent 70%), linear-gradient(180deg, #FFFFFF 0%, #E9F8F5 50%, #FFFFFF 100%)',
+      }}
     >
       {/* Background Soft Glows */}
       <div

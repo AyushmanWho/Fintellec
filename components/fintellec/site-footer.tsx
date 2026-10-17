@@ -13,7 +13,12 @@ const LINKS = [
 
 export function SiteFooter() {
   return (
-    <footer className="bg-mint/80 border-t border-navy/10">
+    <footer
+      className="border-t border-navy/10"
+      style={{
+        background: 'linear-gradient(180deg, #AEE6DC 0%, #B8F2EC 30%, #A0DDD4 100%)',
+      }}
+    >
       <div className="mx-auto max-w-[1400px] px-6 py-12 md:px-12">
         <div className="flex flex-col gap-8 md:flex-row md:items-center md:justify-between">
           <a href="#top" aria-label="Back to top" className="w-fit rounded-full">

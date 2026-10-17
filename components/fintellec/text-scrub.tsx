@@ -88,7 +88,11 @@ export function TextScrub() {
     <section
       id="philosophy"
       ref={containerRef}
-      className="relative py-28 md:py-48 px-6 md:px-12 bg-gradient-to-b from-white via-aqua/40 to-white overflow-hidden scroll-mt-20"
+      className="relative py-28 md:py-48 px-6 md:px-12 overflow-hidden scroll-mt-20"
+      style={{
+        background:
+          'radial-gradient(70% 50% at 50% 15%, rgba(99, 220, 211, 0.28) 0%, transparent 68%), radial-gradient(55% 45% at 85% 70%, rgba(184, 242, 236, 0.35) 0%, transparent 70%), linear-gradient(180deg, #FFFFFF 0%, #F0FAF9 45%, #FFFFFF 100%)',
+      }}
       aria-label="Fintellec philosophy"
     >
       {/* Background ambient Apple glow */}
