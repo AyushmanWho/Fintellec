@@ -1,48 +1,187 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import {
-  TrendingUp,
-  AlertTriangle,
-  CheckCircle2,
-  Calendar,
-  Layers,
-  ArrowRight,
+  GraduationCap,
+  Briefcase,
   Sparkles,
   Users,
   X,
   CreditCard,
-  Briefcase,
-  Clock,
-  Gauge,
-  HelpCircle,
-  DollarSign,
-  Flame,
-  ShieldAlert
+  CheckCircle2,
+  AlertTriangle,
+  ArrowRight,
+  ShieldCheck,
+  TrendingUp,
 } from 'lucide-react'
 import { inr } from '@/lib/format'
 import { cn } from '@/lib/utils'
 import { sound } from '@/lib/sound'
 
-// ==========================================
-// COLOR PALETTE CONSTANTS (FROM OFFICIAL PALETTE)
-// ==========================================
-const COLORS = {
-  navy: '#003365', // Primary Text
-  freshMint: '#63DCD3', // Primary Brand
-  deepTeal: '#00A99E', // Secondary Brand
-  softMint: '#B8F2EC', // Light Accent
-  iceMint: '#EFFAFA', // Main Background
-  white: '#FFFFFF', // White Surface
-  mutedNavy: '#52728A', // Secondary Text
-  paleMint: '#D5EFEC', // Border
-  dangerRed: '#EF4444', // Danger Line & Breaches
-  warningAmber: '#F59E0B', // Caution
-  successGreen: '#10B981', // On-Track
+// =========================================================================
+// ARCHETYPE CONFIGURATIONS (STUDENT vs YOUNG PROFESSIONAL)
+// =========================================================================
+type ArchetypeKey = 'student' | 'professional'
+
+interface ArchetypeConfig {
+  id: ArchetypeKey
+  name: string
+  subtitle: string
+  pillBadge: string
+  financialIQ: number
+  startingBalance: number
+  monthlyInflow: number
+  monthlyInflowLabel: string
+  monthlyFixed: number
+  monthlyFixedLabel: string
+  criticalBuffer: number
+  criticalBufferLabel: string
+  minCost: number
+  maxCost: number
+  stepCost: number
+  defaultPurchase: string
+  defaultCost: number
+  defaultPlan: 'upfront' | '3emi' | '6emi' | 'lockout'
+  quickPicks: Array<{ name: string; cost: number }>
+  primaryGoal: {
+    title: string
+    targetMonthly: number
+    reducedMonthly: number
+  }
+  emergencyReserveName: string
+  cohortTitle: string
+  cohortSampleSize: string
+  cohortRiskStat: string
+  cohortRiskText: string
+  smartPath1: {
+    tag: string
+    title: string
+    badge: string
+    desc: string
+    buttonText: string
+  }
+  smartPath2: {
+    tag: string
+    title: string
+    badge: string
+    desc: string
+    buttonText: string
+    discountFactor: number
+  }
+}
+
+const ARCHETYPES: Record<ArchetypeKey, ArchetypeConfig> = {
+  student: {
+    id: 'student',
+    name: 'Student',
+    subtitle: 'Allowance, side-gigs, hostel living & semester goals',
+    pillBadge: 'Student Workspace · Campus Life',
+    financialIQ: 680,
+    startingBalance: 24000,
+    monthlyInflow: 28000,
+    monthlyInflowLabel: 'Allowance & Stipend',
+    monthlyFixed: 14000,
+    monthlyFixedLabel: 'Hostel, Dining & Subscriptions',
+    criticalBuffer: 5000,
+    criticalBufferLabel: 'Hostel Safety Cushion',
+    minCost: 5000,
+    maxCost: 120000,
+    stepCost: 1000,
+    defaultPurchase: 'Gaming Laptop',
+    defaultCost: 65000,
+    defaultPlan: '6emi',
+    quickPicks: [
+      { name: 'Gaming Laptop', cost: 65000 },
+      { name: 'Goa Trip', cost: 22000 },
+      { name: 'Smart Watch', cost: 18000 },
+      { name: 'Phone Upgrade', cost: 54000 },
+      { name: 'Gym Membership', cost: 12000 },
+      { name: 'Used Commuter Bike', cost: 36000 },
+    ],
+    primaryGoal: {
+      title: 'Goa Trip Fund (Target: Nov 2026)',
+      targetMonthly: 3000,
+      reducedMonthly: 1200,
+    },
+    emergencyReserveName: 'Hostel Cushion Reserve (₹5,000)',
+    cohortTitle: 'Student Behavioral Insights',
+    cohortSampleSize: '1,420 campus interns & students',
+    cohortRiskStat: '64%',
+    cohortRiskText: 'of students in your allowance bracket choosing 6-month EMIs reported noticeable financial crunch before semester end.',
+    smartPath1: {
+      tag: 'Path 01 · Timing',
+      title: 'Delay Purchase by 45 Days',
+      badge: '0 Goal Delays Induced',
+      desc: 'Allows allowance cushion to compound enough to avoid breaching the critical ₹5,000 buffer.',
+      buttonText: 'Simulate 45-Day Delay',
+    },
+    smartPath2: {
+      tag: 'Path 02 · Student Discount',
+      title: 'Opt for Student Discount / Tier-2',
+      badge: 'Goa Trip Delayed 10 Days Only',
+      desc: 'Saves 25% upfront cost while preserving 90% of core performance specs.',
+      buttonText: 'Apply 25% Student Discount',
+      discountFactor: 0.75,
+    },
+  },
+  professional: {
+    id: 'professional',
+    name: 'Young Professional',
+    subtitle: 'Salaried career, rent deposits, lifestyle upgrades & investments',
+    pillBadge: 'Career Workspace · Young Professional',
+    financialIQ: 740,
+    startingBalance: 120000,
+    monthlyInflow: 85000,
+    monthlyInflowLabel: 'Monthly In-Hand Salary',
+    monthlyFixed: 38000,
+    monthlyFixedLabel: 'Rent, EMIs, Utilities & Living',
+    criticalBuffer: 30000,
+    criticalBufferLabel: '6-Month Emergency Runway',
+    minCost: 15000,
+    maxCost: 350000,
+    stepCost: 5000,
+    defaultPurchase: 'MacBook Pro M3 Max',
+    defaultCost: 145000,
+    defaultPlan: '6emi',
+    quickPicks: [
+      { name: 'MacBook Pro M3 Max', cost: 145000 },
+      { name: 'Europe Vacation', cost: 180000 },
+      { name: 'Rental Security Deposit', cost: 95000 },
+      { name: 'EV Scooter / Bike', cost: 125000 },
+      { name: 'Home Office Ergonomics', cost: 42000 },
+      { name: 'Health Insurance Premium', cost: 24000 },
+    ],
+    primaryGoal: {
+      title: 'First Home Equity Fund (Target: 2028)',
+      targetMonthly: 20000,
+      reducedMonthly: 8500,
+    },
+    emergencyReserveName: 'Emergency Living Runway (₹30,000)',
+    cohortTitle: 'Professional Peer Insights',
+    cohortSampleSize: '2,840 early-career tech & finance professionals',
+    cohortRiskStat: '58%',
+    cohortRiskText: 'of early-career professionals locking ₹1.4L+ on 6-month EMIs delayed their emergency savings targets by over 4 months.',
+    smartPath1: {
+      tag: 'Path 01 · Bonus Timing',
+      title: 'Fund 60% from Quarterly Bonus',
+      badge: '0 Runway Dip Induced',
+      desc: 'Locks purchase until performance bonus arrives, keeping monthly salary buffer completely untouched.',
+      buttonText: 'Simulate Bonus Timing',
+    },
+    smartPath2: {
+      tag: 'Path 02 · Smart Refurbished',
+      title: 'Opt for Certified Refurbished Model',
+      badge: 'Equity Goal Delayed 12 Days Only',
+      desc: 'Saves 25% upfront capital with full Apple warranty, preventing runway compromise.',
+      buttonText: 'Apply 25% Refurbished Cost',
+      discountFactor: 0.75,
+    },
+  },
 }
 
 export function FdinSimulator() {
-  const [archetype, setArchetype] = useState<'student' | 'proprietor'>('student')
+  const [archetypeKey, setArchetypeKey] = useState<ArchetypeKey>('student')
+  const config = ARCHETYPES[archetypeKey]
 
   return (
     <section
@@ -54,10 +193,14 @@ export function FdinSimulator() {
           'radial-gradient(75% 55% at 15% 30%, rgba(99, 220, 211, 0.22) 0%, transparent 70%), radial-gradient(80% 60% at 85% 70%, rgba(0, 169, 158, 0.14) 0%, transparent 70%), linear-gradient(180deg, #FFFFFF 0%, #E9F8F5 50%, #FFFFFF 100%)',
       }}
     >
-      {/* Background Soft Glows */}
+      {/* Background Soft Ambient Light Spheres */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute left-1/2 top-10 -translate-x-1/2 w-[900px] aspect-square rounded-full bg-[radial-gradient(circle,rgba(99,220,211,0.18),transparent_70%)] blur-3xl"
+        className="pointer-events-none absolute left-1/2 top-10 -translate-x-1/2 w-[950px] aspect-square rounded-full bg-[radial-gradient(circle,rgba(99,220,211,0.22),transparent_70%)] blur-3xl"
+      />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -right-40 top-1/2 w-[600px] aspect-square rounded-full bg-[radial-gradient(circle,rgba(184,242,236,0.45),transparent_65%)] blur-3xl"
       />
 
       <div className="relative mx-auto max-w-[1400px] px-6 md:px-12">
@@ -68,54 +211,55 @@ export function FdinSimulator() {
             className="text-balance text-[clamp(2.4rem,5.2vw,4.5rem)] font-medium leading-[0.96] tracking-[-0.04em] text-navy"
           >
             Real-time consequences.{' '}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal to-bright">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal via-bright to-teal">
               Zero judgment.
             </span>
           </h2>
           <p className="mt-4 text-steel text-sm md:text-base max-w-xl mx-auto leading-relaxed">
-            Every decision triggers an instant ripple across your future. Simulate discretionary purchases or business overhead before locking in.
+            Every decision triggers an instant ripple across your future. Simulate major purchases, EMIs, or lifestyle shifts before locking in.
           </p>
 
-          {/* Archetype Segmented Switcher */}
-          <div className="mt-10 inline-flex p-1.5 rounded-full bg-white border border-mint shadow-md">
+          {/* Apple Dynamic Island Style Segmented Control */}
+          <div className="mt-9 inline-flex p-1.5 rounded-full bg-white/75 backdrop-blur-2xl border border-white/90 shadow-[0_8px_30px_rgba(0,51,101,0.06),inset_0_1px_2px_rgba(255,255,255,0.95)]">
             <button
               type="button"
               onClick={() => {
-                setArchetype('student')
+                setArchetypeKey('student')
                 sound.snap('high')
               }}
               className={cn(
-                'flex items-center gap-2.5 px-6 py-2.5 rounded-full text-xs md:text-sm font-medium transition-all duration-300',
-                archetype === 'student'
-                  ? 'bg-navy text-white shadow-md'
-                  : 'text-steel hover:text-navy',
+                'flex items-center gap-2.5 px-6 py-2.5 rounded-full text-xs md:text-sm font-semibold transition-all duration-300 select-none',
+                archetypeKey === 'student'
+                  ? 'bg-navy text-white shadow-[0_4px_18px_rgba(0,51,101,0.28)] border border-teal/40'
+                  : 'text-steel hover:text-navy hover:bg-white/40',
               )}
             >
-              <CreditCard className="size-4" />
-              Student & Young Professional
+              <GraduationCap className={cn('size-4 transition-colors', archetypeKey === 'student' ? 'text-bright' : 'text-teal')} />
+              <span>Student</span>
             </button>
+
             <button
               type="button"
               onClick={() => {
-                setArchetype('proprietor')
+                setArchetypeKey('professional')
                 sound.snap('high')
               }}
               className={cn(
-                'flex items-center gap-2.5 px-6 py-2.5 rounded-full text-xs md:text-sm font-medium transition-all duration-300',
-                archetype === 'proprietor'
-                  ? 'bg-navy text-white shadow-md'
-                  : 'text-steel hover:text-navy',
+                'flex items-center gap-2.5 px-6 py-2.5 rounded-full text-xs md:text-sm font-semibold transition-all duration-300 select-none',
+                archetypeKey === 'professional'
+                  ? 'bg-navy text-white shadow-[0_4px_18px_rgba(0,51,101,0.28)] border border-teal/40'
+                  : 'text-steel hover:text-navy hover:bg-white/40',
               )}
             >
-              <Briefcase className="size-4" />
-              Sole Proprietor & Agency
+              <Briefcase className={cn('size-4 transition-colors', archetypeKey === 'professional' ? 'text-bright' : 'text-teal')} />
+              <span>Young Professional</span>
             </button>
           </div>
         </div>
 
-        {/* Dynamic Surface Render based on Archetype */}
-        <div className="mt-14">
-          {archetype === 'student' ? <StudentSimulator /> : <SoleProprietorSimulator />}
+        {/* Dynamic iPhone Glassmorphism Simulator */}
+        <div className="mt-12">
+          <IphoneGlassSimulator key={config.id} config={config} />
         </div>
       </div>
     </section>
@@ -123,38 +267,39 @@ export function FdinSimulator() {
 }
 
 // =========================================================================
-// PART B1: STUDENT EXPERIENCE — DECISION & TRAJECTORY SIMULATOR (STU-01)
+// IPHONE GLASSMORPHISM SIMULATOR ENGINE (UNIFIED & INTERACTIVE)
 // =========================================================================
-function StudentSimulator() {
-  const [purchaseName, setPurchaseName] = useState('Gaming Laptop')
-  const [cost, setCost] = useState(65000)
-  const [paymentPlan, setPaymentPlan] = useState<'upfront' | '3emi' | '6emi' | 'lockout'>('6emi')
+function IphoneGlassSimulator({ config }: { config: ArchetypeConfig }) {
+  const [purchaseName, setPurchaseName] = useState(config.defaultPurchase)
+  const [cost, setCost] = useState(config.defaultCost)
+  const [paymentPlan, setPaymentPlan] = useState<'upfront' | '3emi' | '6emi' | 'lockout'>(config.defaultPlan)
   const [timeRange, setTimeRange] = useState<'3M' | '6M' | '12M'>('12M')
   const [scrubIndex, setScrubIndex] = useState<number | null>(null)
   const [showCohortModal, setShowCohortModal] = useState(false)
 
-  const quickPicks = ['Gaming Laptop', 'Goa Trip', 'Smart Watch', 'Phone Upgrade', 'Gym Membership']
-
-  // Monthly base income & fixed expense defaults for Student archetype
-  const monthlyAllowance = 28000
-  const monthlyFixed = 14000
-  const criticalBuffer = 5000
-  const startingBalance = 24000
+  // Reset local state when archetype flips
+  useEffect(() => {
+    setPurchaseName(config.defaultPurchase)
+    setCost(config.defaultCost)
+    setPaymentPlan(config.defaultPlan)
+    setScrubIndex(null)
+  }, [config])
 
   // Trajectory Simulation Calculation
   const trajectoryData = useMemo(() => {
     const monthsCount = timeRange === '3M' ? 3 : timeRange === '6M' ? 6 : 12
-    const months = ['Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep'].slice(0, monthsCount)
+    const allMonths = ['Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep']
+    const months = allMonths.slice(0, monthsCount)
 
-    let currentBase = startingBalance
-    let currentSim = startingBalance
+    let currentBase = config.startingBalance
+    let currentSim = config.startingBalance
 
-    const points = months.map((month, idx) => {
-      // Baseline: allowance - fixed savings rate
-      const netMonthly = monthlyAllowance - monthlyFixed
+    return months.map((month, idx) => {
+      // Baseline net monthly savings
+      const netMonthly = config.monthlyInflow - config.monthlyFixed
       currentBase += netMonthly
 
-      // Deductions based on chosen payment structure
+      // Deductions based on chosen plan
       let deduction = 0
       if (paymentPlan === 'upfront') {
         if (idx === 0) deduction = cost
@@ -163,13 +308,12 @@ function StudentSimulator() {
       } else if (paymentPlan === '6emi') {
         if (idx < 6) deduction = Math.round(cost / 6)
       } else if (paymentPlan === 'lockout') {
-        // Locked from spending until saved
+        // Disciplined pre-lockout: split over 4 months, zero ongoing debt
         if (idx < 4) deduction = Math.round(cost / 4)
       }
 
       currentSim += netMonthly - deduction
-
-      const isBreach = currentSim < criticalBuffer
+      const isBreach = currentSim < config.criticalBuffer
 
       return {
         month,
@@ -179,36 +323,35 @@ function StudentSimulator() {
         isBreach,
       }
     })
+  }, [cost, paymentPlan, timeRange, config])
 
-    return points
-  }, [cost, paymentPlan, timeRange])
-
-  // Multi-Goal Collisions computed
+  // Multi-Goal Collisions Calculation
   const goalCollisions = useMemo(() => {
-    const isEmiStrain = paymentPlan === '6emi' && cost >= 50000
-    const delayMonths = isEmiStrain ? 2.5 : cost > 30000 ? 1.2 : 0
+    const isEmiStrain = paymentPlan === '6emi' && cost >= (config.id === 'student' ? 50000 : 120000)
+    const delayMonths = isEmiStrain ? 2.5 : cost > (config.id === 'student' ? 30000 : 75000) ? 1.2 : 0
     const cushionBreach = trajectoryData.some((p) => p.isBreach)
+    const lowestBalance = Math.min(...trajectoryData.map((d) => d.simulated))
 
     return {
       travelGoal: {
-        title: 'Goa Trip Fund (Target: Nov 2026)',
+        title: config.primaryGoal.title,
         delayedMonths: delayMonths,
-        monthlyReduction: isEmiStrain ? '₹3,000 → ₹1,200' : '₹3,000 → ₹2,400',
-        impactType: delayMonths > 2 ? 'caution' : delayMonths > 0 ? 'mild' : 'optimal',
+        monthlyReduction: isEmiStrain
+          ? `${inr(config.primaryGoal.targetMonthly)} → ${inr(config.primaryGoal.reducedMonthly)}`
+          : `${inr(config.primaryGoal.targetMonthly)} → ${inr(Math.round(config.primaryGoal.targetMonthly * 0.8))}`,
       },
       emergencyReserve: {
-        title: 'Minimum Cushion Reserve (₹5,000)',
+        title: config.emergencyReserveName,
         breached: cushionBreach,
-        lowestBalance: Math.min(...trajectoryData.map((d) => d.simulated)),
-        impactType: cushionBreach ? 'breach' : 'optimal',
+        lowestBalance,
       },
     }
-  }, [cost, paymentPlan, trajectoryData])
+  }, [cost, paymentPlan, trajectoryData, config])
 
-  // Chart coordinate math
+  // Chart Coordinate Math
   const maxVal = Math.max(
     ...trajectoryData.map((d) => Math.max(d.baseline, d.simulated)),
-    70000,
+    config.startingBalance * 1.8,
   )
   const minVal = Math.min(
     ...trajectoryData.map((d) => Math.min(d.baseline, d.simulated)),
@@ -218,7 +361,7 @@ function StudentSimulator() {
 
   const chartW = 760
   const chartH = 260
-  const pad = { t: 20, b: 35, l: 50, r: 25 }
+  const pad = { t: 20, b: 35, l: 55, r: 25 }
 
   const getY = (val: number) => {
     return chartH - pad.b - ((val - minVal) / range) * (chartH - pad.t - pad.b)
@@ -235,44 +378,58 @@ function StudentSimulator() {
     .map((p, i) => `${i === 0 ? 'M' : 'L'} ${getX(i)} ${getY(p.simulated)}`)
     .join(' ')
 
-  const criticalY = getY(criticalBuffer)
-
+  const criticalY = getY(config.criticalBuffer)
   const activePoint = scrubIndex !== null ? trajectoryData[scrubIndex] : trajectoryData[trajectoryData.length - 1]
   const activeX = scrubIndex !== null ? getX(scrubIndex) : getX(trajectoryData.length - 1)
 
   return (
     <div className="space-y-8">
-      {/* Top Header / Workspace Info */}
-      <div className="flex flex-wrap items-center justify-between gap-4 p-4 rounded-2xl bg-white border border-mint/70 shadow-sm">
+      {/* --------------------------------------------------------------- */}
+      {/* 1. IPHONE FROSTED TOP STATUS BAR                                */}
+      {/* --------------------------------------------------------------- */}
+      <div className="flex flex-wrap items-center justify-between gap-4 p-4 md:px-6 rounded-2xl bg-white/70 backdrop-blur-2xl border border-white/80 shadow-[0_8px_24px_rgba(0,51,101,0.04),inset_0_1px_1px_rgba(255,255,255,0.95)]">
         <div className="flex items-center gap-3">
-          <div className="size-2.5 rounded-full bg-teal animate-pulse" />
-          <span className="font-mono text-xs uppercase tracking-wider text-steel font-medium">
-            Personal Workspace · Student Archetype
+          <div className="size-2.5 rounded-full bg-teal animate-pulse shadow-[0_0_8px_rgba(0,169,158,0.7)]" />
+          <span className="font-mono text-xs uppercase tracking-wider text-navy font-semibold">
+            {config.pillBadge}
           </span>
         </div>
+
         <div className="flex items-center gap-3">
-          {/* Financial IQ Chip */}
-          <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-aqua border border-mint text-navy text-xs font-mono font-medium">
+          {/* Financial IQ Frosted Badge */}
+          <div className="flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-white/80 backdrop-blur-md border border-white/90 text-navy text-xs font-mono font-medium shadow-xs">
             <Sparkles className="size-3.5 text-teal" />
-            Financial IQ: <span className="font-bold text-teal">680</span>
+            <span>Financial IQ:</span>
+            <span className="font-bold text-teal">{config.financialIQ}</span>
           </div>
-          {/* Liquid Cash Badge */}
-          <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-mint text-navy text-xs font-mono font-medium shadow-sm">
-            Buffer: <span className="text-teal font-bold">{inr(startingBalance)}</span>
+
+          {/* Liquid Cash Cushion Badge */}
+          <div className="flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-navy/90 text-white text-xs font-mono font-medium shadow-sm border border-teal/30">
+            <span className="text-bright font-normal">Buffer:</span>
+            <span className="font-bold text-white">{inr(config.startingBalance)}</span>
           </div>
         </div>
       </div>
 
-      {/* Grid: Decision Builder (Input) + Visualizer Chart */}
-      <div className="grid gap-8 lg:grid-cols-12">
-        {/* Input Card: Decision Builder (5 cols) */}
-        <div className="lg:col-span-5 rounded-3xl bg-white border border-mint/80 p-6 md:p-8 shadow-sm flex flex-col justify-between">
-          <div>
+      {/* --------------------------------------------------------------- */}
+      {/* 2. MAIN 2-COLUMN GRID (DECISION BUILDER + TRAJECTORY CHART)    */}
+      {/* --------------------------------------------------------------- */}
+      <div className="grid gap-8 lg:grid-cols-12 items-stretch">
+        {/* Left Column: Decision Builder Card (5 cols) */}
+        <div className="lg:col-span-5 relative overflow-hidden rounded-[28px] bg-white/75 backdrop-blur-2xl backdrop-saturate-150 border border-white/90 p-6 md:p-8 shadow-[0_16px_45px_rgba(0,51,101,0.06),inset_0_1px_2px_rgba(255,255,255,1),inset_0_-1px_1px_rgba(0,169,158,0.06)] flex flex-col justify-between">
+          {/* Frosted Specular Sheen */}
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute -right-16 -top-16 size-48 rounded-full bg-gradient-to-br from-white/90 via-mint/15 to-transparent blur-xl"
+          />
+
+          <div className="relative z-10">
+            {/* Card Header */}
             <div className="flex items-center justify-between">
               <span className="text-[11px] font-mono uppercase tracking-[0.2em] text-steel font-semibold">
                 Decision Builder
               </span>
-              <span className="text-[10px] font-mono text-teal bg-aqua px-2.5 py-0.5 rounded-full border border-mint">
+              <span className="text-[10px] font-mono text-teal bg-white/80 backdrop-blur-md px-3 py-1 rounded-full border border-teal/30 font-semibold shadow-xs">
                 Real-Time Simulation
               </span>
             </div>
@@ -286,38 +443,35 @@ function StudentSimulator() {
                 type="text"
                 value={purchaseName}
                 onChange={(e) => setPurchaseName(e.target.value)}
-                className="mt-2 w-full rounded-xl border border-mint bg-aqua/40 px-4 py-2.5 text-sm font-medium text-navy placeholder:text-steel/60 focus:border-teal focus:outline-none focus:ring-1 focus:ring-teal"
-                placeholder="e.g. Gaming Laptop, Trip, Phone"
+                className="mt-2 w-full rounded-2xl border border-white/80 bg-white/60 backdrop-blur-md px-4 py-3 text-sm font-medium text-navy placeholder:text-steel/50 shadow-[inset_0_1px_2px_rgba(0,0,0,0.04)] focus:bg-white/90 focus:border-teal/60 focus:outline-none focus:ring-2 focus:ring-teal/20 transition-all"
+                placeholder="e.g. Laptop, Trip, Deposit"
               />
-              {/* Autocomplete chips */}
-              <div className="mt-2 flex flex-wrap gap-1.5">
-                {quickPicks.map((pick) => (
+
+              {/* Quick Pick Apple Chips */}
+              <div className="mt-3 flex flex-wrap gap-1.5">
+                {config.quickPicks.map((pick) => (
                   <button
-                    key={pick}
+                    key={pick.name}
                     type="button"
                     onClick={() => {
-                      setPurchaseName(pick)
+                      setPurchaseName(pick.name)
+                      setCost(pick.cost)
                       sound.snap('low')
-                      if (pick === 'Gaming Laptop') setCost(65000)
-                      if (pick === 'Goa Trip') setCost(22000)
-                      if (pick === 'Smart Watch') setCost(18000)
-                      if (pick === 'Phone Upgrade') setCost(54000)
-                      if (pick === 'Gym Membership') setCost(12000)
                     }}
                     className={cn(
-                      'rounded-full px-2.5 py-1 text-[11px] font-mono transition-colors',
-                      purchaseName === pick
-                        ? 'bg-teal text-white font-semibold'
-                        : 'bg-aqua text-steel hover:text-navy border border-mint/60',
+                      'rounded-full px-3 py-1 text-[11px] font-mono transition-all duration-200 select-none',
+                      purchaseName === pick.name
+                        ? 'bg-teal text-white font-semibold shadow-[0_2px_10px_rgba(0,169,158,0.35)]'
+                        : 'bg-white/60 backdrop-blur-sm text-steel hover:text-navy border border-white/80 hover:bg-white/90',
                     )}
                   >
-                    {pick}
+                    {pick.name}
                   </button>
                 ))}
               </div>
             </div>
 
-            {/* Total Cost Input */}
+            {/* Estimated Total Cost with Native Glass Slider */}
             <div className="mt-6">
               <div className="flex justify-between items-baseline">
                 <label className="text-xs font-semibold uppercase tracking-wider text-navy">
@@ -325,39 +479,42 @@ function StudentSimulator() {
                 </label>
                 <span className="font-mono text-xs text-steel">Drag or type</span>
               </div>
+
               <div className="mt-2 relative flex items-center">
-                <span className="absolute left-4 text-xl font-medium text-teal font-serif">₹</span>
+                <span className="absolute left-4 text-xl font-medium text-teal font-serif select-none">₹</span>
                 <input
                   type="number"
                   value={cost}
-                  step={1000}
-                  min={5000}
-                  max={150000}
+                  step={config.stepCost}
+                  min={config.minCost}
+                  max={config.maxCost * 1.25}
                   onChange={(e) => setCost(Number(e.target.value))}
-                  className="w-full rounded-xl border border-mint bg-aqua/40 pl-9 pr-4 py-2.5 text-2xl font-bold tracking-tight text-navy focus:border-teal focus:outline-none focus:ring-1 focus:ring-teal tabular-nums"
+                  className="w-full rounded-2xl border border-white/80 bg-white/60 backdrop-blur-md pl-10 pr-4 py-3 text-2xl font-bold tracking-tight text-navy shadow-[inset_0_1px_2px_rgba(0,0,0,0.04)] focus:bg-white/90 focus:border-teal/60 focus:outline-none focus:ring-2 focus:ring-teal/20 transition-all tabular-nums"
                 />
               </div>
+
               <input
                 type="range"
-                min={5000}
-                max={120000}
-                step={1000}
+                min={config.minCost}
+                max={config.maxCost}
+                step={config.stepCost}
                 value={cost}
                 onChange={(e) => {
                   const val = Number(e.target.value)
                   setCost(val)
-                  sound.tick(700 + val / 70)
+                  sound.tick(700 + val / 150)
                 }}
-                className="fin-range mt-3 w-full"
+                className="fin-range mt-3.5 w-full cursor-pointer"
               />
             </div>
 
-            {/* Payment Structure Selector */}
+            {/* Payment Structure (iPhone Control Tiles) */}
             <div className="mt-6">
               <label className="text-xs font-semibold uppercase tracking-wider text-navy">
                 Payment Structure
               </label>
-              <div className="mt-2 grid grid-cols-2 gap-2">
+
+              <div className="mt-2.5 grid grid-cols-2 gap-2.5">
                 {[
                   { id: 'upfront', label: 'Full Upfront', sub: 'Instant hit' },
                   { id: '3emi', label: '3-Month EMI', sub: `${inr(Math.round(cost / 3))}/mo` },
@@ -372,10 +529,10 @@ function StudentSimulator() {
                       sound.snap('high')
                     }}
                     className={cn(
-                      'rounded-xl border p-2.5 text-left transition-all',
+                      'rounded-2xl p-3 text-left transition-all duration-200 select-none border',
                       paymentPlan === plan.id
-                        ? 'border-teal bg-navy text-white shadow-sm'
-                        : 'border-mint bg-white hover:border-teal/60 text-navy',
+                        ? 'border-teal/60 bg-navy/95 text-white shadow-[0_8px_20px_rgba(0,51,101,0.22)]'
+                        : 'border-white/80 bg-white/60 backdrop-blur-md hover:bg-white/90 hover:border-teal/30 text-navy shadow-xs',
                     )}
                   >
                     <div className="text-xs font-semibold">{plan.label}</div>
@@ -393,8 +550,8 @@ function StudentSimulator() {
             </div>
           </div>
 
-          {/* Peer Cohort Button Link */}
-          <div className="mt-6 pt-5 border-t border-mint/60 flex items-center justify-between">
+          {/* Peer Cohort Link */}
+          <div className="relative z-10 mt-6 pt-5 border-t border-navy/10 flex items-center justify-between">
             <span className="text-xs text-steel">Need behavioral context?</span>
             <button
               type="button"
@@ -402,17 +559,24 @@ function StudentSimulator() {
                 setShowCohortModal(true)
                 sound.chime()
               }}
-              className="inline-flex items-center gap-1.5 text-xs font-mono font-semibold text-teal hover:text-navy transition-colors"
+              className="inline-flex items-center gap-1.5 text-xs font-mono font-semibold text-teal hover:text-navy transition-colors select-none"
             >
               <Users className="size-3.5" />
-              See Cohort Insights →
+              <span>See Cohort Insights →</span>
             </button>
           </div>
         </div>
 
-        {/* Visualizer: 12-Month Trajectory Chart (7 cols) */}
-        <div className="lg:col-span-7 rounded-3xl bg-white border border-mint/80 p-6 md:p-8 shadow-sm flex flex-col justify-between">
-          <div>
+        {/* Right Column: Financial Trajectory Chart Card (7 cols) */}
+        <div className="lg:col-span-7 relative overflow-hidden rounded-[28px] bg-white/75 backdrop-blur-2xl backdrop-saturate-150 border border-white/90 p-6 md:p-8 shadow-[0_16px_45px_rgba(0,51,101,0.06),inset_0_1px_2px_rgba(255,255,255,1),inset_0_-1px_1px_rgba(0,169,158,0.06)] flex flex-col justify-between">
+          {/* Frosted Specular Sheen */}
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute -right-20 -top-20 size-56 rounded-full bg-gradient-to-br from-white/90 via-teal/10 to-transparent blur-xl"
+          />
+
+          <div className="relative z-10">
+            {/* Card Header & Time Range Switcher */}
             <div className="flex flex-wrap items-center justify-between gap-4">
               <div>
                 <h3 className="text-lg font-semibold tracking-tight text-navy">
@@ -423,17 +587,20 @@ function StudentSimulator() {
                 </p>
               </div>
 
-              {/* Range Selectors: 3M | 6M | 12M */}
-              <div className="flex rounded-full bg-aqua p-1 border border-mint">
+              {/* iOS Range Switcher */}
+              <div className="flex rounded-full bg-white/60 backdrop-blur-md p-1 border border-white/80 shadow-xs">
                 {(['3M', '6M', '12M'] as const).map((r) => (
                   <button
                     key={r}
                     type="button"
-                    onClick={() => setTimeRange(r)}
+                    onClick={() => {
+                      setTimeRange(r)
+                      sound.snap('low')
+                    }}
                     className={cn(
-                      'rounded-full px-3 py-1 text-xs font-mono font-medium transition-colors',
+                      'rounded-full px-3.5 py-1 text-xs font-mono font-semibold transition-all select-none',
                       timeRange === r
-                        ? 'bg-navy text-white font-bold'
+                        ? 'bg-navy text-white shadow-xs'
                         : 'text-steel hover:text-navy',
                     )}
                   >
@@ -443,9 +610,9 @@ function StudentSimulator() {
               </div>
             </div>
 
-            {/* Interactive SVG Chart */}
+            {/* Interactive SVG Glass Chart Canvas */}
             <div
-              className="mt-6 relative w-full h-[270px] select-none"
+              className="mt-6 relative w-full h-[270px] select-none rounded-2xl bg-white/40 backdrop-blur-md border border-white/80 p-2 shadow-[inset_0_1px_2px_rgba(255,255,255,0.8)]"
               onPointerMove={(e) => {
                 const rect = e.currentTarget.getBoundingClientRect()
                 const relX = e.clientX - rect.left
@@ -457,30 +624,37 @@ function StudentSimulator() {
               onPointerLeave={() => setScrubIndex(null)}
             >
               <svg viewBox={`0 0 ${chartW} ${chartH}`} className="w-full h-full" fill="none">
-                {/* Horizontal Guide Lines */}
-                <line x1={pad.l} y1={getY(20000)} x2={chartW - pad.r} y2={getY(20000)} stroke="#E2E8F0" strokeDasharray="3 3" />
-                <line x1={pad.l} y1={getY(40000)} x2={chartW - pad.r} y2={getY(40000)} stroke="#E2E8F0" strokeDasharray="3 3" />
-                <line x1={pad.l} y1={getY(60000)} x2={chartW - pad.r} y2={getY(60000)} stroke="#E2E8F0" strokeDasharray="3 3" />
+                <defs>
+                  <linearGradient id="sim-grad" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0%" stopColor="#00A99E" />
+                    <stop offset="100%" stopColor="#63DCD3" />
+                  </linearGradient>
+                </defs>
 
-                {/* Critical Buffer Line (Red Dashed) */}
+                {/* Subtle Grid Guidelines */}
+                <line x1={pad.l} y1={getY(maxVal * 0.25)} x2={chartW - pad.r} y2={getY(maxVal * 0.25)} stroke="#003365" strokeOpacity="0.06" strokeDasharray="3 3" />
+                <line x1={pad.l} y1={getY(maxVal * 0.50)} x2={chartW - pad.r} y2={getY(maxVal * 0.50)} stroke="#003365" strokeOpacity="0.06" strokeDasharray="3 3" />
+                <line x1={pad.l} y1={getY(maxVal * 0.75)} x2={chartW - pad.r} y2={getY(maxVal * 0.75)} stroke="#003365" strokeOpacity="0.06" strokeDasharray="3 3" />
+
+                {/* Critical Safety Buffer Line */}
                 <line
                   x1={pad.l}
                   y1={criticalY}
                   x2={chartW - pad.r}
                   y2={criticalY}
-                  stroke={COLORS.dangerRed}
+                  stroke="#EF4444"
                   strokeWidth="2"
                   strokeDasharray="4 4"
                 />
-                <text x={pad.l + 6} y={criticalY - 6} fill={COLORS.dangerRed} fontSize="9" fontFamily="monospace">
-                  SAFETY BUFFER ({inr(criticalBuffer)})
+                <text x={pad.l + 6} y={criticalY - 6} fill="#EF4444" fontSize="9" fontFamily="monospace" fontWeight="600">
+                  SAFETY BUFFER ({inr(config.criticalBuffer)})
                 </text>
 
-                {/* Baseline Trendline (Solid Charcoal/Navy) */}
-                <path d={baselinePath} stroke="#475569" strokeWidth="2" fill="none" opacity="0.6" />
+                {/* Baseline Trendline */}
+                <path d={baselinePath} stroke="#475569" strokeWidth="2" fill="none" opacity="0.45" />
 
-                {/* Simulated Impact Trajectory (Solid Mint/Teal) */}
-                <path d={simulatedPath} stroke={COLORS.deepTeal} strokeWidth="3" fill="none" strokeLinecap="round" />
+                {/* Simulated Impact Trajectory Line */}
+                <path d={simulatedPath} stroke="url(#sim-grad)" strokeWidth="3.2" fill="none" strokeLinecap="round" />
 
                 {/* Scrubber vertical line indicator */}
                 {scrubIndex !== null && (
@@ -490,11 +664,11 @@ function StudentSimulator() {
                       y1={pad.t}
                       x2={activeX}
                       y2={chartH - pad.b}
-                      stroke={COLORS.navy}
+                      stroke="#003365"
                       strokeWidth="1.5"
                       strokeDasharray="2 3"
                     />
-                    <circle cx={activeX} cy={getY(activePoint.simulated)} r="5" fill={COLORS.freshMint} stroke={COLORS.deepTeal} strokeWidth="2.5" />
+                    <circle cx={activeX} cy={getY(activePoint.simulated)} r="6" fill="#63DCD3" stroke="#003365" strokeWidth="2.5" />
                     <circle cx={activeX} cy={getY(activePoint.baseline)} r="4" fill="#475569" />
                   </>
                 )}
@@ -515,20 +689,20 @@ function StudentSimulator() {
                 ))}
               </svg>
 
-              {/* Scrubber Tooltip Bubble */}
+              {/* Scrubber Glass Tooltip Popover */}
               {scrubIndex !== null && (
                 <div
-                  className="absolute pointer-events-none -top-2 transform -translate-x-1/2 rounded-xl bg-navy text-white px-3 py-2 text-[11px] font-mono shadow-xl border border-teal/40"
+                  className="absolute pointer-events-none -top-3 transform -translate-x-1/2 rounded-2xl bg-navy/95 backdrop-blur-xl text-white px-3.5 py-2.5 text-[11px] font-mono shadow-2xl border border-teal/40"
                   style={{ left: `${(activeX / chartW) * 100}%` }}
                 >
                   <div className="font-bold text-bright">{activePoint.month} Forecast</div>
-                  <div className="flex justify-between gap-3 mt-1">
+                  <div className="flex justify-between gap-4 mt-1">
                     <span className="text-steel">Simulated:</span>
-                    <span className={cn('font-semibold', activePoint.isBreach ? 'text-red-400' : 'text-white')}>
+                    <span className={cn('font-semibold', activePoint.isBreach ? 'text-red-400 font-bold' : 'text-white')}>
                       {inr(activePoint.simulated)}
                     </span>
                   </div>
-                  <div className="flex justify-between gap-3 text-[10px] text-white/60">
+                  <div className="flex justify-between gap-4 text-[10px] text-white/60">
                     <span>Baseline:</span>
                     <span>{inr(activePoint.baseline)}</span>
                   </div>
@@ -537,224 +711,241 @@ function StudentSimulator() {
             </div>
 
             {/* Chart Legend */}
-            <div className="mt-4 flex flex-wrap items-center gap-5 text-xs font-mono text-steel border-t border-mint/50 pt-3">
+            <div className="mt-4 flex flex-wrap items-center gap-5 text-xs font-mono text-steel border-t border-navy/10 pt-3">
               <div className="flex items-center gap-2">
                 <span className="h-0.5 w-4 bg-[#475569]" />
-                Baseline Path (No Purchase)
+                <span>Baseline (No Purchase)</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="h-1 w-4 bg-teal rounded-full" />
-                Simulated {paymentPlan.toUpperCase()} Trajectory
+                <span className="h-1.5 w-4 bg-teal rounded-full" />
+                <span>Simulated {paymentPlan.toUpperCase()} Path</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="h-0.5 w-4 border-b-2 border-dashed border-red-500" />
-                Buffer Limit ({inr(criticalBuffer)})
+                <span>Buffer Limit ({inr(config.criticalBuffer)})</span>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Impact & Alternative Paths Row */}
-      <div className="grid gap-8 md:grid-cols-12">
-        {/* Multi-Goal Collision Matrix (6 cols) */}
-        <div className="md:col-span-6 rounded-3xl bg-white border border-mint/80 p-6 md:p-8 shadow-sm">
-          <div className="flex items-center justify-between">
-            <h3 className="text-base font-semibold text-navy">
-              Active Goal Impacts & Delays
-            </h3>
-            <span className="text-[10px] font-mono uppercase tracking-wider text-steel">
-              Collision Matrix
-            </span>
-          </div>
-
-          <div className="mt-5 space-y-4">
-            {/* Goal Item 1: Travel */}
-            <div className="rounded-2xl border border-mint bg-aqua/30 p-4 transition-all">
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-semibold text-navy">
-                  {goalCollisions.travelGoal.title}
-                </span>
-                <span
-                  className={cn(
-                    'rounded-full px-2.5 py-0.5 text-[10px] font-mono font-bold uppercase',
-                    goalCollisions.travelGoal.impactType === 'caution'
-                      ? 'bg-amber-100 text-amber-800 border border-amber-200'
-                      : 'bg-emerald-100 text-emerald-800 border border-emerald-200',
-                  )}
-                >
-                  {goalCollisions.travelGoal.delayedMonths > 0
-                    ? `Delayed by ${goalCollisions.travelGoal.delayedMonths} Months`
-                    : 'On Track'}
-                </span>
-              </div>
-              <p className="mt-2 text-xs font-mono text-steel">
-                Monthly allocation adjusted from {goalCollisions.travelGoal.monthlyReduction}.
-              </p>
+      {/* --------------------------------------------------------------- */}
+      {/* 3. BOTTOM ROW: COLLISION MATRIX + SMART ALTERNATIVE PATHS      */}
+      {/* --------------------------------------------------------------- */}
+      <div className="grid gap-8 md:grid-cols-12 items-stretch">
+        {/* Goal Collision Matrix (6 cols) */}
+        <div className="md:col-span-6 relative overflow-hidden rounded-[28px] bg-white/75 backdrop-blur-2xl backdrop-saturate-150 border border-white/90 p-6 md:p-8 shadow-[0_16px_45px_rgba(0,51,101,0.06),inset_0_1px_2px_rgba(255,255,255,1),inset_0_-1px_1px_rgba(0,169,158,0.06)] flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between">
+              <h3 className="text-base font-semibold text-navy">
+                Active Goal Impacts & Delays
+              </h3>
+              <span className="text-[10px] font-mono uppercase tracking-wider text-steel">
+                Collision Matrix
+              </span>
             </div>
 
-            {/* Goal Item 2: Emergency Reserve */}
-            <div className="rounded-2xl border border-mint bg-aqua/30 p-4 transition-all">
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-semibold text-navy">
-                  {goalCollisions.emergencyReserve.title}
-                </span>
-                <span
-                  className={cn(
-                    'rounded-full px-2.5 py-0.5 text-[10px] font-mono font-bold uppercase',
-                    goalCollisions.emergencyReserve.breached
-                      ? 'bg-red-100 text-red-800 border border-red-200'
-                      : 'bg-emerald-100 text-emerald-800 border border-emerald-200',
-                  )}
-                >
-                  {goalCollisions.emergencyReserve.breached ? 'Breaches Threshold' : 'Safe Cushion'}
-                </span>
+            <div className="mt-5 space-y-3.5">
+              {/* Primary Savings Goal Impact */}
+              <div className="rounded-2xl border border-white/80 bg-white/60 backdrop-blur-md p-4 shadow-xs">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-semibold text-navy">
+                    {goalCollisions.travelGoal.title}
+                  </span>
+                  <span
+                    className={cn(
+                      'rounded-full px-2.5 py-0.5 text-[10px] font-mono font-bold uppercase',
+                      goalCollisions.travelGoal.delayedMonths > 0
+                        ? 'bg-amber-500/15 text-amber-800 border border-amber-500/30'
+                        : 'bg-emerald-500/15 text-emerald-800 border border-emerald-500/30',
+                    )}
+                  >
+                    {goalCollisions.travelGoal.delayedMonths > 0
+                      ? `Delayed by ${goalCollisions.travelGoal.delayedMonths} Months`
+                      : 'On Track'}
+                  </span>
+                </div>
+                <p className="mt-2 text-xs font-mono text-steel">
+                  Monthly allocation adjusted to {goalCollisions.travelGoal.monthlyReduction}.
+                </p>
               </div>
-              <p className="mt-2 text-xs font-mono text-steel">
-                {goalCollisions.emergencyReserve.breached
-                  ? `Lowest projected balance falls to ${inr(goalCollisions.emergencyReserve.lowestBalance)}.`
-                  : 'Maintains healthy liquid reserves above critical threshold throughout.'}
-              </p>
+
+              {/* Emergency Reserve Cushion Impact */}
+              <div className="rounded-2xl border border-white/80 bg-white/60 backdrop-blur-md p-4 shadow-xs">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-semibold text-navy">
+                    {goalCollisions.emergencyReserve.title}
+                  </span>
+                  <span
+                    className={cn(
+                      'rounded-full px-2.5 py-0.5 text-[10px] font-mono font-bold uppercase',
+                      goalCollisions.emergencyReserve.breached
+                        ? 'bg-red-500/15 text-red-800 border border-red-500/30'
+                        : 'bg-emerald-500/15 text-emerald-800 border border-emerald-500/30',
+                    )}
+                  >
+                    {goalCollisions.emergencyReserve.breached ? 'Breaches Threshold' : 'Safe Cushion'}
+                  </span>
+                </div>
+                <p className="mt-2 text-xs font-mono text-steel">
+                  {goalCollisions.emergencyReserve.breached
+                    ? `Lowest projected balance falls to ${inr(goalCollisions.emergencyReserve.lowestBalance)}.`
+                    : 'Maintains healthy liquid reserves above critical threshold throughout.'}
+                </p>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Alternative Path Guidance Cards (6 cols) */}
-        <div className="md:col-span-6 rounded-3xl bg-white border border-mint/80 p-6 md:p-8 shadow-sm">
-          <div className="flex items-center justify-between">
-            <h3 className="text-base font-semibold text-navy">
-              Alternative Smart Paths
-            </h3>
-            <span className="text-[10px] font-mono uppercase tracking-wider text-steel">
-              Trade-Off Engine
-            </span>
-          </div>
-
-          <div className="mt-5 grid sm:grid-cols-2 gap-4">
-            {/* Alternative Card 1: Delay */}
-            <div className="rounded-2xl border border-mint hover:border-teal p-5 bg-aqua/20 flex flex-col justify-between transition-all">
-              <div>
-                <span className="text-[10px] font-mono uppercase tracking-wider text-teal font-semibold">
-                  Path 01 · Timing
-                </span>
-                <h4 className="mt-2 text-sm font-semibold text-navy">
-                  Delay Purchase by 45 Days
-                </h4>
-                <div className="mt-3 inline-block rounded-md bg-emerald-50 px-2 py-1 text-[11px] font-mono font-semibold text-emerald-700">
-                  0 Goal Delays Induced
-                </div>
-                <p className="mt-2 text-xs text-steel leading-relaxed">
-                  Allows allowance cushion to compound enough to avoid breaching the ₹5,000 threshold.
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setPaymentPlan('lockout')}
-                className="mt-4 w-full rounded-xl bg-navy hover:bg-teal text-white py-2 text-xs font-medium transition-colors"
-              >
-                Simulate 45-Day Delay
-              </button>
+        {/* Alternative Smart Paths (6 cols) */}
+        <div className="md:col-span-6 relative overflow-hidden rounded-[28px] bg-white/75 backdrop-blur-2xl backdrop-saturate-150 border border-white/90 p-6 md:p-8 shadow-[0_16px_45px_rgba(0,51,101,0.06),inset_0_1px_2px_rgba(255,255,255,1),inset_0_-1px_1px_rgba(0,169,158,0.06)] flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between">
+              <h3 className="text-base font-semibold text-navy">
+                Alternative Smart Paths
+              </h3>
+              <span className="text-[10px] font-mono uppercase tracking-wider text-steel">
+                Trade-Off Engine
+              </span>
             </div>
 
-            {/* Alternative Card 2: Tier Adjustment */}
-            <div className="rounded-2xl border border-mint hover:border-teal p-5 bg-aqua/20 flex flex-col justify-between transition-all">
-              <div>
-                <span className="text-[10px] font-mono uppercase tracking-wider text-teal font-semibold">
-                  Path 02 · Spec Tier
-                </span>
-                <h4 className="mt-2 text-sm font-semibold text-navy">
-                  Opt for Tier-2 Model ({inr(Math.round(cost * 0.75))})
-                </h4>
-                <div className="mt-3 inline-block rounded-md bg-amber-50 px-2 py-1 text-[11px] font-mono font-semibold text-amber-700">
-                  Goa Trip Delayed 10 Days Only
+            <div className="mt-5 grid sm:grid-cols-2 gap-3.5">
+              {/* Alternative Path 1: Timing */}
+              <div className="rounded-2xl border border-white/80 bg-white/60 backdrop-blur-md hover:border-teal/50 p-4.5 flex flex-col justify-between transition-all shadow-xs">
+                <div>
+                  <span className="text-[10px] font-mono uppercase tracking-wider text-teal font-semibold">
+                    {config.smartPath1.tag}
+                  </span>
+                  <h4 className="mt-1.5 text-sm font-semibold text-navy">
+                    {config.smartPath1.title}
+                  </h4>
+                  <div className="mt-2.5 inline-block rounded-md bg-emerald-500/15 text-emerald-800 border border-emerald-500/30 px-2 py-0.5 text-[10px] font-mono font-semibold">
+                    {config.smartPath1.badge}
+                  </div>
+                  <p className="mt-2 text-xs text-steel leading-relaxed">
+                    {config.smartPath1.desc}
+                  </p>
                 </div>
-                <p className="mt-2 text-xs text-steel leading-relaxed">
-                  Saves 25% upfront cost while preserving 90% of core performance specs.
-                </p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setPaymentPlan('lockout')
+                    sound.snap('high')
+                  }}
+                  className="mt-4 w-full rounded-xl bg-navy hover:bg-teal text-white py-2 text-xs font-semibold transition-colors shadow-xs"
+                >
+                  {config.smartPath1.buttonText}
+                </button>
               </div>
-              <button
-                type="button"
-                onClick={() => setCost((prev) => Math.round(prev * 0.75))}
-                className="mt-4 w-full rounded-xl bg-navy hover:bg-teal text-white py-2 text-xs font-medium transition-colors"
-              >
-                Apply Tier-2 Cost
-              </button>
+
+              {/* Alternative Path 2: Tier Spec / Discount */}
+              <div className="rounded-2xl border border-white/80 bg-white/60 backdrop-blur-md hover:border-teal/50 p-4.5 flex flex-col justify-between transition-all shadow-xs">
+                <div>
+                  <span className="text-[10px] font-mono uppercase tracking-wider text-teal font-semibold">
+                    {config.smartPath2.tag}
+                  </span>
+                  <h4 className="mt-1.5 text-sm font-semibold text-navy">
+                    {config.smartPath2.title} ({inr(Math.round(cost * config.smartPath2.discountFactor))})
+                  </h4>
+                  <div className="mt-2.5 inline-block rounded-md bg-amber-500/15 text-amber-800 border border-amber-500/30 px-2 py-0.5 text-[10px] font-mono font-semibold">
+                    {config.smartPath2.badge}
+                  </div>
+                  <p className="mt-2 text-xs text-steel leading-relaxed">
+                    {config.smartPath2.desc}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setCost((prev) => Math.round(prev * config.smartPath2.discountFactor))
+                    sound.snap('high')
+                  }}
+                  className="mt-4 w-full rounded-xl bg-navy hover:bg-teal text-white py-2 text-xs font-semibold transition-colors shadow-xs"
+                >
+                  {config.smartPath2.buttonText}
+                </button>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Peer Cohort Insights Drawer / Modal (Modal STU-02) */}
+      {/* --------------------------------------------------------------- */}
+      {/* 4. IPHONE FROSTED PEER COHORT MODAL SHEET                      */}
+      {/* --------------------------------------------------------------- */}
       {showCohortModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-navy/40 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="relative w-full max-w-lg rounded-3xl bg-white border border-mint p-6 md:p-8 shadow-2xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-navy/35 backdrop-blur-md animate-in fade-in duration-200">
+          <div className="relative w-full max-w-lg rounded-[32px] bg-white/85 backdrop-blur-2xl border border-white/90 p-6 md:p-8 shadow-[0_25px_80px_rgba(0,51,101,0.25),inset_0_1px_2px_rgba(255,255,255,1)]">
             <button
               type="button"
               onClick={() => setShowCohortModal(false)}
-              className="absolute top-5 right-5 size-8 rounded-full bg-aqua text-navy hover:bg-mint flex items-center justify-center transition-colors"
+              className="absolute top-5 right-5 size-8 rounded-full bg-white/80 hover:bg-white text-navy flex items-center justify-center border border-white/80 transition-colors shadow-xs"
             >
               <X className="size-4" />
             </button>
 
             <div className="flex items-center gap-2 font-mono text-xs text-teal font-semibold">
               <Users className="size-4" />
-              Cohort Behavioral Insights (STU-02)
+              <span>{config.cohortTitle}</span>
             </div>
+
             <h3 className="mt-2 text-xl font-semibold text-navy">
               Anonymized Peer Data
             </h3>
-            <p className="text-xs text-steel">
-              Based on 1,420 users in your income bracket evaluating similar commitments.
+            <p className="text-xs text-steel mt-0.5">
+              {config.cohortSampleSize}
             </p>
 
-            {/* Primary Stat Callout Box */}
-            <div className="mt-6 rounded-2xl bg-aqua/50 border border-mint p-5">
-              <div className="text-4xl font-bold font-mono text-teal">64%</div>
+            {/* Stat Callout Bubble */}
+            <div className="mt-5 rounded-2xl bg-teal/10 border border-teal/25 p-5 backdrop-blur-md">
+              <div className="text-4xl font-bold font-mono text-teal">{config.cohortRiskStat}</div>
               <p className="mt-2 text-xs text-navy font-medium leading-relaxed">
-                of students in your income bracket who chose a 6-month EMI reported noticeable financial strain by Month 3.
+                {config.cohortRiskText}
               </p>
             </div>
 
-            {/* Horizontal Distribution Stacked Bar */}
-            <div className="mt-6">
+            {/* Outcome Distribution */}
+            <div className="mt-5">
               <span className="text-xs font-semibold text-navy">Outcome Distribution</span>
-              <div className="mt-2 flex h-4 w-full rounded-full overflow-hidden">
-                <div className="w-[22%] bg-emerald-500" title="22% Met all goals" />
-                <div className="w-[48%] bg-amber-400" title="48% Delayed non-essential" />
-                <div className="w-[30%] bg-red-500" title="30% Regretted structure" />
+              <div className="mt-2 flex h-3.5 w-full rounded-full overflow-hidden shadow-inner">
+                <div className="w-[26%] bg-emerald-500" title="Met all goals" />
+                <div className="w-[46%] bg-amber-400" title="Delayed non-essential goals" />
+                <div className="w-[28%] bg-red-500" title="Regretted structure timing" />
               </div>
 
               <div className="mt-3 grid grid-cols-3 gap-2 text-[10px] font-mono">
                 <div>
                   <span className="size-2 rounded-full inline-block bg-emerald-500 mr-1" />
-                  <span className="text-navy font-bold">22%</span> Met all goals
+                  <span className="text-navy font-bold">26%</span> Met all goals
                 </div>
                 <div>
                   <span className="size-2 rounded-full inline-block bg-amber-400 mr-1" />
-                  <span className="text-navy font-bold">48%</span> Delayed later
+                  <span className="text-navy font-bold">46%</span> Delayed goals
                 </div>
                 <div>
                   <span className="size-2 rounded-full inline-block bg-red-500 mr-1" />
-                  <span className="text-navy font-bold">30%</span> Regretted timing
+                  <span className="text-navy font-bold">28%</span> Felt strain
                 </div>
               </div>
             </div>
 
-            <div className="mt-8 flex gap-3">
+            {/* Modal Actions */}
+            <div className="mt-7 flex gap-3">
               <button
                 type="button"
                 onClick={() => {
                   setPaymentPlan('3emi')
                   setShowCohortModal(false)
+                  sound.snap('high')
                 }}
-                className="flex-1 rounded-xl bg-teal hover:bg-navy text-white py-2.5 text-xs font-semibold transition-colors"
+                className="flex-1 rounded-xl bg-teal hover:bg-navy text-white py-2.5 text-xs font-semibold transition-colors shadow-sm"
               >
                 Apply Recommendation (3-Month EMI)
               </button>
               <button
                 type="button"
                 onClick={() => setShowCohortModal(false)}
-                className="rounded-xl border border-mint px-4 py-2.5 text-xs font-medium text-steel hover:text-navy transition-colors"
+                className="rounded-xl border border-white/80 bg-white/60 hover:bg-white px-4 py-2.5 text-xs font-medium text-steel hover:text-navy transition-colors shadow-xs"
               >
                 Close
               </button>
@@ -762,444 +953,6 @@ function StudentSimulator() {
           </div>
         </div>
       )}
-    </div>
-  )
-}
-
-// =========================================================================
-// PART C: SOLE PROPRIETOR EXPERIENCE — COMMITMENT DASHBOARD (SOL-01)
-// =========================================================================
-function SoleProprietorSimulator() {
-  const [toolName, setToolName] = useState('Adobe Creative Suite + SaaS Tooling')
-  const [recurringCost, setRecurringCost] = useState(4500)
-  const [lockInMonths, setLockInMonths] = useState<0 | 6 | 12>(6)
-  const [penalty, setPenalty] = useState(8000)
-  const [revenueScenario, setRevenueScenario] = useState<'conservative' | 'baseline' | 'aggressive' | 'crisis'>('baseline')
-
-  // Financial baseline numbers
-  const lowestMonthlyRevenue = 40000
-  const baselineMonthlyRevenue = 85000
-  const existingFixedOverhead = 14200
-  const averageHourlyRate = 1200
-  const clientRetainerRate = 25000
-
-  // Total new overhead
-  const totalOverhead = existingFixedOverhead + recurringCost
-
-  // Fixed Commitment Ratio (FCR) calculation
-  // Formula: FCR = Fixed Overhead / Lowest Monthly Revenue
-  const fcrPercent = Math.round((totalOverhead / lowestMonthlyRevenue) * 100)
-
-  // Risk bands: Green (<30%), Yellow (30-50%), Red (>50%)
-  const fcrRisk = fcrPercent > 50 ? 'high' : fcrPercent >= 30 ? 'medium' : 'low'
-
-  // Operational conversions
-  const additionalRetainersNeeded = (recurringCost / clientRetainerRate).toFixed(1)
-  const billableHoursNeeded = (recurringCost / averageHourlyRate).toFixed(1)
-
-  // Total liability over contract lock-in
-  const totalContractLiability = recurringCost * (lockInMonths || 1) + (lockInMonths ? penalty : 0)
-
-  // PRD 7.1 Crisis Edge Case Calculations (Zero Inflow Burn-Only Runway)
-  const initialReserves = 160000
-  const daysUntilDepletion = Math.max(1, Math.floor((initialReserves / totalOverhead) * 30))
-  const daysWithoutTool = Math.max(1, Math.floor((initialReserves / existingFixedOverhead) * 30))
-  const daysSavedIfToolCancelled = Math.max(1, daysWithoutTool - daysUntilDepletion)
-
-  // Revenue Stress-Test Months Data
-  const stressTestData = useMemo(() => {
-    const months = ['Month 1', 'Month 2', 'Month 3', 'Month 4', 'Month 5', 'Month 6']
-    const multiplier =
-      revenueScenario === 'conservative'
-        ? 0.7
-        : revenueScenario === 'aggressive'
-          ? 1.2
-          : revenueScenario === 'crisis'
-            ? 0.0 // Zero inflow (PRD 7.1)
-            : 1.0
-
-    let runwayBalance = initialReserves // Starting operational buffer
-
-    return months.map((m, idx) => {
-      const revenue = Math.round(baselineMonthlyRevenue * multiplier)
-      const net = revenue - totalOverhead
-      runwayBalance += net
-
-      // Check danger state
-      const isNegativeState =
-        revenueScenario === 'crisis'
-          ? true
-          : revenueScenario === 'conservative' && idx >= 3
-
-      return {
-        month: m,
-        revenue,
-        overhead: totalOverhead,
-        net,
-        runwayBalance: Math.max(0, runwayBalance),
-        isDanger: isNegativeState,
-      }
-    })
-  }, [revenueScenario, totalOverhead, initialReserves])
-
-  return (
-    <div className="space-y-8">
-      {/* Top Header / Business Health Metric Section */}
-      <div className="flex flex-wrap items-center justify-between gap-4 p-5 rounded-2xl bg-white border border-mint/70 shadow-sm">
-        <div>
-          <span className="font-mono text-xs uppercase tracking-wider text-teal font-semibold">
-            Solo Practice / Agency Workspace
-          </span>
-          <h3 className="text-base font-semibold text-navy">
-            Monthly Revenue Range: ₹40,000 – ₹1,20,000 / mo
-          </h3>
-        </div>
-        <div className="flex items-center gap-3">
-          <div className="px-3.5 py-1.5 rounded-full bg-aqua border border-mint text-navy font-mono text-xs font-semibold">
-            Operational Runway: <span className="text-teal font-bold">4.2 Months</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Grid: FCR Gauge & Tool Evaluator Card */}
-      <div className="grid gap-8 lg:grid-cols-12">
-        {/* FCR Gauge Card (5 cols) */}
-        <div className="lg:col-span-5 rounded-3xl bg-white border border-mint/80 p-6 md:p-8 shadow-sm flex flex-col justify-between">
-          <div>
-            <div className="flex items-center justify-between">
-              <span className="text-[11px] font-mono uppercase tracking-[0.2em] text-steel font-semibold">
-                Stability Metric
-              </span>
-              <span
-                className={cn(
-                  'text-[10px] font-mono px-2.5 py-0.5 rounded-full font-bold uppercase',
-                  fcrRisk === 'high'
-                    ? 'bg-red-100 text-red-700'
-                    : fcrRisk === 'medium'
-                      ? 'bg-amber-100 text-amber-800'
-                      : 'bg-emerald-100 text-emerald-800',
-                )}
-              >
-                {fcrRisk.toUpperCase()} RISK
-              </span>
-            </div>
-
-            <h3 className="mt-2 text-lg font-semibold text-navy">
-              Fixed Commitment Ratio (FCR)
-            </h3>
-            <p className="text-xs font-mono text-steel mt-0.5">
-              Fixed Overhead ÷ Lowest Monthly Revenue
-            </p>
-
-            {/* 180-Degree Semi-Circle Radial Gauge SVG */}
-            <div className="relative mt-6 flex flex-col items-center">
-              <svg viewBox="0 0 240 130" className="w-[240px] h-[130px]">
-                {/* Background Arc */}
-                <path
-                  d="M 20 120 A 100 100 0 0 1 220 120"
-                  fill="none"
-                  stroke="#E2E8F0"
-                  strokeWidth="20"
-                  strokeLinecap="round"
-                />
-                {/* Active Colored Arc */}
-                <path
-                  d="M 20 120 A 100 100 0 0 1 220 120"
-                  fill="none"
-                  stroke={fcrRisk === 'high' ? COLORS.dangerRed : fcrRisk === 'medium' ? COLORS.warningAmber : COLORS.deepTeal}
-                  strokeWidth="20"
-                  strokeLinecap="round"
-                  pathLength={100}
-                  strokeDasharray={`${Math.min(100, fcrPercent)} 100`}
-                  style={{ transition: 'stroke-dasharray 700ms ease, stroke 400ms ease' }}
-                />
-              </svg>
-
-              <div className="absolute bottom-2 text-center">
-                <span className="text-4xl font-bold font-mono tracking-tight text-navy tabular-nums">
-                  {fcrPercent}%
-                </span>
-                <span className="block text-[10px] font-mono text-steel uppercase tracking-widest mt-0.5">
-                  FCR Ratio
-                </span>
-              </div>
-            </div>
-
-            {/* Color Bands Legend */}
-            <div className="mt-6 grid grid-cols-3 gap-2 text-[10px] font-mono text-center">
-              <div className="rounded-lg bg-emerald-50 border border-emerald-200 p-1.5 text-emerald-800">
-                &lt; 30% Safe
-              </div>
-              <div className="rounded-lg bg-amber-50 border border-amber-200 p-1.5 text-amber-800">
-                30–50% Moderate
-              </div>
-              <div className="rounded-lg bg-red-50 border border-red-200 p-1.5 text-red-800">
-                &gt; 50% High Risk
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-6 border-t border-mint/60 pt-4 text-xs font-mono text-steel">
-            Formula: <span className="text-navy">{inr(totalOverhead)}</span> ÷ {inr(lowestMonthlyRevenue)}
-          </div>
-        </div>
-
-        {/* Input Card: Overhead Evaluator Form (7 cols) */}
-        <div className="lg:col-span-7 rounded-3xl bg-white border border-mint/80 p-6 md:p-8 shadow-sm">
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] font-mono uppercase tracking-[0.2em] text-steel font-semibold">
-              New Overhead Evaluator
-            </span>
-            <span className="text-xs font-mono text-teal">Screen SOL-01</span>
-          </div>
-
-          <div className="mt-5 grid sm:grid-cols-2 gap-4">
-            {/* Field 1: Commitment Name */}
-            <div className="sm:col-span-2">
-              <label className="text-xs font-semibold uppercase tracking-wider text-navy">
-                Commitment Name
-              </label>
-              <input
-                type="text"
-                value={toolName}
-                onChange={(e) => setToolName(e.target.value)}
-                className="mt-1.5 w-full rounded-xl border border-mint bg-aqua/30 px-4 py-2.5 text-sm font-medium text-navy focus:border-teal focus:outline-none"
-              />
-            </div>
-
-            {/* Field 2: Recurring Cost */}
-            <div>
-              <label className="text-xs font-semibold uppercase tracking-wider text-navy">
-                Monthly Recurring Cost
-              </label>
-              <div className="mt-1.5 relative flex items-center">
-                <span className="absolute left-3.5 font-serif text-teal font-semibold">₹</span>
-                <input
-                  type="number"
-                  value={recurringCost}
-                  step={500}
-                  onChange={(e) => setRecurringCost(Number(e.target.value))}
-                  className="w-full rounded-xl border border-mint bg-aqua/30 pl-8 pr-4 py-2 text-base font-bold text-navy focus:border-teal focus:outline-none"
-                />
-              </div>
-            </div>
-
-            {/* Field 3: Contract Commitment Lock-In */}
-            <div>
-              <label className="text-xs font-semibold uppercase tracking-wider text-navy">
-                Contract Lock-In
-              </label>
-              <div className="mt-1.5 flex rounded-xl bg-aqua/60 p-1 border border-mint">
-                {[
-                  { m: 0, label: 'None' },
-                  { m: 6, label: '6 Mos' },
-                  { m: 12, label: '12 Mos' },
-                ].map((l) => (
-                  <button
-                    key={l.m}
-                    type="button"
-                    onClick={() => setLockInMonths(l.m as any)}
-                    className={cn(
-                      'flex-1 rounded-lg py-1.5 text-xs font-mono transition-colors',
-                      lockInMonths === l.m
-                        ? 'bg-navy text-white font-bold'
-                        : 'text-steel hover:text-navy',
-                    )}
-                  >
-                    {l.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Field 4: Early Termination Penalty */}
-            <div className="sm:col-span-2">
-              <div className="flex justify-between items-baseline">
-                <label className="text-xs font-semibold uppercase tracking-wider text-navy">
-                  Early Termination Penalty
-                </label>
-                <span className="text-xs font-mono text-steel">
-                  Total Exposure: <span className="text-navy font-bold">{inr(totalContractLiability)}</span>
-                </span>
-              </div>
-              <input
-                type="number"
-                value={penalty}
-                step={1000}
-                onChange={(e) => setPenalty(Number(e.target.value))}
-                className="mt-1.5 w-full rounded-xl border border-mint bg-aqua/30 px-4 py-2 text-sm font-semibold text-navy focus:border-teal focus:outline-none"
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Revenue Stress-Test Section */}
-      <div className="rounded-3xl bg-white border border-mint/80 p-6 md:p-8 shadow-sm">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <h3 className="text-lg font-semibold tracking-tight text-navy">
-              Revenue Stress-Test & Cash Flow
-            </h3>
-            <p className="text-xs font-mono text-steel mt-0.5">
-              Simulating overhead impact against revenue fluctuation models
-            </p>
-          </div>
-
-          {/* Revenue Scenario Pills */}
-          <div className="flex flex-wrap rounded-full bg-aqua p-1 border border-mint text-xs font-mono">
-            {[
-              { id: 'conservative', label: 'Conservative (-30%)' },
-              { id: 'baseline', label: 'Baseline Average' },
-              { id: 'aggressive', label: 'Aggressive (+20%)' },
-              { id: 'crisis', label: '⚠️ Crisis Mode (Zero Inflow)' },
-            ].map((sc) => (
-              <button
-                key={sc.id}
-                type="button"
-                onClick={() => {
-                  setRevenueScenario(sc.id as any)
-                  if (sc.id === 'crisis') {
-                    sound.warning()
-                  } else {
-                    sound.snap('low')
-                  }
-                }}
-                className={cn(
-                  'rounded-full px-3.5 py-1.5 transition-all',
-                  revenueScenario === sc.id
-                    ? sc.id === 'crisis'
-                      ? 'bg-red-600 text-white font-bold shadow-md shadow-red-500/30'
-                      : 'bg-navy text-white font-bold'
-                    : sc.id === 'crisis'
-                      ? 'text-red-600 hover:bg-red-50 font-semibold'
-                      : 'text-steel hover:text-navy',
-                )}
-              >
-                {sc.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Stress-Test Data Cards */}
-        <div className="mt-6 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
-          {stressTestData.map((st) => (
-            <div
-              key={st.month}
-              className={cn(
-                'rounded-2xl border p-3.5 text-center transition-all',
-                st.isDanger
-                  ? 'border-red-300 bg-red-50 text-red-900'
-                  : 'border-mint bg-aqua/20 text-navy',
-              )}
-            >
-              <div className="text-[11px] font-mono text-steel">{st.month}</div>
-              <div className="mt-1 font-mono text-xs font-bold tabular-nums">
-                {inr(st.net)}
-              </div>
-              <div
-                className={cn(
-                  'mt-1 text-[9px] font-mono uppercase tracking-wider',
-                  st.isDanger ? 'text-red-700 font-bold' : 'text-teal',
-                )}
-              >
-                {st.isDanger ? 'Danger Zone' : 'Positive'}
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Commitment Drift / Burn-Rate Banner */}
-        {revenueScenario === 'crisis' ? (
-          <div className="mt-6 rounded-2xl p-5 border border-red-300 bg-gradient-to-r from-red-50 via-rose-50 to-red-50 text-red-950 space-y-3 shadow-md animate-in fade-in duration-300">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <div className="flex items-center gap-2 text-red-700 font-bold font-mono text-sm uppercase tracking-wider">
-                <Flame className="size-5 text-red-600 animate-bounce" />
-                Burn-Only Runway Visualizer · PRD Edge Case 7.1
-              </div>
-              <div className="rounded-full bg-red-600 text-white px-3.5 py-1 font-mono text-xs font-bold shadow-sm tracking-wide">
-                {daysUntilDepletion} DAYS REMAINING
-              </div>
-            </div>
-            <p className="text-xs md:text-sm leading-relaxed text-red-900 font-medium">
-              <strong>Zero Inflow Scenario:</strong> With revenue at ₹0, your operational cash reserves of <strong>{inr(initialReserves)}</strong> will be completely exhausted in approximately <strong>{daysUntilDepletion} days</strong> ({Math.ceil(daysUntilDepletion / 30)} months) at your current total overhead burn rate of <strong>{inr(totalOverhead)}/mo</strong>.
-            </p>
-            <div className="pt-2 border-t border-red-200/80 flex flex-wrap items-center justify-between gap-2 text-xs font-mono">
-              <span className="text-red-700 font-semibold">
-                🛡️ Defense Protocol: De-committing from &ldquo;{toolName}&rdquo; saves {inr(recurringCost)}/mo
-              </span>
-              <span className="bg-red-100 text-red-800 px-2.5 py-1 rounded-md font-bold">
-                Extends Runway by +{daysSavedIfToolCancelled} Days
-              </span>
-            </div>
-          </div>
-        ) : (
-          <div
-            className={cn(
-              'mt-6 rounded-2xl p-4 flex items-center gap-3 border text-xs md:text-sm font-medium',
-              revenueScenario === 'conservative'
-                ? 'bg-red-50 border-red-200 text-red-900'
-                : 'bg-emerald-50 border-emerald-200 text-emerald-900',
-            )}
-          >
-            {revenueScenario === 'conservative' ? (
-              <>
-                <AlertTriangle className="size-5 text-red-600 shrink-0" />
-                <span>
-                  <strong>High Risk Warning:</strong> If revenue drops to your historical -30% July low, this commitment creates a negative cash flow state by Month 4.
-                </span>
-              </>
-            ) : (
-              <>
-                <CheckCircle2 className="size-5 text-emerald-600 shrink-0" />
-                <span>
-                  <strong>Safe Commitment:</strong> Projected cash flow stays positive and maintains 4+ months operational runway across selected scenario.
-                </span>
-              </>
-            )}
-          </div>
-        )}
-      </div>
-
-      {/* Operational Workload & Unit Conversion Cards */}
-      <div className="grid sm:grid-cols-2 gap-6">
-        {/* Card 1: Client Retainer Unit Conversion */}
-        <div className="rounded-3xl bg-white border border-mint/80 p-6 shadow-sm flex items-start gap-4">
-          <div className="size-12 rounded-2xl bg-aqua border border-mint flex items-center justify-center shrink-0">
-            <Briefcase className="size-6 text-teal" />
-          </div>
-          <div>
-            <span className="text-[10px] font-mono uppercase tracking-wider text-steel font-semibold">
-              Workload Conversion
-            </span>
-            <h4 className="text-xl font-bold font-mono text-navy mt-1">
-              +{additionalRetainersNeeded} Client Retainers / mo
-            </h4>
-            <p className="mt-1 text-xs text-steel leading-relaxed">
-              Required billable capacity increase to fully offset this recurring {inr(recurringCost)} commitment without cutting profit margin.
-            </p>
-          </div>
-        </div>
-
-        {/* Card 2: Billable Hours Break-Even */}
-        <div className="rounded-3xl bg-white border border-mint/80 p-6 shadow-sm flex items-start gap-4">
-          <div className="size-12 rounded-2xl bg-aqua border border-mint flex items-center justify-center shrink-0">
-            <Clock className="size-6 text-teal" />
-          </div>
-          <div>
-            <span className="text-[10px] font-mono uppercase tracking-wider text-steel font-semibold">
-              Hourly Break-Even
-            </span>
-            <h4 className="text-xl font-bold font-mono text-navy mt-1">
-              {billableHoursNeeded} Billable Hours / mo
-            </h4>
-            <p className="mt-1 text-xs text-steel leading-relaxed">
-              Additional work required at your current average hourly rate ({inr(averageHourlyRate)}/hr) solely to cover this new tool's overhead.
-            </p>
-          </div>
-        </div>
-      </div>
     </div>
   )
 }
