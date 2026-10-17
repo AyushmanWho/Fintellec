@@ -102,12 +102,6 @@ export function TextScrub() {
       />
 
       <div className="relative mx-auto max-w-[1200px] text-center">
-        {/* Apple style subhead kicker */}
-        <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full border border-teal/30 bg-teal/5 text-teal text-xs font-mono tracking-[0.24em] uppercase mb-8">
-          <span className="size-1.5 rounded-full bg-teal animate-pulse" />
-          The Core Philosophy
-        </div>
-
         {/* Apple Scrub Typography */}
         <h2 className="text-balance text-[clamp(2.4rem,5.6vw,4.8rem)] font-medium leading-[1.08] tracking-[-0.04em] text-navy">
           <div>

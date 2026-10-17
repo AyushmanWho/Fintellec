@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef, useState, useEffect } from 'react'
-import { Cpu, Layers, ShieldCheck, Zap } from 'lucide-react'
+import { Cpu, ShieldCheck, Zap } from 'lucide-react'
 import { clamp } from '@/lib/smooth-path'
 import { useReducedMotion } from '@/hooks/use-motion'
 import { cn } from '@/lib/utils'
@@ -148,10 +148,6 @@ export function ExplodedAnatomy() {
       <div className="relative mx-auto max-w-[1400px] px-6 md:px-12">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full border border-bright/40 bg-bright/10 text-bright text-xs font-mono tracking-[0.22em] uppercase mb-5 shadow-[0_0_15px_rgba(99,220,211,0.2)]">
-            <Layers className="size-3.5" />
-            Deconstructed Architecture
-          </div>
           <h2
             id="anatomy-title"
             className="text-balance text-[clamp(2.5rem,5.5vw,5rem)] font-medium leading-[0.94] tracking-[-0.04em] text-white"

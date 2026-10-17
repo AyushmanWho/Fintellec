@@ -195,16 +195,13 @@ export function Direction() {
       }}
     >
       <div className="mx-auto max-w-[1400px] px-6 md:px-12">
-        <div className="grid gap-8 md:grid-cols-12">
-          <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-teal md:col-span-3 md:pt-4">How it works</p>
-          <h2
-            id="direction-title"
-            className="text-balance text-[clamp(2.6rem,6vw,5.5rem)] font-medium leading-[0.92] tracking-[-0.045em] text-navy md:col-span-8"
-          >
-            Every rupee has a <span className="text-teal">direction.</span>
-          </h2>
-        </div>
-        <p className="mt-8 max-w-md text-pretty text-steel md:ml-[25%] md:text-lg">
+        <h2
+          id="direction-title"
+          className="text-balance text-[clamp(2.6rem,6vw,5.5rem)] font-medium leading-[0.92] tracking-[-0.045em] text-navy max-w-4xl"
+        >
+          Every rupee has a <span className="text-teal">direction.</span>
+        </h2>
+        <p className="mt-6 max-w-xl text-pretty text-steel md:text-lg">
           Three movements, one continuous flow — from knowing where money goes to arriving where you want it.
         </p>
       </div>

@@ -106,10 +106,9 @@ export function BiggerPicture() {
       <div className="mx-auto max-w-[1400px] px-6 md:px-12">
         <div className="grid gap-10 md:grid-cols-12 md:items-end">
           <div className="md:col-span-7">
-            <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-teal">Money insights</p>
             <h2
               id="bigger-picture-title"
-              className="mt-5 text-balance text-[clamp(2.6rem,6vw,5.5rem)] font-medium leading-[0.92] tracking-[-0.045em] text-navy"
+              className="text-balance text-[clamp(2.6rem,6vw,5.5rem)] font-medium leading-[0.92] tracking-[-0.045em] text-navy"
             >
               See the bigger <span className="text-teal">picture.</span>
             </h2>

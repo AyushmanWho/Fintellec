@@ -86,10 +86,9 @@ export function FinalCta() {
       </svg>
 
       <div className="relative mx-auto flex min-h-[86svh] max-w-[1400px] flex-col items-center justify-center px-6 py-32 text-center md:px-12">
-        <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-teal">Begin</p>
         <h2
           id="cta-title"
-          className="mt-6 max-w-4xl text-balance text-[clamp(2.8rem,7vw,6.5rem)] font-medium leading-[0.92] tracking-[-0.05em] text-navy"
+          className="max-w-4xl text-balance text-[clamp(2.8rem,7vw,6.5rem)] font-medium leading-[0.92] tracking-[-0.05em] text-navy"
         >
           Your money story <span className="text-teal">starts here.</span>
         </h2>

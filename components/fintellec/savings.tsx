@@ -130,10 +130,9 @@ export function Savings() {
         </div>
 
         <div className="md:col-span-5 md:col-start-8">
-          <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-teal">Savings goals</p>
           <h2
             id="savings-title"
-            className="mt-5 text-balance text-[clamp(2.6rem,5.2vw,4.75rem)] font-medium leading-[0.92] tracking-[-0.045em] text-navy"
+            className="text-balance text-[clamp(2.6rem,5.2vw,4.75rem)] font-medium leading-[0.92] tracking-[-0.045em] text-navy"
           >
             Make room for what <span className="text-teal">matters.</span>
           </h2>

@@ -16,7 +16,6 @@ import {
   Clock,
   Gauge,
   HelpCircle,
-  Sliders,
   DollarSign,
   Flame,
   ShieldAlert
@@ -64,10 +63,6 @@ export function FdinSimulator() {
       <div className="relative mx-auto max-w-[1400px] px-6 md:px-12">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full border border-teal/30 bg-teal/5 text-teal text-xs font-mono tracking-[0.22em] uppercase mb-5 shadow-sm">
-            <Sliders className="size-3.5" />
-            FDIN · Decision Intelligence Engine
-          </div>
           <h2
             id="simulator-title"
             className="text-balance text-[clamp(2.4rem,5.2vw,4.5rem)] font-medium leading-[0.96] tracking-[-0.04em] text-navy"
