@@ -138,7 +138,6 @@ const CAPTIONS = [
 
 const HERO_START = 0.285
 const HERO_SPAN = 1 - HERO_START
-const HERO_STOP_PROGRESS = 0.335
 
 export function Hero() {
   const reduced = useReducedMotion()
@@ -149,11 +148,6 @@ export function Hero() {
   const { isNight } = useCircadian()
   const pointerRef = useRef<{ x: number; y: number } | null>(null)
   const ripplesRef = useRef<{ x: number; y: number; time: number }[]>([])
-
-  // Automatic hero stop detent refs
-  const fromTopRef = useRef(true)
-  const snappedRef = useRef(false)
-  const unlockTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   // Wallet Chapter Refs
   const walletWorldRef = useRef<HTMLDivElement>(null)
@@ -636,19 +630,19 @@ export function Hero() {
         if (body) body.style.color = `color-mix(in srgb, #B8F2EC ${(1 - reveal) * 100}%, #52728A)`
       }
 
-      // Opening copy stays rock-solid, 100% sharp and fully loaded throughout Scene 1 plateau (heroP <= 0.22)
-      // Only begins smooth departure when user scrolls past heroP = 0.22 toward Scene 2 (KEYS[1] = 0.44)
-      const hOut = clamp((heroP - 0.22) / (KEYS[1] - 0.22))
+      // Opening copy stays rock-solid through Scene 1, then gracefully glides out
+      // completely BEFORE Scene 2 ("Money is never still") begins, eliminating text collision and ghosting
+      const hOut = smoothstep(0.12, 0.28, heroP)
       if (headline.current) {
         const headlineO = heroIntro * (1 - hOut)
         const scale = 1 - hOut * 0.075
-        const blur = hOut * 10
-        const yOffset = (1 - heroIntro) * 20 - hOut * 90
+        const blur = hOut * 8
+        const yOffset = (1 - heroIntro) * 20 - hOut * 70
         headline.current.style.opacity = String(headlineO)
         headline.current.style.transform = `translate3d(0, ${yOffset}px, 0) scale(${scale})`
         headline.current.style.filter = blur > 0.1 ? `blur(${blur}px)` : 'none'
         headline.current.style.transformOrigin = 'left center'
-        headline.current.style.visibility = headlineO > 0.01 ? 'visible' : 'hidden'
+        headline.current.style.visibility = headlineO > 0.005 ? 'visible' : 'hidden'
       }
 
       captions.current.forEach((c, i) => {
@@ -682,7 +676,7 @@ export function Hero() {
       const rect = section.getBoundingClientRect()
       const total = Math.max(1, rect.height - window.innerHeight)
       const target = reduced ? 0 : clamp(-rect.top / total)
-      smooth = smooth < 0 || reduced ? target : smooth + (target - smooth) * 0.085
+      smooth = smooth < 0 || reduced ? target : smooth + (target - smooth) * 0.12
       if (Math.abs(target - smooth) < 0.0002) smooth = target
       render(smooth, reduced ? 0 : now / 1000)
     }
@@ -697,92 +691,13 @@ export function Hero() {
     })
     io.observe(section)
 
-    // Automatic Hero Snap Detent: when scrolling down from starting, smoothly stops at the Hero scene
-    const onWheel = (e: WheelEvent) => {
-      if (reduced) return
-      const sec = sectionRef.current
-      if (!sec) return
-      const rect = sec.getBoundingClientRect()
-      const total = Math.max(1, rect.height - window.innerHeight)
-      const currentP = clamp(-rect.top / total)
-
-      if (e.deltaY <= 0) {
-        // Scrolling up is completely unrestricted; re-arms if reaching the top
-        if (currentP < 0.10) {
-          fromTopRef.current = true
-          snappedRef.current = false
-        }
-        return
-      }
-
-      // Re-arm if user is back at the top
-      if (currentP < 0.10) {
-        fromTopRef.current = true
-        snappedRef.current = false
-      }
-
-      // If user has already arrived and stopped, any new scroll gesture immediately unlocks!
-      if (snappedRef.current) {
-        fromTopRef.current = false
-        return
-      }
-
-      // When scrolling down from starting and approaching the Hero scene:
-      if (fromTopRef.current && !snappedRef.current) {
-        if (currentP >= HERO_STOP_PROGRESS - 0.035) {
-          e.preventDefault()
-          const targetY = Math.round(sec.offsetTop + total * HERO_STOP_PROGRESS)
-          window.scrollTo({ top: targetY, behavior: 'smooth' })
-          snappedRef.current = true
-
-          if (unlockTimeoutRef.current) clearTimeout(unlockTimeoutRef.current)
-          unlockTimeoutRef.current = setTimeout(() => {
-            fromTopRef.current = false
-          }, 650)
-        }
-      }
-    }
-
-    const onScroll = () => {
-      if (reduced) return
-      const sec = sectionRef.current
-      if (!sec) return
-      const rect = sec.getBoundingClientRect()
-      const total = Math.max(1, rect.height - window.innerHeight)
-      const currentP = clamp(-rect.top / total)
-
-      if (currentP < 0.10) {
-        fromTopRef.current = true
-        snappedRef.current = false
-      }
-
-      if (fromTopRef.current && !snappedRef.current && currentP >= HERO_STOP_PROGRESS) {
-        const targetY = Math.round(sec.offsetTop + total * HERO_STOP_PROGRESS)
-        window.scrollTo({ top: targetY, behavior: 'smooth' })
-        snappedRef.current = true
-
-        if (unlockTimeoutRef.current) clearTimeout(unlockTimeoutRef.current)
-        unlockTimeoutRef.current = setTimeout(() => {
-          fromTopRef.current = false
-        }, 650)
-      }
-    }
-
-    window.addEventListener('wheel', onWheel, { passive: false })
-    window.addEventListener('scroll', onScroll, { passive: true })
-
     return () => {
       io.disconnect()
       cancelAnimationFrame(raf)
-      window.removeEventListener('wheel', onWheel)
-      window.removeEventListener('scroll', onScroll)
-      if (unlockTimeoutRef.current) clearTimeout(unlockTimeoutRef.current)
     }
   }, [scene, reduced])
 
   const goToFlow = () => {
-    fromTopRef.current = false
-    snappedRef.current = true
     const sec = sectionRef.current
     if (!sec) return
     const total = sec.offsetHeight - window.innerHeight
