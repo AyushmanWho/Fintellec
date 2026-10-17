@@ -859,7 +859,8 @@ export function Hero() {
           className="pointer-events-none absolute inset-0 z-[1]"
           style={{
             opacity: 0.94,
-            background: 'radial-gradient(60% 55% at 72% 48%, rgba(0,169,158,0.28), transparent 72%), linear-gradient(135deg, #003365 0%, #003365 58%, #00A99E 145%)',
+            background:
+              'radial-gradient(75% 45% at 50% 0%, rgba(0, 169, 158, 0.22) 0%, transparent 70%), radial-gradient(60% 50% at 85% 18%, rgba(99, 220, 211, 0.16) 0%, transparent 65%), radial-gradient(80% 60% at 50% 75%, rgba(0, 169, 158, 0.24) 0%, transparent 70%), linear-gradient(180deg, #001022 0%, #001e3b 28%, #002d54 58%, #001c38 88%, #001224 100%)',
             transition: reduced ? 'none' : 'opacity 120ms linear',
           }}
         />
