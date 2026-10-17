@@ -161,8 +161,17 @@ export function Hero() {
   const walletCoinRef = useRef<HTMLDivElement>(null)
   const walletBodyRef = useRef<HTMLDivElement>(null)
   const walletLidRef = useRef<HTMLDivElement>(null)
+  const magneticFieldRef = useRef<HTMLDivElement>(null)
+  const coinShadowRef = useRef<HTMLDivElement>(null)
+  const coinPulseRef = useRef(0)
   const meterRef = useRef<HTMLDivElement>(null)
   const tileRefs = useRef<(HTMLDivElement | null)[]>([])
+
+  const handleWalletCoinClick = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    coinPulseRef.current = performance.now()
+    sound.snap('high')
+  }
 
   // Chapter 1.5: Thread Convergence Refs
   const threadsSvgRef = useRef<SVGSVGElement>(null)
@@ -231,27 +240,53 @@ export function Hero() {
       }
 
       if (isWalletActive) {
-        // 1. Rupee Coin in 3D: Rotates continuously, tilts naturally, then drops smoothly into the wallet
+        // 1. Rupee Coin in 3D: Levitates with cursor tilt at rest, rotates continuously, tilts naturally, then drops into wallet
+        const mx = pointerRef.current?.x ?? (w * 0.5)
+        const my = pointerRef.current?.y ?? (h * 0.5)
+        const curDistX = clamp((mx - w * 0.5) / (w * 0.5))
+        const curDistY = clamp((my - h * 0.5) / (h * 0.5))
+        const cursorInfluence = 1 - smoothstep(0.0, 0.16, wP)
+        const cursorTiltX = -curDistY * 20 * cursorInfluence
+        const cursorTiltY = curDistX * 24 * cursorInfluence
+        const idleFloat = Math.sin(t * 1.8) * 8 * cursorInfluence
+
+        const pulseElapsed = performance.now() - coinPulseRef.current
+        const pulseBoost = pulseElapsed < 450 ? Math.sin((pulseElapsed / 450) * Math.PI) * 0.14 : 0
+
         const spinDeg = wP * 960
         const tiltX = Math.sin(wP * Math.PI * 3.2) * 14
         const tiltZ = Math.sin(wP * Math.PI * 2.2) * 9
         const drop = smoothstep(0.16, 0.35, wP)
         const dropY = drop * 155
-        const coinScale = Math.max(0.18, 1 - drop * 0.72)
+        const coinScale = Math.max(0.18, 1 - drop * 0.72) + pulseBoost
         const coinFade = 1 - smoothstep(0.33, 0.40, wP)
 
         if (walletCoinRef.current) {
           walletCoinRef.current.style.opacity = String(coinFade)
-          walletCoinRef.current.style.transform = `translate3d(-50%, calc(-50% + ${dropY}px), 0) rotateY(${spinDeg}deg) rotateX(${tiltX}deg) rotateZ(${tiltZ}deg) scale(${coinScale})`
+          walletCoinRef.current.style.transform = `translate3d(calc(-50% + ${curDistX * 12 * cursorInfluence}px), calc(-50% + ${dropY + idleFloat}px), 0) rotateY(${spinDeg + cursorTiltY}deg) rotateX(${tiltX + cursorTiltX}deg) rotateZ(${tiltZ}deg) scale(${coinScale})`
         }
 
-        // 2. Leather Wallet Body glides in smoothly & swings its lid open in synchronization with the coin
-        const walletIn = smoothstep(0.0, 0.20, wP)
+        // Magnetic induction flux field & contact shadow dynamics
+        const magFade = (1 - smoothstep(0.12, 0.28, wP)) * (1 - handoff)
+        const pulseGlow = pulseElapsed < 450 ? Math.sin((pulseElapsed / 450) * Math.PI) * 0.4 : 0
+        if (magneticFieldRef.current) {
+          magneticFieldRef.current.style.opacity = String(Math.min(1, magFade * 0.92 + pulseGlow))
+          magneticFieldRef.current.style.transform = `translate3d(calc(-50% + ${curDistX * 8 * cursorInfluence}px), calc(-50% + ${dropY * 0.35}px), 0) scale(${Math.max(0.4, 1 - drop * 0.3 + pulseGlow * 0.25)})`
+        }
+        if (coinShadowRef.current) {
+          const shadowScale = Math.max(0.38, 1 - drop * 0.52 - idleFloat * 0.02)
+          coinShadowRef.current.style.opacity = String((0.85 - drop * 0.45) * magFade)
+          coinShadowRef.current.style.transform = `translate3d(calc(-50% + ${curDistX * 6 * cursorInfluence}px), calc(-50% + ${dropY * 0.55}px), 0) scale(${shadowScale})`
+        }
+
+        // 2. Leather Wallet Body rests physically below coin, then glides in & swings its lid open in synchronization with the coin
+        const walletIn = smoothstep(0.0, 0.18, wP)
         const walletOpen = smoothstep(0.14, 0.35, wP)
         if (walletBodyRef.current) {
           const walletFade = 1 - smoothstep(0.79, 0.91, wP)
-          walletBodyRef.current.style.opacity = String(walletIn * walletFade)
-          walletBodyRef.current.style.transform = `translate3d(-50%, calc(-50% + ${(1 - walletIn) * 75 - walletOpen * 12}px), 0) scale(${0.84 + walletIn * 0.16 + walletOpen * 0.04})`
+          const baseVisibility = 0.88 + walletIn * 0.12
+          walletBodyRef.current.style.opacity = String(baseVisibility * walletFade)
+          walletBodyRef.current.style.transform = `translate3d(-50%, calc(-50% + ${(1 - walletIn) * 35 - walletOpen * 12}px), 0) scale(${0.92 + walletIn * 0.08 + walletOpen * 0.04})`
         }
         if (walletLidRef.current) {
           const lidAngle = walletOpen * (1 - handoff)
@@ -844,8 +879,35 @@ export function Hero() {
             </h1>
           </div>
 
-          {/* 3D Rupee Coin */}
-          <div ref={walletCoinRef} className="fintellec-wallet-reveal__coin" aria-label="Fintellec rupee coin">
+          {/* Magnetic Flux Induction Field & Caustic Light Pool */}
+          <div
+            ref={magneticFieldRef}
+            className="pointer-events-none absolute left-1/2 top-[68%] z-[2] -translate-x-1/2 -translate-y-1/2 w-[clamp(240px,36vw,440px)] h-[clamp(110px,18vw,190px)] flex items-center justify-center will-change-transform"
+            aria-hidden="true"
+          >
+            <div className="absolute inset-2 rounded-full bg-radial from-teal-400/25 via-cyan-400/10 to-transparent blur-2xl" />
+            <svg className="w-full h-full overflow-visible" viewBox="0 0 240 120">
+              <ellipse cx="120" cy="60" rx="100" ry="34" fill="none" stroke="rgba(99,220,211,0.22)" strokeDasharray="5 5" />
+              <ellipse cx="120" cy="60" rx="72" ry="24" fill="none" stroke="rgba(184,242,236,0.4)" strokeWidth="1.2" />
+              <ellipse cx="120" cy="60" rx="46" ry="15" fill="none" stroke="rgba(99,220,211,0.6)" strokeWidth="1" />
+            </svg>
+          </div>
+
+          {/* Dynamic Contact Drop Shadow directly below coin */}
+          <div
+            ref={coinShadowRef}
+            className="pointer-events-none absolute left-1/2 top-[68.2%] z-[2] -translate-x-1/2 -translate-y-1/2 w-[clamp(110px,14vw,170px)] h-[22px] rounded-[100%] bg-[#001020]/95 blur-md will-change-transform"
+            aria-hidden="true"
+          />
+
+          {/* 3D Rupee Coin (Clickable for Magnetic Pulse) */}
+          <div
+            ref={walletCoinRef}
+            onClick={handleWalletCoinClick}
+            className="fintellec-wallet-reveal__coin pointer-events-auto cursor-pointer select-none transition-[box-shadow] duration-200 hover:shadow-[0_0_0_6px_rgba(99,220,211,.65),0_0_55px_rgba(99,220,211,.45)]"
+            aria-label="Fintellec rupee coin - click to pulse magnetic field"
+            title="Click to pulse magnetic levitation field"
+          >
             <span>₹</span>
             <small>FINTELLEC</small>
           </div>
