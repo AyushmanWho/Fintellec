@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo, useEffect, useRef } from 'react'
 import {
   GraduationCap,
   Briefcase,
@@ -220,6 +220,114 @@ function LiquidGlassCard({
   )
 }
 
+// =========================================================================
+// APPLE LIQUID GLASS NAVIGATION BAR TOGGLE (REEL_50 ENGINE)
+// =========================================================================
+function AppleLiquidToggle({
+  archetypeKey,
+  onChange,
+}: {
+  archetypeKey: ArchetypeKey
+  onChange: (key: ArchetypeKey) => void
+}) {
+  const navRef = useRef<HTMLDivElement>(null)
+  const studentBtnRef = useRef<HTMLButtonElement>(null)
+  const profBtnRef = useRef<HTMLButtonElement>(null)
+  const [pillStyle, setPillStyle] = useState<{ left: number; width: number }>({ left: 0, width: 0 })
+
+  // Synchronize sliding pill geometry with the active button
+  useEffect(() => {
+    const activeBtn = archetypeKey === 'student' ? studentBtnRef.current : profBtnRef.current
+    if (activeBtn) {
+      setPillStyle({
+        left: activeBtn.offsetLeft,
+        width: activeBtn.offsetWidth,
+      })
+    }
+  }, [archetypeKey])
+
+  // Mousemove listener for dynamic 3D optical glare refraction
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!navRef.current) return
+    const rect = navRef.current.getBoundingClientRect()
+    navRef.current.style.setProperty('--x', `${e.clientX - rect.left}px`)
+    navRef.current.style.setProperty('--y', `${e.clientY - rect.top}px`)
+  }
+
+  return (
+    <nav
+      ref={navRef}
+      onMouseMove={handleMouseMove}
+      className="liquid-nav select-none shadow-[0_24px_60px_-15px_rgba(0,51,101,0.18)]"
+      aria-label="Archetype selector"
+    >
+      {/* Dynamic 3D Optical Glare follows mouse */}
+      <div className="liquid-glare-container">
+        <div className="liquid-glare" />
+      </div>
+
+      <div className="liquid-nav-items">
+        {/* Animated Sliding Active Navy Pill */}
+        <div
+          className="liquid-active-pill"
+          style={{
+            transform: `translateX(${pillStyle.left}px)`,
+            width: pillStyle.width ? `${pillStyle.width}px` : undefined,
+          }}
+        />
+
+        {/* Student Button */}
+        <button
+          ref={studentBtnRef}
+          type="button"
+          onClick={() => {
+            onChange('student')
+            sound.snap('high')
+          }}
+          className={cn(
+            'liquid-nav-btn',
+            archetypeKey === 'student' ? 'active' : 'bg-white/40 backdrop-blur-sm hover:bg-white/60',
+          )}
+        >
+          <div className="liquid-btn-content">
+            <GraduationCap
+              className={cn(
+                'size-4 transition-colors',
+                archetypeKey === 'student' ? 'text-bright' : 'text-teal',
+              )}
+            />
+            <span className="font-semibold text-sm">Student</span>
+          </div>
+        </button>
+
+        {/* Young Professional Button */}
+        <button
+          ref={profBtnRef}
+          type="button"
+          onClick={() => {
+            onChange('professional')
+            sound.snap('high')
+          }}
+          className={cn(
+            'liquid-nav-btn',
+            archetypeKey === 'professional' ? 'active' : 'bg-white/40 backdrop-blur-sm hover:bg-white/60',
+          )}
+        >
+          <div className="liquid-btn-content">
+            <Briefcase
+              className={cn(
+                'size-4 transition-colors',
+                archetypeKey === 'professional' ? 'text-bright' : 'text-teal',
+              )}
+            />
+            <span className="font-semibold text-sm">Young Professional</span>
+          </div>
+        </button>
+      </div>
+    </nav>
+  )
+}
+
 export function FdinSimulator() {
   const [archetypeKey, setArchetypeKey] = useState<ArchetypeKey>('student')
   const config = ARCHETYPES[archetypeKey]
@@ -234,16 +342,14 @@ export function FdinSimulator() {
           'radial-gradient(75% 55% at 15% 25%, rgba(99, 220, 211, 0.38) 0%, transparent 70%), radial-gradient(80% 60% at 85% 70%, rgba(0, 169, 158, 0.32) 0%, transparent 70%), linear-gradient(180deg, #F0FAF7 0%, #E3F7F3 45%, #EBF8F5 100%)',
       }}
     >
-      {/* Background Liquid Aurora Mesh Blobs (Breathing color bodies that refract through the glass) */}
+      {/* Background Liquid Aurora Mesh Blobs (Breathing color bodies from Reel_50 style53.css) */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
-        {/* Floating Orb 1: Mint & Cyan */}
-        <div className="liquid-mesh-blob-1 absolute -left-20 top-24 w-[640px] h-[640px] rounded-full bg-gradient-to-tr from-[#63DCD3]/70 via-[#00A99E]/50 to-transparent blur-[90px]" />
-
-        {/* Floating Orb 2: Deep Teal & Emerald */}
-        <div className="liquid-mesh-blob-2 absolute -right-24 top-1/3 w-[700px] h-[700px] rounded-full bg-gradient-to-bl from-[#00A99E]/65 via-[#63DCD3]/50 to-[#0F766E]/40 blur-[100px]" />
-
-        {/* Floating Orb 3: Aqua Soft Center Lagoon */}
-        <div className="liquid-mesh-blob-3 absolute left-1/4 bottom-12 w-[580px] h-[580px] rounded-full bg-gradient-to-r from-[#B8F2EC]/90 via-[#63DCD3]/60 to-[#00A99E]/30 blur-[90px]" />
+        {/* Blob 1 */}
+        <div className="apple-liquid-blob w-[50vw] h-[50vw] -top-[10%] -left-[10%] bg-[#63DCD3]/55" style={{ animationDelay: '0s' }} />
+        {/* Blob 2 */}
+        <div className="apple-liquid-blob w-[45vw] h-[45vw] -bottom-[10%] -right-[10%] bg-[#00A99E]/45" style={{ animationDelay: '-5s' }} />
+        {/* Blob 3 */}
+        <div className="apple-liquid-blob w-[38vw] h-[38vw] top-[25%] left-[35%] bg-[#B8F2EC]/70" style={{ animationDelay: '-10s' }} />
 
         {/* Caustic Grid Texture */}
         <div className="absolute inset-0 bg-[radial-gradient(rgba(0,51,101,0.06)_1px,transparent_1px)] [background-size:24px_24px] opacity-40" />
@@ -265,41 +371,9 @@ export function FdinSimulator() {
             Every decision triggers an instant ripple across your future. Simulate major purchases, EMIs, or lifestyle shifts before locking in.
           </p>
 
-          {/* Apple Dynamic Island Style Segmented Control */}
-          <div className="mt-9 inline-flex p-1.5 rounded-full iphone-liquid-glass shadow-[0_12px_36px_rgba(0,51,101,0.1)]">
-            <button
-              type="button"
-              onClick={() => {
-                setArchetypeKey('student')
-                sound.snap('high')
-              }}
-              className={cn(
-                'flex items-center gap-2.5 px-6 py-2.5 rounded-full text-xs md:text-sm font-semibold transition-all duration-300 select-none',
-                archetypeKey === 'student'
-                  ? 'bg-navy text-white shadow-[0_4px_18px_rgba(0,51,101,0.35)] border border-teal/40'
-                  : 'text-steel hover:text-navy hover:bg-white/40',
-              )}
-            >
-              <GraduationCap className={cn('size-4 transition-colors', archetypeKey === 'student' ? 'text-bright' : 'text-teal')} />
-              <span>Student</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => {
-                setArchetypeKey('professional')
-                sound.snap('high')
-              }}
-              className={cn(
-                'flex items-center gap-2.5 px-6 py-2.5 rounded-full text-xs md:text-sm font-semibold transition-all duration-300 select-none',
-                archetypeKey === 'professional'
-                  ? 'bg-navy text-white shadow-[0_4px_18px_rgba(0,51,101,0.35)] border border-teal/40'
-                  : 'text-steel hover:text-navy hover:bg-white/40',
-              )}
-            >
-              <Briefcase className={cn('size-4 transition-colors', archetypeKey === 'professional' ? 'text-bright' : 'text-teal')} />
-              <span>Young Professional</span>
-            </button>
+          {/* Apple Liquid Navigation Bar Toggle (Reel_50 Engine) */}
+          <div className="mt-9 flex justify-center">
+            <AppleLiquidToggle archetypeKey={archetypeKey} onChange={setArchetypeKey} />
           </div>
         </div>
 
