@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { sound } from '@/lib/sound'
 import { inr, inrCompact } from '@/lib/format'
-import { TrendingUp, Sparkles, Award, Shield, Layers, ArrowRight } from 'lucide-react'
+import { Clock, TrendingUp, Sparkles, Award, Shield, Layers, ArrowRight } from 'lucide-react'
 
 const YEARS = [0, 1, 3, 5, 7, 10]
 
@@ -94,6 +94,10 @@ export function TimeMachine() {
       <div className="relative mx-auto max-w-[1400px] px-6 md:px-12">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full border border-teal/30 bg-teal/5 text-teal text-xs font-mono tracking-[0.22em] uppercase mb-4 shadow-xs">
+            <Clock className="size-3.5" />
+            The Compounding Time Machine
+          </div>
           <h2
             id="time-machine-title"
             className="text-balance text-[clamp(2.4rem,5.4vw,4.8rem)] font-medium leading-[0.96] tracking-[-0.04em] text-navy"

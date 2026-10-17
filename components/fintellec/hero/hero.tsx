@@ -622,9 +622,11 @@ export function Hero() {
       if (headline.current) {
         const primary = headline.current.querySelector<HTMLElement>('[data-cinematic-primary]')
         const secondary = headline.current.querySelector<HTMLElement>('[data-cinematic-secondary]')
+        const eyebrow = headline.current.querySelector<HTMLElement>('[data-cinematic-eyebrow]')
         const body = headline.current.querySelector<HTMLElement>('[data-cinematic-body]')
         if (primary) primary.style.color = `color-mix(in srgb, #FFFFFF ${(1 - reveal) * 100}%, #003365)`
         if (secondary) secondary.style.color = `color-mix(in srgb, #63DCD3 ${(1 - reveal) * 100}%, #00A99E)`
+        if (eyebrow) eyebrow.style.color = `color-mix(in srgb, #63DCD3 ${(1 - reveal) * 100}%, #00A99E)`
         if (body) body.style.color = `color-mix(in srgb, #B8F2EC ${(1 - reveal) * 100}%, #52728A)`
       }
 
@@ -787,6 +789,7 @@ export function Hero() {
 
           {/* Intro Copy */}
           <div ref={walletCopyRef} className="fintellec-wallet-reveal__copy">
+            <p className="fintellec-wallet-reveal__eyebrow">MONEY, IN MOTION</p>
             <h1 className="fintellec-wallet-reveal__headline">
               Every rupee has<br /><span>a place to go.</span>
             </h1>
@@ -1171,7 +1174,18 @@ export function Hero() {
           className="pointer-events-none absolute inset-0 z-[4] mx-auto flex max-w-[1440px] flex-col justify-start px-6 pt-[17svh] md:justify-center md:px-12 md:pt-0"
         >
           <div className="pointer-events-auto max-w-[36rem]">
-            <h1 className="text-[clamp(3rem,8.6vw,7.6rem)] font-medium leading-[0.9] tracking-[-0.045em]">
+            <p
+              data-cinematic-eyebrow
+              className={cn(
+                'text-[11px] font-medium uppercase tracking-[0.32em] transition-all duration-700 ease-out',
+                isNight ? 'text-teal font-semibold' : 'text-teal',
+                alive ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0',
+              )}
+            >
+              Financial clarity, reimagined.
+            </p>
+
+            <h1 className="mt-5 text-[clamp(3rem,8.6vw,7.6rem)] font-medium leading-[0.9] tracking-[-0.045em]">
               <span className="block overflow-hidden pb-[0.08em]">
                 <span
                   data-cinematic-primary
