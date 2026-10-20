@@ -186,6 +186,7 @@ export function GlassCoin() {
       {/* Interactive Toss Trigger Pill (Hover / idle guide) */}
       <div className="pointer-events-none absolute -bottom-7 left-1/2 -translate-x-1/2 whitespace-nowrap">
         <div className="flex items-center gap-1.5 rounded-full border border-mint/90 bg-white/80 px-3 py-1 shadow-sm backdrop-blur-md transition-all duration-300 group-hover:border-teal">
+          <img src="/fintellec-f.png" alt="" aria-hidden="true" className="h-4 w-auto shrink-0" />
           <Sparkles className="size-3 text-teal" />
           <span className="font-mono text-[10px] font-medium tracking-wide text-navy">
             {flipping ? 'Airborne in 3D...' : 'Tap coin to toss for financial decisions'}

@@ -60,8 +60,8 @@ export function TextScrub() {
         frame = 0
         const rect = container.getBoundingClientRect()
         const windowH = window.innerHeight
-        // Progress 0 when top reaches 75% of viewport, 1 when bottom reaches 25%
-        const total = rect.height + windowH * 0.5
+        // Finish earlier: smaller denominator = faster completion
+        const total = rect.height - windowH * 0.3
         const current = windowH * 0.75 - rect.top
         setProgress(clamp(current / total))
       })
@@ -152,9 +152,9 @@ export function TextScrub() {
 
         {/* Fold Money Style Witty Microcopy Footnote */}
         <div className="mt-8 inline-flex items-center gap-2 rounded-full border border-mint/80 bg-white/70 px-4 py-1.5 shadow-xs backdrop-blur-sm">
-          <span className="text-xs">☕</span>
+          <img src="/fintellec-f.png" alt="" aria-hidden="true" className="h-4 w-auto shrink-0" />
           <p className="font-mono text-[11px] text-steel">
-            Tested on 14,800 real UPI transactions — including ₹10 tapri chai, ₹40 auto surcharges, and that gym subscription you swore you’d use.
+            Tested on 14,800 real UPI transactions — including ₹10 tapri chai, ₹40 auto surcharges, and that gym subscription you swore you'd use.
           </p>
         </div>
       </div>
