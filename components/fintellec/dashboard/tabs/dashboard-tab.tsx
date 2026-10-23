@@ -67,6 +67,26 @@ export function DashboardTab() {
   // Active delayed goals count
   const delayedGoals = goals.filter((g) => g.status === 'caution' || g.status === 'critical')
 
+  // Category visual styles for ledger
+  const getCategoryStyle = (category: string) => {
+    switch (category) {
+      case 'food':
+        return 'bg-amber-50 text-amber-700 border-amber-200'
+      case 'tech':
+        return 'bg-indigo-50 text-indigo-700 border-indigo-200'
+      case 'impulse':
+        return 'bg-rose-50 text-rose-700 border-rose-200'
+      case 'travel':
+        return 'bg-sky-50 text-sky-700 border-sky-200'
+      case 'bills':
+        return 'bg-blue-50 text-blue-700 border-blue-200'
+      case 'lifestyle':
+        return 'bg-fuchsia-50 text-fuchsia-700 border-fuchsia-200'
+      default:
+        return 'bg-aqua text-teal border-mint/60'
+    }
+  }
+
   return (
     <div className="space-y-8 pb-28 pt-2">
       {/* 1. Header Greeting & Top Actions */}
@@ -219,11 +239,11 @@ export function DashboardTab() {
           className="group cursor-pointer rounded-3xl border border-mint/80 bg-white/90 p-5 shadow-sm backdrop-blur-sm transition-all hover:border-teal hover:-translate-y-0.5"
         >
           <div className="flex items-center justify-between">
-            <span className="font-mono text-[11px] font-semibold tracking-wider text-steel uppercase group-hover:text-teal transition-colors">
+            <span className="font-mono text-[11px] font-semibold tracking-wider text-steel uppercase group-hover:text-purple-600 transition-colors">
               FINANCIAL IQ
             </span>
-            <div className="flex size-8 items-center justify-center rounded-xl bg-aqua text-teal transition-transform group-hover:scale-110">
-              <Info className="size-4" />
+            <div className="flex size-8 items-center justify-center rounded-xl bg-purple-50 text-purple-600 border border-purple-200/50 transition-transform group-hover:scale-110">
+              <Sparkles className="size-4" />
             </div>
           </div>
           <div className="mt-3">
@@ -231,7 +251,7 @@ export function DashboardTab() {
               <span>{user.financialIq}</span>
               <span className="text-sm font-semibold text-steel">/100</span>
             </div>
-            <p className="mt-1 text-xs text-steel group-hover:text-navy transition-colors">
+            <p className="mt-1 text-xs text-steel group-hover:text-purple-600 transition-colors">
               Tap for factor breakdown →
             </p>
           </div>
@@ -523,7 +543,7 @@ export function DashboardTab() {
               {expenses.map((exp) => (
                 <div key={exp.id} className="group flex items-center justify-between py-3 first:pt-0 last:pb-0">
                   <div className="flex items-center gap-3">
-                    <div className="flex size-9 items-center justify-center rounded-xl bg-aqua text-teal border border-mint/60">
+                    <div className={cn('flex size-9 items-center justify-center rounded-xl border text-sm', getCategoryStyle(exp.category))}>
                       {exp.category === 'food' && '☕'}
                       {exp.category === 'tech' && '💻'}
                       {exp.category === 'impulse' && '🌙'}

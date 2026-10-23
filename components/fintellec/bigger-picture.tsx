@@ -24,12 +24,12 @@ const PERIODS = {
 type Period = keyof typeof PERIODS
 
 export const CATEGORIES = [
-  { name: 'Food & dining', share: 0.31, color: '#07877F' },
-  { name: 'Shopping', share: 0.22, color: '#65DED2' },
-  { name: 'Bills & utilities', share: 0.2, color: '#063568' },
-  { name: 'Transport', share: 0.15, color: '#5FA9C9' },
-  { name: 'Other', share: 0.08, color: '#B9F0E9' },
-  { name: 'Subscriptions', share: 0.04, color: '#9DD9D2' },
+  { name: 'Food & dining', share: 0.31, color: '#FB923C' }, // Warm Coral
+  { name: 'Shopping', share: 0.22, color: '#F43F5E' },       // Rose Pink
+  { name: 'Bills & utilities', share: 0.2, color: '#003365' }, // Deep Navy
+  { name: 'Transport', share: 0.15, color: '#0284C7' },      // Sky Azure
+  { name: 'Other', share: 0.08, color: '#10B981' },          // Fresh Emerald
+  { name: 'Subscriptions', share: 0.04, color: '#8B5CF6' },  // Iris Violet
 ]
 
 const W = 1000

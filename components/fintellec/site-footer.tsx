@@ -49,7 +49,7 @@ export function SiteFooter() {
           </div>
           <div className="md:col-span-4 flex md:justify-end">
             <div className="inline-flex items-center gap-2 rounded-full border border-navy/10 bg-white/70 px-3.5 py-1.5 text-[11px] font-mono text-navy/80 shadow-xs backdrop-blur-sm">
-              <Sparkles className="size-3 text-teal" />
+              <img src="/fintellec-f.png" alt="" aria-hidden="true" className="h-4 w-auto shrink-0" />
               <span>Obsessively crafted in Delhi</span>
             </div>
           </div>

@@ -34,8 +34,8 @@ const INSIGHTS: Insight[] = [
     viz: (
       <div className="space-y-2">
         {[
-          { m: 'Sep', v: 5200, w: '78%', c: 'bg-mint' },
-          { m: 'Oct', v: 6140, w: '92%', c: 'bg-teal' },
+          { m: 'Sep', v: 5200, w: '78%', c: 'bg-amber-300' },
+          { m: 'Oct', v: 6140, w: '92%', c: 'bg-orange-500' },
         ].map((b) => (
           <div key={b.m} className="flex items-center gap-3 text-xs">
             <span className="w-7 font-mono text-steel">{b.m}</span>
@@ -57,7 +57,7 @@ const INSIGHTS: Insight[] = [
     viz: (
       <div>
         <div className="h-1.5 w-full rounded-full bg-aqua">
-          <div className="h-full w-[72%] rounded-full bg-gradient-to-r from-bright to-teal" />
+          <div className="h-full w-[72%] rounded-full bg-gradient-to-r from-sky-400 via-teal to-bright" />
         </div>
         <div className="mt-2 flex justify-between font-mono text-xs">
           <span className="text-navy">{inr(50400)}</span>
@@ -77,9 +77,9 @@ const INSIGHTS: Insight[] = [
         {SUBS.map((s) => (
           <li key={s.name} className="flex items-center justify-between py-1.5">
             <span className={cn('flex items-center gap-2', s.idle ? 'text-navy' : 'text-steel')}>
-              <span className={cn('size-1.5 rounded-full', s.idle ? 'bg-navy' : 'bg-mint')} aria-hidden />
+              <span className={cn('size-1.5 rounded-full', s.idle ? 'bg-purple-600' : 'bg-mint')} aria-hidden />
               {s.name}
-              {s.idle && <span className="font-mono text-[9px] uppercase tracking-[0.14em] text-teal">idle</span>}
+              {s.idle && <span className="font-mono text-[9px] uppercase tracking-[0.14em] text-purple-700 bg-purple-50 px-1.5 py-0.5 rounded-full border border-purple-200">idle</span>}
             </span>
             <span className="font-mono text-navy">{inr(s.cost)}/mo</span>
           </li>

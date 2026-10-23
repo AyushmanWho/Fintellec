@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react'
 import { ArrowDown, ArrowUpRight, Moon, ShieldAlert, BedDouble, Droplets } from 'lucide-react'
-import { clamp, smoothPath, type Vec } from '@/lib/smooth-path'
+import { clamp, smoothPath, getSplinePoint, type Vec } from '@/lib/smooth-path'
 import { inr, inrCompact } from '@/lib/format'
 import { useReducedMotion } from '@/hooks/use-motion'
 import { cn } from '@/lib/utils'
@@ -26,6 +26,9 @@ const FEATURES = [
     title: 'Know where it goes.',
     caption: 'Every rupee accounted for. Even that 2 AM biryani you promised you would never order again.',
     tag: 'No judgment. Just math.',
+    kickerColor: '#63dcd3',
+    tagColor: 'text-mint/90 bg-teal/20 border-teal/40',
+    glowColor: 'rgba(99, 220, 211, 0.45)',
   },
   {
     id: 'plan',
@@ -34,6 +37,9 @@ const FEATURES = [
     title: 'Give goals a place.',
     caption: 'Because "saving next month" has been active on your WhatsApp group since 2021.',
     tag: 'Goa Trip 2026? Finally.',
+    kickerColor: '#fb923c',
+    tagColor: 'text-amber-200 bg-amber-500/20 border-amber-400/40',
+    glowColor: 'rgba(251, 146, 60, 0.35)',
   },
   {
     id: 'insights',
@@ -42,6 +48,9 @@ const FEATURES = [
     title: 'See the bigger picture.',
     caption: 'Discover why 14 forgotten OTT trials are acting like silent, rent-free roommates.',
     tag: 'Gym: Paid. Visited: 0.',
+    kickerColor: '#a78bfa',
+    tagColor: 'text-purple-200 bg-purple-500/20 border-purple-400/40',
+    glowColor: 'rgba(167, 139, 250, 0.35)',
   },
 ] as const
 
@@ -88,7 +97,7 @@ function InteractiveWalletTile({
         className="pointer-events-none absolute inset-0 rounded-[22px] transition-opacity duration-300 z-10"
         style={{
           opacity: tilt.active ? 1 : 0,
-          background: `radial-gradient(circle 140px at ${tilt.spotX}% ${tilt.spotY}%, rgba(184, 242, 236, 0.45), rgba(99, 220, 211, 0.12) 42%, transparent 75%)`,
+          background: `radial-gradient(circle 140px at ${tilt.spotX}% ${tilt.spotY}%, ${feature.glowColor}, rgba(99, 220, 211, 0.12) 42%, transparent 75%)`,
         }}
         aria-hidden="true"
       />
@@ -107,8 +116,10 @@ function InteractiveWalletTile({
         }}
       >
         <div className="w-full flex items-center justify-between">
-          <span className="fintellec-wallet-reveal__tile-kicker">{feature.number} / {feature.eyebrow}</span>
-          <span className="text-[9px] font-mono tracking-wide text-mint/80 bg-navy/60 px-2 py-0.5 rounded-full border border-mint/20">
+          <span className="fintellec-wallet-reveal__tile-kicker" style={{ color: feature.kickerColor }}>
+            {feature.number} / {feature.eyebrow}
+          </span>
+          <span className={cn('text-[9px] font-mono tracking-wide px-2 py-0.5 rounded-full border', feature.tagColor)}>
             {feature.tag}
           </span>
         </div>
@@ -179,7 +190,6 @@ export function Hero() {
   const heroSvgFrontRef = useRef<SVGSVGElement>(null)
   const ribbon = useRef<(SVGPathElement | null)[]>([])
   const highlights = useRef<(SVGPathElement | null)[]>([])
-  const measure = useRef<SVGPathElement>(null)
   const drawPath = useRef<SVGPathElement>(null)
   const area = useRef<SVGPathElement>(null)
   const mask = useRef<SVGPathElement>(null)
@@ -198,6 +208,12 @@ export function Hero() {
   const coin = useRef<HTMLDivElement>(null)
   const wallet = useRef<HTMLDivElement>(null)
   const headline = useRef<HTMLDivElement>(null)
+  const headlineElements = useRef<{
+    primary: HTMLElement | null
+    secondary: HTMLElement | null
+    eyebrow: HTMLElement | null
+    body: HTMLElement | null
+  }>({ primary: null, secondary: null, eyebrow: null, body: null })
   const cinematicVeil = useRef<HTMLDivElement>(null)
   const captions = useRef<(HTMLDivElement | null)[]>([])
   const progressBar = useRef<HTMLSpanElement>(null)
@@ -219,6 +235,10 @@ export function Hero() {
     if (!section || !stage) return
     const { w, h, box } = scene
     let lastPct = ''
+    let lastSplit = -1
+    let lastReveal = -1
+    let lastGraphVisible = true
+    let lastHeadlineVisible = true
 
     const render = (progress: number, t: number) => {
       // ----------------------------------------------------
@@ -507,15 +527,29 @@ export function Hero() {
       if (coin.current) {
         const coinFade = smoothstep(0.38, 0.62, handoff)
         const coinAlpha = Math.max(coinFade, heroIntro) * s.coinO
-        coin.current.style.transform = `translate3d(${s.coinX - 200}px, ${s.coinY - 200}px, 0) scale(${s.coinR / 200})`
-        coin.current.style.opacity = String(coinAlpha)
-        coin.current.style.visibility = coinAlpha > 0.01 ? 'visible' : 'hidden'
+        if (coinAlpha > 0.01) {
+          coin.current.style.transform = `translate3d(${(s.coinX - 200).toFixed(1)}px, ${(s.coinY - 200).toFixed(1)}px, 0) scale(${(s.coinR / 200).toFixed(3)})`
+          coin.current.style.opacity = String(coinAlpha)
+          coin.current.style.visibility = 'visible'
+        } else {
+          coin.current.style.opacity = '0'
+          coin.current.style.visibility = 'hidden'
+        }
       }
       if (wallet.current) {
-        wallet.current.style.transform = `translate3d(${s.walletX - 120}px, ${s.walletY - 80}px, 0) scale(${s.walletS})`
-        wallet.current.style.opacity = String(s.walletO * heroIntro)
-        wallet.current.style.setProperty('--split', s.split.toFixed(3))
-        wallet.current.style.visibility = heroIntro > 0.01 ? 'visible' : 'hidden'
+        const walletAlpha = s.walletO * heroIntro
+        if (walletAlpha > 0.01) {
+          wallet.current.style.transform = `translate3d(${(s.walletX - 120).toFixed(1)}px, ${(s.walletY - 80).toFixed(1)}px, 0) scale(${s.walletS.toFixed(3)})`
+          wallet.current.style.opacity = String(walletAlpha)
+          if (Math.abs(s.split - lastSplit) > 0.002) {
+            wallet.current.style.setProperty('--split', s.split.toFixed(3))
+            lastSplit = s.split
+          }
+          wallet.current.style.visibility = 'visible'
+        } else {
+          wallet.current.style.opacity = '0'
+          wallet.current.style.visibility = 'hidden'
+        }
       }
 
       // Graph drawing along the same path
@@ -528,7 +562,7 @@ export function Hero() {
       if (area.current) {
         area.current.setAttribute(
           'd',
-          s.graph > 0.01 ? `${d} L${pts[13][0]},${box.bottom} L${pts[0][0]},${box.bottom} Z` : 'M0,0',
+          s.graph > 0.01 ? `${d} L${pts[13][0].toFixed(1)},${box.bottom} L${pts[0][0].toFixed(1)},${box.bottom} Z` : 'M0,0',
         )
         area.current.style.opacity = String(s.graph * drawT * heroIntro)
       }
@@ -539,76 +573,92 @@ export function Hero() {
         if (!g) return
         const reveal = clamp(drawT * 13 - i + 1)
         const o = s.dots[i] * (1 - s.graph + s.graph * reveal) * heroIntro
-        g.setAttribute('transform', `translate(${pts[i][0]} ${pts[i][1]})`)
-        g.style.opacity = String(o)
-      })
-      DATA_INDICES.forEach((i) => {
-        const reveal = clamp(drawT * 13 - i + 1) * s.graph * heroIntro
-        const v = values.current[i]
-        if (v) {
-          v.setAttribute('x', String(pts[i][0]))
-          v.setAttribute('y', String(pts[i][1] - 16))
-          v.style.opacity = String(reveal)
-        }
-        const mo = months.current[i]
-        if (mo) {
-          mo.setAttribute('x', String(pts[i][0]))
-          mo.style.opacity = String(s.graph * 0.9 * heroIntro)
+        if (o > 0.01) {
+          g.setAttribute('transform', `translate(${pts[i][0].toFixed(1)} ${pts[i][1].toFixed(1)})`)
+          g.style.opacity = String(o)
+          g.style.visibility = 'visible'
+        } else {
+          g.style.opacity = '0'
+          g.style.visibility = 'hidden'
         }
       })
+      if (s.graph > 0.005) {
+        DATA_INDICES.forEach((i) => {
+          const reveal = clamp(drawT * 13 - i + 1) * s.graph * heroIntro
+          const v = values.current[i]
+          if (v) {
+            v.setAttribute('x', pts[i][0].toFixed(1))
+            v.setAttribute('y', (pts[i][1] - 16).toFixed(1))
+            v.style.opacity = String(reveal)
+          }
+          const mo = months.current[i]
+          if (mo) {
+            mo.setAttribute('x', pts[i][0].toFixed(1))
+            mo.style.opacity = String(s.graph * 0.9 * heroIntro)
+          }
+        })
+        lastGraphVisible = true
+      } else if (lastGraphVisible) {
+        DATA_INDICES.forEach((i) => {
+          if (values.current[i]) values.current[i]!.style.opacity = '0'
+          if (months.current[i]) months.current[i]!.style.opacity = '0'
+        })
+        lastGraphVisible = false
+      }
 
       // Savings ring
       const goalRatio = GOAL.saved / GOAL.target
-      if (ringGroup.current) ringGroup.current.style.opacity = String(s.ringO * heroIntro)
-      for (const c of [ringTrack.current, ringProg.current]) {
-        if (!c) continue
-        c.setAttribute('cx', String(s.ringX))
-        c.setAttribute('cy', String(s.ringY))
-        c.setAttribute('r', String(s.ringR))
-      }
-      if (ringProg.current) {
-        ringProg.current.style.strokeDasharray = `${(s.ringFill * goalRatio * 100).toFixed(2)} 100`
-        ringProg.current.setAttribute('transform', `rotate(-90 ${s.ringX} ${s.ringY})`)
-      }
-      const textO = clamp((heroP - KEYS[3] - 0.04) / (KEYS[4] - KEYS[3] - 0.04)) * heroIntro
-      if (ringText.current) ringText.current.style.opacity = String(textO)
-      const small = Math.max(10, s.ringR * 0.075)
-      if (ringPct.current) {
-        const pct = `${Math.round(s.ringFill * goalRatio * 100)}%`
-        if (pct !== lastPct) {
-          ringPct.current.textContent = pct
-          lastPct = pct
+      const ringAlpha = s.ringO * heroIntro
+      if (ringGroup.current) ringGroup.current.style.opacity = String(ringAlpha)
+      if (ringAlpha > 0.01) {
+        for (const c of [ringTrack.current, ringProg.current]) {
+          if (!c) continue
+          c.setAttribute('cx', String(s.ringX))
+          c.setAttribute('cy', String(s.ringY))
+          c.setAttribute('r', String(s.ringR))
         }
-        ringPct.current.setAttribute('x', String(s.ringX))
-        ringPct.current.setAttribute('y', String(s.ringY + s.ringR * 0.12))
-        ringPct.current.style.fontSize = `${s.ringR * 0.4}px`
-      }
-      if (ringName.current) {
-        ringName.current.setAttribute('x', String(s.ringX))
-        ringName.current.setAttribute('y', String(s.ringY - s.ringR * 0.32))
-        ringName.current.style.fontSize = `${small}px`
-        ringName.current.textContent = GOAL.name.toUpperCase()
-      }
-      if (ringSub.current) {
-        ringSub.current.setAttribute('x', String(s.ringX))
-        ringSub.current.setAttribute('y', String(s.ringY + s.ringR * 0.36))
-        ringSub.current.style.fontSize = `${small}px`
-        ringSub.current.textContent = `${inr(GOAL.saved)} of ${inr(GOAL.target)}`
+        if (ringProg.current) {
+          ringProg.current.style.strokeDasharray = `${(s.ringFill * goalRatio * 100).toFixed(2)} 100`
+          ringProg.current.setAttribute('transform', `rotate(-90 ${s.ringX} ${s.ringY})`)
+        }
+        const textO = clamp((heroP - KEYS[3] - 0.04) / (KEYS[4] - KEYS[3] - 0.04)) * heroIntro
+        if (ringText.current) ringText.current.style.opacity = String(textO)
+        const small = Math.max(10, s.ringR * 0.075)
+        if (ringPct.current) {
+          const pct = `${Math.round(s.ringFill * goalRatio * 100)}%`
+          if (pct !== lastPct) {
+            ringPct.current.textContent = pct
+            lastPct = pct
+          }
+          ringPct.current.setAttribute('x', String(s.ringX))
+          ringPct.current.setAttribute('y', String(s.ringY + s.ringR * 0.12))
+          ringPct.current.style.fontSize = `${s.ringR * 0.4}px`
+        }
+        if (ringName.current) {
+          ringName.current.setAttribute('x', String(s.ringX))
+          ringName.current.setAttribute('y', String(s.ringY - s.ringR * 0.32))
+          ringName.current.style.fontSize = `${small}px`
+          ringName.current.textContent = GOAL.name.toUpperCase()
+        }
+        if (ringSub.current) {
+          ringSub.current.setAttribute('x', String(s.ringX))
+          ringSub.current.setAttribute('y', String(s.ringY + s.ringR * 0.36))
+          ringSub.current.style.fontSize = `${small}px`
+          ringSub.current.textContent = `${inr(GOAL.saved)} of ${inr(GOAL.target)}`
+        }
       }
 
-      // Particles travel along the live ribbon
-      const path = measure.current
-      if (path && (heroP > 0.02 || reduced) && heroIntro > 0.1) {
-        const L = path.getTotalLength()
+      // Particles travel along the live ribbon - pure analytical Bezier spline evaluation (0 DOM root-finding)
+      if ((heroP > 0.02 || reduced) && heroIntro > 0.1) {
         particles.current.forEach((c, i) => {
           if (!c) return
           const f = reduced ? (i + 0.5) / PARTICLES : (t * 0.026 + i / PARTICLES + Math.sin(i * 7.1) * 0.02 + 1) % 1
-          const pt = path.getPointAtLength(f * L)
-          c.setAttribute('cx', pt.x.toFixed(1))
-          c.setAttribute('cy', pt.y.toFixed(1))
+          const pt = getSplinePoint(pts, f)
+          c.setAttribute('cx', pt[0].toFixed(1))
+          c.setAttribute('cy', pt[1].toFixed(1))
           c.style.opacity = String(Math.sin(f * Math.PI) * (0.35 + (((i * 37) % 10) / 10) * 0.6) * heroIntro)
         })
-      } else if (path) {
+      } else {
         particles.current.forEach((c) => {
           if (c) c.style.opacity = '0'
         })
@@ -616,18 +666,25 @@ export function Hero() {
 
       // Cinematic palette transition: begin in Deep Navy for Scene 1, then reveal daytime mint as Scene 2 arrives
       const reveal = reduced ? 1 : clamp((heroP - 0.22) / 0.18)
-      if (cinematicVeil.current) {
-        cinematicVeil.current.style.opacity = String(0.94 * (1 - reveal))
-      }
-      if (headline.current) {
-        const primary = headline.current.querySelector<HTMLElement>('[data-cinematic-primary]')
-        const secondary = headline.current.querySelector<HTMLElement>('[data-cinematic-secondary]')
-        const eyebrow = headline.current.querySelector<HTMLElement>('[data-cinematic-eyebrow]')
-        const body = headline.current.querySelector<HTMLElement>('[data-cinematic-body]')
+      if (Math.abs(reveal - lastReveal) > 0.005) {
+        if (cinematicVeil.current) {
+          cinematicVeil.current.style.opacity = String(0.94 * (1 - reveal))
+        }
+        // Cache headline elements once to avoid 240 DOM querySelector traversals per second
+        if (headline.current && !headlineElements.current.primary) {
+          headlineElements.current = {
+            primary: headline.current.querySelector<HTMLElement>('[data-cinematic-primary]'),
+            secondary: headline.current.querySelector<HTMLElement>('[data-cinematic-secondary]'),
+            eyebrow: headline.current.querySelector<HTMLElement>('[data-cinematic-eyebrow]'),
+            body: headline.current.querySelector<HTMLElement>('[data-cinematic-body]'),
+          }
+        }
+        const { primary, secondary, eyebrow, body } = headlineElements.current
         if (primary) primary.style.color = `color-mix(in srgb, #FFFFFF ${(1 - reveal) * 100}%, #003365)`
         if (secondary) secondary.style.color = `color-mix(in srgb, #63DCD3 ${(1 - reveal) * 100}%, #00A99E)`
         if (eyebrow) eyebrow.style.color = `color-mix(in srgb, #63DCD3 ${(1 - reveal) * 100}%, #00A99E)`
         if (body) body.style.color = `color-mix(in srgb, #B8F2EC ${(1 - reveal) * 100}%, #52728A)`
+        lastReveal = reveal
       }
 
       // Opening copy stays rock-solid through Scene 1, then gracefully glides out
@@ -635,27 +692,37 @@ export function Hero() {
       const hOut = smoothstep(0.12, 0.28, heroP)
       if (headline.current) {
         const headlineO = heroIntro * (1 - hOut)
-        const scale = 1 - hOut * 0.075
-        const blur = hOut * 8
-        const yOffset = (1 - heroIntro) * 20 - hOut * 70
-        headline.current.style.opacity = String(headlineO)
-        headline.current.style.transform = `translate3d(0, ${yOffset}px, 0) scale(${scale})`
-        headline.current.style.filter = blur > 0.1 ? `blur(${blur}px)` : 'none'
-        headline.current.style.transformOrigin = 'left center'
-        headline.current.style.visibility = headlineO > 0.005 ? 'visible' : 'hidden'
+        if (headlineO > 0.005) {
+          const scale = 1 - hOut * 0.075
+          const yOffset = (1 - heroIntro) * 20 - hOut * 70
+          headline.current.style.opacity = String(headlineO)
+          headline.current.style.transform = `translate3d(0, ${yOffset.toFixed(1)}px, 0) scale(${scale.toFixed(3)})`
+          headline.current.style.transformOrigin = 'left center'
+          headline.current.style.visibility = 'visible'
+          lastHeadlineVisible = true
+        } else if (lastHeadlineVisible) {
+          headline.current.style.opacity = '0'
+          headline.current.style.visibility = 'hidden'
+          lastHeadlineVisible = false
+        }
       }
 
       captions.current.forEach((c, i) => {
         if (!c) return
         const k = KEYS[i + 1]
         const o = (i === 3 ? clamp((heroP - (k - 0.11)) / 0.06) : clamp((0.115 - Math.abs(heroP - k)) / 0.055)) * heroIntro
-        c.style.opacity = String(o)
-        c.style.transform = `translate3d(0, ${(1 - o) * 18}px, 0)`
-        c.style.visibility = o < 0.01 ? 'hidden' : 'visible'
+        if (o > 0.01) {
+          c.style.opacity = String(o)
+          c.style.transform = `translate3d(0, ${((1 - o) * 18).toFixed(1)}px, 0)`
+          c.style.visibility = 'visible'
+        } else {
+          c.style.opacity = '0'
+          c.style.visibility = 'hidden'
+        }
       })
 
       if (progressBar.current) {
-        progressBar.current.style.transform = `scaleX(${heroP})`
+        progressBar.current.style.transform = `scaleX(${heroP.toFixed(3)})`
       }
       if (progressFooterRef.current) {
         progressFooterRef.current.style.opacity = String(heroIntro)
@@ -671,19 +738,35 @@ export function Hero() {
 
     let raf = 0
     let smooth = -1
+    let cachedTotal = 0
+    let cachedOffsetTop = 0
+
+    const updateMetrics = () => {
+      cachedOffsetTop = section.offsetTop
+      cachedTotal = Math.max(1, section.offsetHeight - window.innerHeight)
+    }
+    updateMetrics()
+    window.addEventListener('resize', updateMetrics, { passive: true })
+
     const frame = (now: number) => {
       raf = requestAnimationFrame(frame)
-      const rect = section.getBoundingClientRect()
-      const total = Math.max(1, rect.height - window.innerHeight)
-      const target = reduced ? 0 : clamp(-rect.top / total)
-      smooth = smooth < 0 || reduced ? target : smooth + (target - smooth) * 0.12
-      if (Math.abs(target - smooth) < 0.0002) smooth = target
+      // Read compositor scroll position directly without forcing layout reflow
+      const scrollY = window.scrollY
+      const currentTop = cachedOffsetTop - scrollY
+      const target = reduced ? 0 : clamp(-currentTop / cachedTotal)
+
+      // Responsive snappy lerp (0.28 factor eliminates sluggish drag while maintaining butter-smooth 60-120fps glide)
+      smooth = smooth < 0 || reduced ? target : smooth + (target - smooth) * 0.28
+      if (Math.abs(target - smooth) < 0.0001) smooth = target
       render(smooth, reduced ? 0 : now / 1000)
     }
 
     const io = new IntersectionObserver(([entry]) => {
       stage.dataset.paused = String(!entry.isIntersecting)
-      if (entry.isIntersecting && !raf) raf = requestAnimationFrame(frame)
+      if (entry.isIntersecting) {
+        updateMetrics()
+        if (!raf) raf = requestAnimationFrame(frame)
+      }
       if (!entry.isIntersecting && raf) {
         cancelAnimationFrame(raf)
         raf = 0
@@ -693,6 +776,7 @@ export function Hero() {
 
     return () => {
       io.disconnect()
+      window.removeEventListener('resize', updateMetrics)
       cancelAnimationFrame(raf)
     }
   }, [scene, reduced])
@@ -723,8 +807,7 @@ export function Hero() {
         ref={stageRef}
         className="hero-stage sticky top-0 h-svh w-full overflow-hidden"
         onPointerMove={(e) => {
-          const rect = e.currentTarget.getBoundingClientRect()
-          pointerRef.current = { x: e.clientX - rect.left, y: e.clientY - rect.top }
+          pointerRef.current = { x: e.clientX, y: e.clientY }
         }}
         onPointerLeave={() => {
           pointerRef.current = null
@@ -859,13 +942,6 @@ export function Hero() {
           style={{ opacity: 0, visibility: 'hidden' }}
         >
           <defs>
-            <filter id="thread-glow" x="-30%" y="-30%" width="160%" height="160%">
-              <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur" />
-              <feMerge>
-                <feMergeNode in="blur" />
-                <feMergeNode in="SourceGraphic" />
-              </feMerge>
-            </filter>
             <linearGradient id="thread-grad-0" x1="0" y1="1" x2="1" y2="0">
               <stop offset="0%" stopColor="#63DCD3" stopOpacity="0.4" />
               <stop offset="60%" stopColor="#EFFAFA" stopOpacity="1" />
@@ -884,7 +960,7 @@ export function Hero() {
           </defs>
 
           {/* 3 Laser Base Beams */}
-          <g filter="url(#thread-glow)">
+          <g>
             <path
               ref={(el) => { threadPaths.current[0] = el }}
               fill="none"
@@ -974,7 +1050,8 @@ export function Hero() {
           <g ref={fusionSparkRef} style={{ opacity: 0 }}>
             {/* Crisp 4-Point Star Lens Flare */}
             <circle r="4" fill="#FFFFFF" />
-            <circle r="12" fill="#63DCD3" fillOpacity="0.4" filter="url(#thread-glow)" />
+            <circle r="18" fill="#63DCD3" fillOpacity="0.18" />
+            <circle r="10" fill="#63DCD3" fillOpacity="0.45" />
             <line x1="-36" y1="0" x2="36" y2="0" stroke="#FFFFFF" strokeWidth="2.2" strokeLinecap="round" />
             <line x1="0" y1="-36" x2="0" y2="36" stroke="#FFFFFF" strokeWidth="2.2" strokeLinecap="round" />
             <line x1="-20" y1="-20" x2="20" y2="20" stroke="#63DCD3" strokeWidth="1.5" strokeLinecap="round" />
@@ -1017,7 +1094,7 @@ export function Hero() {
             <svg
               ref={heroSvgFrontRef}
               aria-hidden
-              className="absolute inset-0 z-[2] size-full pointer-events-none"
+              className="absolute inset-0 z-[4] size-full pointer-events-none"
               style={{ opacity: 0, visibility: 'hidden' }}
               viewBox={`0 0 ${scene.w} ${scene.h}`}
             >
@@ -1066,7 +1143,6 @@ export function Hero() {
                 <path
                   ref={(el) => {
                     ribbon.current[4] = el
-                    measure.current = el
                   }}
                   stroke="url(#rb-grad)"
                   strokeWidth="2.6"

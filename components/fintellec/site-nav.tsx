@@ -12,18 +12,25 @@ import { useAuth } from './auth/auth-context'
 
 export function SiteNav() {
   const { user, isAuthenticated, setIsGoogleModalOpen, setPreviewLandingMode } = useAuth()
-  const [scrolled, setScrolled] = useState(false)
+  const [scrollY, setScrollY] = useState(0)
   const [open, setOpen] = useState(false)
   const [note, setNote] = useState(false)
   const [soundActive, setSoundActive] = useState(true)
   const noteTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24)
+    const onScroll = () => {
+      setScrollY(window.scrollY)
+    }
     onScroll()
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
+
+  // When at the hero section where "Your money. In motion." sits (first 600px):
+  // Keep navbar 100% transparent and hide the Fintellec logo so it never blocks or overlaps the "YOUR" headline.
+  const inHeroTitle = scrollY < 1600
+  const isScrolledPast = scrollY >= 1600
 
   useEffect(() => {
     return () => {
@@ -42,14 +49,29 @@ export function SiteNav() {
       <nav
         aria-label="Primary"
         className={cn(
-          'relative mx-auto flex h-14 max-w-[1400px] items-center justify-between rounded-full border px-4 transition-[background-color,border-color,box-shadow] duration-500 md:px-6',
-          scrolled || open
-            ? 'border-mint/90 bg-aqua/75 shadow-[0_16px_40px_-28px_rgba(0,51,101,0.4)] backdrop-blur-md'
-            : 'border-transparent bg-transparent',
+          'relative mx-auto flex h-16 max-w-[1400px] items-center justify-between rounded-full px-4 transition-all duration-500 md:px-6',
+          isScrolledPast || open
+            ? 'border border-navy/10 bg-white/70 shadow-[0_12px_36px_-18px_rgba(0,51,101,0.15)] backdrop-blur-xl dark:bg-navy/70 dark:border-white/10 dark:shadow-[0_12px_36px_-18px_rgba(0,0,0,0.5)]'
+            : '!border-transparent !bg-transparent !shadow-none !backdrop-blur-none',
         )}
+        style={!isScrolledPast && !open ? { background: 'transparent', borderColor: 'transparent', boxShadow: 'none', backdropFilter: 'none', WebkitBackdropFilter: 'none' } : undefined}
       >
-        <a href="#top" aria-label="Fintellec home" className="rounded-full">
-          <img src="/fintellec-logo.png" alt="Fintellec — Track Smarter. Spend Wiser." className="h-10 w-[132px] object-contain sm:h-11 sm:w-[148px]" />
+        <a
+          href="#top"
+          aria-label="Fintellec home"
+          className={cn(
+            'flex items-center rounded-full py-1 transition-all duration-500 ease-out',
+            inHeroTitle && !open
+              ? 'opacity-0 -translate-x-4 pointer-events-none'
+              : 'opacity-100 translate-x-0 pointer-events-auto',
+          )}
+          style={inHeroTitle && !open ? { opacity: 0, pointerEvents: 'none', visibility: 'hidden' } : undefined}
+        >
+          <img
+            src="/fintellec-logo-clean.png"
+            alt="Fintellec — Track Smarter. Spend Wiser."
+            className="h-10 w-auto object-contain sm:h-11"
+          />
         </a>
 
 

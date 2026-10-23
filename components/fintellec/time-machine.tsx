@@ -7,42 +7,78 @@ import { Clock, TrendingUp, Sparkles, Award, Shield, Layers, ArrowRight } from '
 
 const YEARS = [0, 1, 3, 5, 7, 10]
 
-const MILESTONES: Record<number, { title: string; badge: string; joke: string; icon: string }> = {
+const MILESTONES: Record<
+  number,
+  {
+    title: string
+    badge: string
+    joke: string
+    icon: string
+    accentColor: string
+    badgeClass: string
+    cardBorder: string
+    cardBg: string
+  }
+> = {
   0: {
     title: 'Genesis: Starting The Rhythm',
     badge: 'DAY ONE',
     joke: 'Still questioning whether a ₹15 tapri chai needs to be entered in a budget spreadsheet.',
     icon: '🌱',
+    accentColor: '#00A99E',
+    badgeClass: 'text-teal bg-teal/10 border-teal/30',
+    cardBorder: 'border-teal/30',
+    cardBg: 'bg-teal/5',
   },
   1: {
     title: 'Freedom Scooty Paid in Cash',
     badge: '1-YEAR BUFFER',
     joke: 'Parents secretly proud. WhatsApp family group is genuinely stunned by your financial calm.',
     icon: '🛵',
+    accentColor: '#10B981',
+    badgeClass: 'text-emerald-700 bg-emerald-50 border-emerald-300',
+    cardBorder: 'border-emerald-300',
+    cardBg: 'bg-emerald-50/50',
   },
   3: {
     title: 'Dream Workspace & 6-Month Runway',
     badge: 'RUNWAY ESTABLISHED',
     joke: 'Looking at flight tickets to Europe without reflexively closing the browser tab in panic.',
     icon: '💻',
+    accentColor: '#0284C7',
+    badgeClass: 'text-sky-700 bg-sky-50 border-sky-300',
+    cardBorder: 'border-sky-300',
+    cardBg: 'bg-sky-50/50',
   },
   5: {
     title: 'Down Payment Ready & Zero Panic',
     badge: 'MOMENTUM ACCELERATING',
     joke: 'Extended relatives start asking you for mutual fund and tax advice at wedding buffets.',
     icon: '🏡',
+    accentColor: '#F59E0B',
+    badgeClass: 'text-amber-800 bg-amber-50 border-amber-300',
+    cardBorder: 'border-amber-300',
+    cardBg: 'bg-amber-50/50',
   },
   7: {
     title: 'Car Bought Without Crushing EMIs',
     badge: 'DEBT IMMUNITY',
     joke: 'Zero loan calls, zero high-interest traps, 100% peaceful sleep on Sunday nights.',
     icon: '🚗',
+    accentColor: '#FF7A59',
+    badgeClass: 'text-orange-800 bg-orange-50 border-orange-300',
+    cardBorder: 'border-orange-300',
+    cardBg: 'bg-orange-50/50',
   },
   10: {
     title: 'Financial Sovereignty & Early Freedom',
     badge: 'COMPOUND SOVEREIGNTY',
     joke: 'Compound interest now generates more money in one week than your entire first annual salary.',
     icon: '🏝️',
+    accentColor: '#8B5CF6',
+    badgeClass: 'text-purple-800 bg-purple-50 border-purple-300',
+    cardBorder: 'border-purple-300',
+    cardBg: 'bg-purple-50/50',
   },
 }
 
@@ -162,6 +198,7 @@ export function TimeMachine() {
               <div className="mt-4 grid grid-cols-6 gap-2">
                 {YEARS.map((y, idx) => {
                   const isActive = yearIndex === idx
+                  const m = MILESTONES[y]
                   return (
                     <button
                       key={y}
@@ -172,8 +209,9 @@ export function TimeMachine() {
                           ? 'bg-navy text-white border-navy shadow-md scale-105'
                           : 'bg-white border-mint/80 text-steel hover:border-teal hover:text-navy'
                       }`}
+                      style={isActive ? { boxShadow: `0 4px 14px -2px ${m.accentColor}40` } : undefined}
                     >
-                      <span className="text-xs">{MILESTONES[y].icon}</span>
+                      <span className="text-xs">{m.icon}</span>
                       <span className="font-mono text-xs font-bold mt-1">{y === 0 ? 'Today' : `${y}Y`}</span>
                     </button>
                   )
@@ -253,10 +291,10 @@ export function TimeMachine() {
               </div>
 
               {/* Unlocked Life Milestone Card (Fold Money Style) */}
-              <div className="rounded-2xl border border-teal/40 bg-teal/5 p-4 transition-all duration-300">
+              <div className={`rounded-2xl border ${milestone.cardBorder} ${milestone.cardBg} p-4 transition-all duration-300`}>
                 <div className="flex items-center gap-2">
                   <span className="text-lg">{milestone.icon}</span>
-                  <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-teal">
+                  <span className={`font-mono text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border ${milestone.badgeClass}`}>
                     {milestone.badge}
                   </span>
                 </div>

@@ -17,32 +17,38 @@ export function PulseHud() {
   // Monitor scroll velocity to dynamically accelerate ECG heart rate
   useEffect(() => {
     let timeout: NodeJS.Timeout
+    let frame = 0
 
     const handleScroll = () => {
-      const now = performance.now()
-      const currentY = window.scrollY
-      const dt = Math.max(1, now - lastScrollTime.current)
-      const dy = Math.abs(currentY - lastScrollY.current)
-      const velocity = dy / dt
+      if (frame) return
+      frame = requestAnimationFrame(() => {
+        frame = 0
+        const now = performance.now()
+        const currentY = window.scrollY
+        const dt = Math.max(1, now - lastScrollTime.current)
+        const dy = Math.abs(currentY - lastScrollY.current)
+        const velocity = dy / dt
 
-      lastScrollY.current = currentY
-      lastScrollTime.current = now
+        lastScrollY.current = currentY
+        lastScrollTime.current = now
 
-      if (velocity > 1.8) {
-        // High scroll velocity triggers emergency cardiac pulse acceleration
-        setIsSpiking(true)
-        setBpm(Math.min(136, Math.round(92 + velocity * 14)))
-        clearTimeout(timeout)
-        timeout = setTimeout(() => {
-          setIsSpiking(false)
-          setBpm(72)
-        }, 1800)
-      }
+        if (velocity > 1.8) {
+          // High scroll velocity triggers emergency cardiac pulse acceleration
+          setIsSpiking(true)
+          setBpm(Math.min(136, Math.round(92 + velocity * 14)))
+          clearTimeout(timeout)
+          timeout = setTimeout(() => {
+            setIsSpiking(false)
+            setBpm(72)
+          }, 1800)
+        }
+      })
     }
 
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => {
       window.removeEventListener('scroll', handleScroll)
+      if (frame) cancelAnimationFrame(frame)
       clearTimeout(timeout)
     }
   }, [])
@@ -139,7 +145,7 @@ export function PulseHud() {
           sound.snap('high')
         }}
         className={`group flex items-center gap-3 rounded-full border bg-white/90 px-3.5 py-2 shadow-[0_12px_32px_-12px_rgba(0,51,101,0.25)] backdrop-blur-md cursor-pointer transition-all duration-300 hover:scale-102 ${
-          isSpiking ? 'border-bright ring-2 ring-bright/40' : 'border-mint/90 hover:border-teal/50'
+          isSpiking ? 'border-rose-400/80 ring-2 ring-rose-400/30' : 'border-mint/90 hover:border-teal/50'
         }`}
       >
         {/* Animated ECG Pulse Waveform SVG */}
@@ -148,7 +154,7 @@ export function PulseHud() {
             <polyline
               points="0,15 20,15 30,15 35,4 40,26 45,8 50,18 55,15 70,15 75,5 80,25 85,15 100,15"
               fill="none"
-              stroke={isSpiking ? '#00A99E' : '#00A99E'}
+              stroke={isSpiking ? '#F43F5E' : '#00A99E'}
               strokeWidth="2.4"
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -161,7 +167,7 @@ export function PulseHud() {
         <div className="flex items-center gap-1.5">
           <Heart
             className={`size-3.5 transition-transform duration-200 ${
-              isSpiking ? 'text-teal animate-ping' : 'text-teal animate-pulse'
+              isSpiking ? 'text-rose-500 animate-ping' : 'text-teal animate-pulse'
             }`}
           />
           <span className="font-mono text-xs font-semibold text-navy">
@@ -175,7 +181,7 @@ export function PulseHud() {
             isNight
               ? 'bg-navy/80 text-bright font-semibold border border-teal/40'
               : isSpiking
-                ? 'bg-bright/20 text-navy font-semibold'
+                ? 'bg-rose-500/15 text-rose-600 font-semibold'
                 : 'bg-aqua text-teal'
           }`}
         >

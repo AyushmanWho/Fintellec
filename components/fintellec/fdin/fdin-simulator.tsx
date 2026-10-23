@@ -293,7 +293,7 @@ function AppleLiquidToggle({
             <GraduationCap
               className={cn(
                 'size-4 transition-colors',
-                archetypeKey === 'student' ? 'text-bright' : 'text-teal',
+                archetypeKey === 'student' ? 'text-purple-300' : 'text-purple-600',
               )}
             />
             <span className="font-semibold text-sm">Student</span>
@@ -512,7 +512,14 @@ function IphoneGlassSimulator({ config }: { config: ArchetypeConfig }) {
       <LiquidGlassCard className="p-4 md:px-6 rounded-2xl">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="size-2.5 rounded-full bg-teal animate-pulse shadow-[0_0_10px_rgba(0,169,158,0.85)]" />
+            <div
+              className={cn(
+                'size-2.5 rounded-full animate-pulse',
+                config.id === 'student'
+                  ? 'bg-purple-500 shadow-[0_0_10px_rgba(139,92,246,0.85)]'
+                  : 'bg-teal shadow-[0_0_10px_rgba(0,169,158,0.85)]',
+              )}
+            />
             <span className="font-mono text-xs uppercase tracking-wider text-navy font-semibold">
               {config.pillBadge}
             </span>
@@ -521,9 +528,9 @@ function IphoneGlassSimulator({ config }: { config: ArchetypeConfig }) {
           <div className="flex items-center gap-3">
             {/* Financial IQ Frosted Badge */}
             <div className="flex items-center gap-1.5 px-3.5 py-1 rounded-full iphone-liquid-inset text-navy text-xs font-mono font-medium shadow-xs">
-              <Sparkles className="size-3.5 text-teal" />
+              <img src="/fintellec-f.png" alt="" aria-hidden="true" className="h-4 w-auto shrink-0" />
               <span>Financial IQ:</span>
-              <span className="font-bold text-teal">{config.financialIQ}</span>
+              <span className="font-bold bg-gradient-to-r from-amber-500 to-teal bg-clip-text text-transparent">{config.financialIQ}</span>
             </div>
 
             {/* Liquid Cash Cushion Badge */}

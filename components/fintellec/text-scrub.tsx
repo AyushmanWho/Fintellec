@@ -9,9 +9,11 @@ interface WordProps {
   progress: number
   range: [number, number]
   highlight?: boolean
+  highlightColor?: string
+  glowColor?: string
 }
 
-function ScrubWord({ children, progress, range, highlight }: WordProps) {
+function ScrubWord({ children, progress, range, highlight, highlightColor = '#00A99E', glowColor = 'rgba(99, 220, 211, 0.55)' }: WordProps) {
   const [start, end] = range
   const p = clamp((progress - start) / (end - start))
 
@@ -21,7 +23,7 @@ function ScrubWord({ children, progress, range, highlight }: WordProps) {
       style={{
         color: highlight
           ? p > 0.4
-            ? '#00A99E'
+            ? highlightColor
             : 'rgba(0, 51, 101, 0.16)'
           : p > 0.4
             ? '#003365'
@@ -30,7 +32,7 @@ function ScrubWord({ children, progress, range, highlight }: WordProps) {
         transform: `translateY(${(1 - p) * 3}px)`,
         textShadow:
           highlight && p > 0.6
-            ? '0 0 24px rgba(99, 220, 211, 0.55)'
+            ? `0 0 24px ${glowColor}`
             : 'none',
       }}
     >
@@ -54,16 +56,26 @@ export function TextScrub() {
     if (!container) return
 
     let frame = 0
+    let cachedTop = 0
+    let cachedTotal = 0
+
+    const updateMetrics = () => {
+      if (!container) return
+      cachedTop = container.offsetTop
+      const windowH = window.innerHeight
+      cachedTotal = Math.max(1, container.offsetHeight - windowH * 0.3)
+    }
+    updateMetrics()
+    window.addEventListener('resize', updateMetrics, { passive: true })
+
     const onScroll = () => {
       if (frame) return
       frame = requestAnimationFrame(() => {
         frame = 0
-        const rect = container.getBoundingClientRect()
         const windowH = window.innerHeight
-        // Finish earlier: smaller denominator = faster completion
-        const total = rect.height - windowH * 0.3
-        const current = windowH * 0.75 - rect.top
-        setProgress(clamp(current / total))
+        const currentTop = cachedTop - window.scrollY
+        const current = windowH * 0.75 - currentTop
+        setProgress(clamp(current / cachedTotal))
       })
     }
 
@@ -71,6 +83,7 @@ export function TextScrub() {
     onScroll()
     return () => {
       window.removeEventListener('scroll', onScroll)
+      window.removeEventListener('resize', updateMetrics)
       if (frame) cancelAnimationFrame(frame)
     }
   }, [reduced])
@@ -126,9 +139,18 @@ export function TextScrub() {
             {phrase2.map((word) => {
               const idx = currentIndex++
               const range: [number, number] = [idx / total, (idx + 1) / total]
-              const isHighlight = ['Fintellec', 'mission', 'rupee'].includes(word.replace(/[^a-zA-Z]/g, ''))
+              const cleanWord = word.replace(/[^a-zA-Z]/g, '')
+              const isRupee = cleanWord === 'rupee'
+              const isHighlight = ['Fintellec', 'mission', 'rupee'].includes(cleanWord)
               return (
-                <ScrubWord key={idx} progress={progress} range={range} highlight={isHighlight}>
+                <ScrubWord
+                  key={idx}
+                  progress={progress}
+                  range={range}
+                  highlight={isHighlight}
+                  highlightColor={isRupee ? '#F59E0B' : '#00A99E'}
+                  glowColor={isRupee ? 'rgba(245, 158, 11, 0.55)' : 'rgba(99, 220, 211, 0.55)'}
+                >
                   {word}
                 </ScrubWord>
               )
@@ -152,7 +174,7 @@ export function TextScrub() {
 
         {/* Fold Money Style Witty Microcopy Footnote */}
         <div className="mt-8 inline-flex items-center gap-2 rounded-full border border-mint/80 bg-white/70 px-4 py-1.5 shadow-xs backdrop-blur-sm">
-          <img src="/fintellec-f.png" alt="" aria-hidden="true" className="h-4 w-auto shrink-0" />
+          <img src="/fintellec-f.png" alt="" aria-hidden="true" className="h-7 w-auto shrink-0" />
           <p className="font-mono text-[11px] text-steel">
             Tested on 14,800 real UPI transactions — including ₹10 tapri chai, ₹40 auto surcharges, and that gym subscription you swore you'd use.
           </p>

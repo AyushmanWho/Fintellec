@@ -24,29 +24,39 @@ export function DigitalCrown() {
   const lastTickScroll = useRef(0)
   const dragStartY = useRef(0)
   const dragStartScroll = useRef(0)
+  const scrollRaf = useRef(0)
+  const lastCheckTime = useRef(0)
 
   const handleScroll = useCallback(() => {
-    const docH = document.documentElement.scrollHeight - window.innerHeight
-    if (docH <= 0) return
-    const current = window.scrollY
-    const pct = Math.min(1, Math.max(0, current / docH))
-    setScrollPct(pct)
-    setRotation((pct * 1440) % 360)
+    if (scrollRaf.current) return
+    scrollRaf.current = requestAnimationFrame(() => {
+      scrollRaf.current = 0
+      const docH = document.documentElement.scrollHeight - window.innerHeight
+      if (docH <= 0) return
+      const current = window.scrollY
+      const pct = Math.min(1, Math.max(0, current / docH))
+      setScrollPct(pct)
+      setRotation((pct * 1440) % 360)
 
-    // Haptic tick every 35px scrolled
-    if (Math.abs(current - lastTickScroll.current) > 36) {
-      sound.crownTick(2000 + Math.sin(pct * Math.PI) * 600)
-      lastTickScroll.current = current
-    }
+      // Haptic tick every 35px scrolled
+      if (Math.abs(current - lastTickScroll.current) > 36) {
+        sound.crownTick(2000 + Math.sin(pct * Math.PI) * 600)
+        lastTickScroll.current = current
+      }
 
-    // Determine active chapter based on section positions
-    CHAPTERS.forEach((ch, idx) => {
-      const el = document.getElementById(ch.id)
-      if (el) {
-        const rect = el.getBoundingClientRect()
-        if (rect.top <= window.innerHeight * 0.45 && rect.bottom >= window.innerHeight * 0.2) {
-          setActiveChapter(idx)
-        }
+      // Throttle chapter boundary calculations to every 120ms instead of every scroll tick
+      const now = performance.now()
+      if (now - lastCheckTime.current > 120) {
+        lastCheckTime.current = now
+        CHAPTERS.forEach((ch, idx) => {
+          const el = document.getElementById(ch.id)
+          if (el) {
+            const rect = el.getBoundingClientRect()
+            if (rect.top <= window.innerHeight * 0.45 && rect.bottom >= window.innerHeight * 0.2) {
+              setActiveChapter(idx)
+            }
+          }
+        })
       }
     })
   }, [])
@@ -54,7 +64,10 @@ export function DigitalCrown() {
   useEffect(() => {
     window.addEventListener('scroll', handleScroll, { passive: true })
     handleScroll()
-    return () => window.removeEventListener('scroll', handleScroll)
+    return () => {
+      window.removeEventListener('scroll', handleScroll)
+      if (scrollRaf.current) cancelAnimationFrame(scrollRaf.current)
+    }
   }, [handleScroll])
 
   // Drag interaction on the crown

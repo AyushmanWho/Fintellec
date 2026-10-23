@@ -141,8 +141,12 @@ export function GoalsTab() {
               >
                 <div className="flex items-center justify-between">
                   <span className={cn(
-                    'rounded-full px-2.5 py-0.5 text-[10px] font-mono font-bold uppercase',
-                    goal.priority === 'high' ? 'bg-navy text-white' : 'bg-aqua text-steel',
+                    'rounded-full px-2.5 py-0.5 text-[10px] font-mono font-bold uppercase border',
+                    goal.priority === 'high'
+                      ? 'bg-navy text-bright border-bright/30'
+                      : goal.priority === 'medium'
+                        ? 'bg-amber-50 text-amber-800 border-amber-200'
+                        : 'bg-aqua text-steel border-mint/60',
                   )}>
                     {goal.priority} Priority
                   </span>

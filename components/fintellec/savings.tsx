@@ -5,29 +5,66 @@ import { Laptop, Plane, ShieldCheck, type LucideIcon } from 'lucide-react'
 import { inr } from '@/lib/format'
 import { cn } from '@/lib/utils'
 
-type Goal = { id: string; name: string; Icon: LucideIcon; saved: number; target: number }
+type Goal = {
+  id: string
+  name: string
+  Icon: LucideIcon
+  saved: number
+  target: number
+  fromColor: string
+  toColor: string
+  dotColor: string
+}
 
 const GOALS: Goal[] = [
-  { id: 'laptop', name: 'New laptop', Icon: Laptop, saved: 31500, target: 85000 },
-  { id: 'travel', name: 'Travel fund', Icon: Plane, saved: 50400, target: 70000 },
-  { id: 'emergency', name: 'Emergency savings', Icon: ShieldCheck, saved: 62000, target: 150000 },
+  {
+    id: 'laptop',
+    name: 'New laptop',
+    Icon: Laptop,
+    saved: 31500,
+    target: 85000,
+    fromColor: '#63DCD3',
+    toColor: '#00A99E',
+    dotColor: '#00A99E',
+  },
+  {
+    id: 'travel',
+    name: 'Travel fund',
+    Icon: Plane,
+    saved: 50400,
+    target: 70000,
+    fromColor: '#38BDF8',
+    toColor: '#FB923C',
+    dotColor: '#FB923C',
+  },
+  {
+    id: 'emergency',
+    name: 'Emergency savings',
+    Icon: ShieldCheck,
+    saved: 62000,
+    target: 150000,
+    fromColor: '#10B981',
+    toColor: '#F59E0B',
+    dotColor: '#F59E0B',
+  },
 ]
 
 const MAX_CONTRIBUTION = 20000
 
 function GoalRing({ basePct, totalPct, goal, saved }: { basePct: number; totalPct: number; goal: Goal; saved: number }) {
   const angle = totalPct * 3.6
+  const gradId = `goal-grad-${goal.id}`
   return (
     <div className="relative mx-auto aspect-square w-full max-w-[460px]">
       <svg viewBox="0 0 440 440" className="size-full" fill="none" aria-hidden>
         <defs>
-          <linearGradient id="goal-grad" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0" stopColor="#65DED2" />
-            <stop offset="1" stopColor="#07877F" />
+          <linearGradient id={gradId} x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor={goal.fromColor} />
+            <stop offset="100%" stopColor={goal.toColor} />
           </linearGradient>
         </defs>
-        <circle cx="220" cy="220" r="206" stroke="#07877F" strokeOpacity="0.12" strokeDasharray="1 7" />
-        <circle cx="220" cy="220" r="168" fill="rgba(255,255,255,0.6)" stroke="#D7F5F1" strokeWidth="18" />
+        <circle cx="220" cy="220" r="206" stroke={goal.toColor} strokeOpacity="0.14" strokeDasharray="1 7" />
+        <circle cx="220" cy="220" r="168" fill="rgba(255,255,255,0.7)" stroke="#D7F5F1" strokeWidth="18" />
         <g transform="rotate(-90 220 220)">
           <circle
             cx="220"
@@ -44,7 +81,7 @@ function GoalRing({ basePct, totalPct, goal, saved }: { basePct: number; totalPc
             cx="220"
             cy="220"
             r="168"
-            stroke="url(#goal-grad)"
+            stroke={`url(#${gradId})`}
             strokeWidth="18"
             strokeLinecap="round"
             pathLength={100}
@@ -56,8 +93,8 @@ function GoalRing({ basePct, totalPct, goal, saved }: { basePct: number; totalPc
             cx="220"
             cy="220"
             r="194"
-            stroke="#65DED2"
-            strokeOpacity="0.25"
+            stroke={goal.fromColor}
+            strokeOpacity="0.3"
             strokeWidth="8"
             strokeLinecap="round"
             pathLength={100}
@@ -68,7 +105,7 @@ function GoalRing({ basePct, totalPct, goal, saved }: { basePct: number; totalPc
             cx="220"
             cy="220"
             r="194"
-            stroke="#07877F"
+            stroke={goal.toColor}
             strokeWidth="1.6"
             strokeLinecap="round"
             pathLength={100}
@@ -77,16 +114,16 @@ function GoalRing({ basePct, totalPct, goal, saved }: { basePct: number; totalPc
           />
         </g>
         <g style={{ transform: `rotate(${angle}deg)`, transformOrigin: '220px 220px', transition: 'transform 700ms cubic-bezier(.4,0,.2,1)' }}>
-          <circle cx="220" cy="26" r="12" fill="#65DED2" fillOpacity="0.3" />
-          <circle cx="220" cy="26" r="5" fill="#fff" stroke="#07877F" strokeWidth="2" />
+          <circle cx="220" cy="26" r="12" fill={goal.fromColor} fillOpacity="0.35" />
+          <circle cx="220" cy="26" r="5" fill="#fff" stroke={goal.toColor} strokeWidth="2.5" />
         </g>
       </svg>
       <div className="absolute inset-0 grid place-items-center text-center">
         <div>
-          <goal.Icon className="mx-auto size-5 text-teal" aria-hidden />
+          <goal.Icon className="mx-auto size-5 transition-colors" style={{ color: goal.toColor }} aria-hidden />
           <p className="mt-3 text-[clamp(3.5rem,9vw,6rem)] font-medium leading-none tracking-[-0.06em] text-navy tabular-nums">
             {Math.round(totalPct)}
-            <span className="text-[0.45em] tracking-normal text-teal">%</span>
+            <span className="text-[0.45em] tracking-normal" style={{ color: goal.toColor }}>%</span>
           </p>
           <p className="mt-3 font-mono text-xs text-steel">
             <span className="text-navy">{inr(saved)}</span> of {inr(goal.target)}
@@ -146,10 +183,17 @@ export function Savings() {
                 aria-pressed={selected === g.id}
                 onClick={() => setSelected(g.id)}
                 className={cn(
-                  'inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm transition-colors',
-                  selected === g.id ? 'border-navy bg-navy text-white' : 'border-mint bg-white/70 text-navy hover:border-teal',
+                  'inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm transition-all',
+                  selected === g.id
+                    ? 'border-navy bg-navy text-white shadow-xs'
+                    : 'border-mint bg-white/70 text-navy hover:border-teal hover:bg-white',
                 )}
               >
+                <span
+                  className="size-2 rounded-full transition-transform"
+                  style={{ backgroundColor: g.dotColor }}
+                  aria-hidden="true"
+                />
                 <g.Icon className="size-4" aria-hidden />
                 {g.name}
               </button>
