@@ -20,7 +20,7 @@ export function CohortDrawer() {
                 <Users className="size-5" />
               </div>
               <div>
-                <span className="font-mono text-[10px] font-bold text-teal uppercase tracking-widest">
+                <span className="font-mono text-[10px] font-bold text-violet uppercase tracking-widest">
                   SCREEN STU-02
                 </span>
                 <h3 className="font-bold text-navy text-base">Peer Cohort Insights</h3>

@@ -48,11 +48,7 @@ export function FinalCta() {
     <section
       ref={ref}
       aria-labelledby="cta-title"
-      className="relative overflow-hidden"
-      style={{
-        background:
-          'radial-gradient(90% 70% at 50% 0%, rgba(255, 255, 255, 0.6) 0%, transparent 70%), radial-gradient(60% 50% at 80% 80%, rgba(99, 220, 211, 0.25) 0%, transparent 70%), linear-gradient(180deg, #E4F7F3 0%, #C4ECE5 50%, #AEE6DC 100%)',
-      }}
+      className="fintellec-micro-grid relative overflow-hidden transition-colors duration-500"
     >
       <svg
         aria-hidden
@@ -62,8 +58,8 @@ export function FinalCta() {
         fill="none"
       >
         <g ref={circle} style={{ transformOrigin: `${CX}px ${CY}px`, opacity: 0 }}>
-          <circle cx={CX} cy={CY} r={R} fill="rgba(255,255,255,0.4)" stroke="#fff" strokeOpacity="0.9" />
-          <circle cx={CX} cy={CY} r={R - 26} stroke="#07877F" strokeOpacity="0.12" strokeDasharray="1 6" />
+          <circle cx={CX} cy={CY} r={R} fill="rgba(255,255,255,0.2)" stroke="#63DCD3" strokeOpacity="0.45" />
+          <circle cx={CX} cy={CY} r={R - 26} stroke="#07877F" strokeOpacity="0.18" strokeDasharray="1 6" />
         </g>
         {[
           { s: '#65DED2', o: 0.18, w: 18 },
@@ -90,14 +86,14 @@ export function FinalCta() {
           id="cta-title"
           className="max-w-4xl text-balance text-[clamp(2.8rem,7vw,6.5rem)] font-medium leading-[0.92] tracking-[-0.05em] text-navy"
         >
-          Your money story <span className="text-teal">starts here.</span>
+          Your money story <span className="font-highlight text-teal">starts here.</span>
         </h2>
         <p className="mt-7 max-w-md text-pretty text-base leading-relaxed text-steel md:text-lg">
           Get a clearer picture. Make more intentional choices. Build better habits.
         </p>
         <a
           href="#how-it-works"
-          className="group mt-10 inline-flex items-center gap-2 rounded-full bg-navy px-7 py-4 text-sm font-medium text-white shadow-[0_24px_50px_-20px_rgba(6,53,104,0.7)] transition-colors hover:bg-teal"
+          className="group mt-10 inline-flex items-center gap-2 rounded-full bg-violet px-7 py-4 text-sm font-medium text-white shadow-[0_24px_50px_-20px_rgba(101,71,215,0.74)] transition-colors hover:bg-teal"
         >
           Explore Fintellec
           <ArrowUpRight className="size-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" aria-hidden />

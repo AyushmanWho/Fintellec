@@ -1,6 +1,6 @@
 import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
-import { Libre_Baskerville, Nunito, Edu_NSW_ACT_Hand_Pre, Geist_Mono } from 'next/font/google'
+import { Libre_Baskerville, Nunito, Edu_NSW_ACT_Hand_Pre } from 'next/font/google'
 import './globals.css'
 
 const baskerville = Libre_Baskerville({
@@ -8,20 +8,21 @@ const baskerville = Libre_Baskerville({
   weight: ['400', '700'],
   variable: '--font-baskerville',
   display: 'swap',
+  adjustFontFallback: false,
 })
 
 const nunito = Nunito({
   subsets: ['latin'],
   variable: '--font-nunito',
   display: 'swap',
+  adjustFontFallback: false,
 })
-
-const geistMono = Geist_Mono({ subsets: ['latin'], variable: '--font-geist-mono', display: 'swap' })
 
 const eduHand = Edu_NSW_ACT_Hand_Pre({
   subsets: ['latin'],
   variable: '--font-edu-hand',
   display: 'swap',
+  adjustFontFallback: false,
 })
 
 export const metadata: Metadata = {
@@ -49,7 +50,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className={`${baskerville.variable} ${nunito.variable} ${eduHand.variable} ${geistMono.variable} bg-aqua`}>
+    <html lang="en" className={`${baskerville.variable} ${nunito.variable} ${eduHand.variable} bg-aqua`}>
       <body className="font-sans antialiased">
         {children}
         {process.env.NODE_ENV === 'production' && <Analytics />}

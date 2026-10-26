@@ -14,7 +14,7 @@ export function ReportsTab() {
   return (
     <div className="space-y-8 pb-28 pt-2">
       <div>
-        <span className="font-mono text-xs font-bold uppercase tracking-widest text-teal">
+        <span className="font-mono text-xs font-bold uppercase tracking-widest text-violet">
           SYSTEM ENGINE / APP / REPORTS
         </span>
         <h1 className="text-3xl font-extrabold tracking-tight text-navy">

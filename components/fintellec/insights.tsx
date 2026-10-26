@@ -79,7 +79,7 @@ const INSIGHTS: Insight[] = [
             <span className={cn('flex items-center gap-2', s.idle ? 'text-navy' : 'text-steel')}>
               <span className={cn('size-1.5 rounded-full', s.idle ? 'bg-purple-600' : 'bg-mint')} aria-hidden />
               {s.name}
-              {s.idle && <span className="font-mono text-[9px] uppercase tracking-[0.14em] text-purple-700 bg-purple-50 px-1.5 py-0.5 rounded-full border border-purple-200">idle</span>}
+              {s.idle && <span className="rounded-full border border-violet/20 bg-violet-soft px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-[0.14em] text-violet">idle</span>}
             </span>
             <span className="font-mono text-navy">{inr(s.cost)}/mo</span>
           </li>
@@ -139,11 +139,7 @@ export function Insights() {
   return (
     <section
       aria-labelledby="insights-title"
-      className="relative overflow-hidden py-24 md:py-36"
-      style={{
-        background:
-          'radial-gradient(70% 50% at 20% 30%, rgba(99, 220, 211, 0.24) 0%, transparent 70%), linear-gradient(180deg, #E8F7F4 0%, #F5FCFA 50%, #E5F7F4 100%)',
-      }}
+      className="fintellec-micro-grid relative overflow-hidden py-24 md:py-36 transition-colors duration-500"
     >
       <div className="mx-auto max-w-[1400px] px-6 md:px-12">
         <div className="grid gap-8 md:grid-cols-12 md:items-end">
@@ -153,13 +149,13 @@ export function Insights() {
           >
             Small insights.
             <br />
-            <span className="text-teal">Better decisions.</span>
+            <span className="font-highlight text-teal">Better decisions.</span>
           </h2>
           <div className="md:col-span-4 md:col-start-9">
             <p className="text-pretty text-base leading-relaxed text-steel md:text-lg">
               Notice the patterns. Make more intentional choices.
             </p>
-            <p className="mt-4 inline-flex rounded-full border border-mint bg-white/70 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.18em] text-steel">
+            <p className="fintellec-specular-card mt-4 inline-flex rounded-full px-3 py-1 font-mono text-[10px] uppercase tracking-[0.18em] text-steel">
               Illustrative demo data · no accounts connected
             </p>
           </div>
@@ -221,7 +217,7 @@ export function Insights() {
                 onBlur={() => setHover(null)}
                 tabIndex={0}
                 className={cn(
-                  'group w-full rounded-3xl border border-mint/80 bg-white/75 p-6 backdrop-blur-md transition-[clip-path,transform,border-color,box-shadow] duration-[900ms] ease-[cubic-bezier(.2,.8,.2,1)] hover:-translate-y-1 hover:border-teal/50 hover:shadow-[0_30px_60px_-34px_rgba(6,53,104,0.45)] focus-visible:border-teal md:absolute md:w-[330px]',
+                  'fintellec-specular-card group w-full rounded-3xl p-6 transition-[clip-path,transform,border-color,box-shadow] duration-[900ms] ease-[cubic-bezier(.2,.8,.2,1)] focus-visible:border-teal md:absolute md:w-[330px]',
                   pos,
                   inView ? '[clip-path:inset(0_0_0_0_round_24px)]' : '[clip-path:inset(0_0_100%_0_round_24px)]',
                 )}

@@ -24,7 +24,7 @@ export function DashboardShell() {
   const { activeTab, setPreviewLandingMode } = useAuth()
 
   return (
-    <div className="min-h-screen bg-[#EFFBFA] text-[#003365] transition-colors selection:bg-teal selection:text-white">
+    <div className="fintellec-micro-grid min-h-screen bg-[#EFFBFA] text-[#003365] transition-colors duration-500 selection:bg-teal selection:text-white">
       {/* Top Cockpit Mode Pill Bar */}
       <div className="bg-navy px-4 py-1.5 text-center text-[11px] font-mono text-white/90 flex items-center justify-center gap-2">
         <span className="flex size-2 rounded-full bg-bright animate-pulse" />

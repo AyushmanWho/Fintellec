@@ -36,7 +36,7 @@ export function FinancialIqModal() {
             <Trophy className="size-6" />
           </div>
           <div>
-            <span className="font-mono text-xs font-bold uppercase tracking-widest text-teal">
+            <span className="font-mono text-xs font-bold uppercase tracking-widest text-violet">
               SCORING METHODOLOGY
             </span>
             <h2 className="text-xl font-extrabold text-navy">Financial IQ Breakdown</h2>

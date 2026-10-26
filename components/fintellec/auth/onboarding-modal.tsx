@@ -60,7 +60,7 @@ export function OnboardingModal() {
           </div>
           <div>
             <div className="flex items-center gap-1.5">
-              <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-teal">
+              <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-violet">
                 FIRST-TIME SETUP
               </span>
               <span className="rounded-full bg-emerald-100 px-2 py-0.2 text-[9px] font-mono font-bold text-emerald-800">

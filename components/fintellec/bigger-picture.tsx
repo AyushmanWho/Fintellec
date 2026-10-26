@@ -92,11 +92,7 @@ export function BiggerPicture() {
     <section
       id="money-insights"
       aria-labelledby="bigger-picture-title"
-      className="relative scroll-mt-24 overflow-hidden pb-28 pt-10 md:pb-40"
-      style={{
-        background:
-          'radial-gradient(70% 50% at 80% 25%, rgba(184, 242, 236, 0.38) 0%, transparent 65%), linear-gradient(180deg, #FFFFFF 0%, #F4FCFA 50%, #FFFFFF 100%)',
-      }}
+      className="fintellec-micro-grid relative scroll-mt-24 overflow-hidden pb-28 pt-10 md:pb-40 transition-colors duration-500"
     >
       <RibbonDivider
         className="h-28 w-full md:h-40"
@@ -110,7 +106,7 @@ export function BiggerPicture() {
               id="bigger-picture-title"
               className="text-balance text-[clamp(2.6rem,6vw,5.5rem)] font-medium leading-[0.92] tracking-[-0.045em] text-navy"
             >
-              See the bigger <span className="text-teal">picture.</span>
+              See the bigger <span className="font-highlight text-teal">picture.</span>
             </h2>
           </div>
           <div className="md:col-span-4 md:col-start-9">
@@ -122,7 +118,7 @@ export function BiggerPicture() {
 
         <div className="mt-16 flex flex-wrap items-end justify-between gap-6 border-t border-navy/10 pt-8 md:mt-24">
           <div>
-            <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-steel">Spending · {data.label}</p>
+            <p className="font-mono text-[11px] font-medium uppercase tracking-[0.22em] text-steel">Spending · {data.label}</p>
             <p className="mt-2 text-[clamp(2.75rem,7vw,6rem)] font-medium leading-none tracking-[-0.05em] text-navy tabular-nums">
               {inr(tSpent)}
             </p>
@@ -130,11 +126,11 @@ export function BiggerPicture() {
           <div
             role="group"
             aria-label="Time period"
-            className="relative inline-flex rounded-full border border-mint bg-white p-1 shadow-[0_10px_30px_-20px_rgba(6,53,104,0.4)]"
+            className="fintellec-specular-card relative inline-flex rounded-full p-1"
           >
             <span
               aria-hidden
-              className="absolute inset-y-1 left-1 w-24 rounded-full bg-navy transition-transform duration-500 ease-[cubic-bezier(.6,0,.2,1)]"
+              className="absolute inset-y-1 left-1 w-24 rounded-full bg-violet transition-transform duration-500 ease-[cubic-bezier(.6,0,.2,1)]"
               style={{ transform: period === 'weekly' ? 'translateX(0)' : 'translateX(100%)' }}
             />
             {(['weekly', 'monthly'] as const).map((p) => (
@@ -144,7 +140,7 @@ export function BiggerPicture() {
                 aria-pressed={period === p}
                 onClick={() => switchTo(p)}
                 className={cn(
-                  'relative z-10 w-24 rounded-full py-2 text-sm font-medium capitalize transition-colors duration-300',
+                  'relative z-10 w-24 rounded-full py-2 font-mono text-xs font-semibold capitalize transition-colors duration-300',
                   period === p ? 'text-white' : 'text-navy/70 hover:text-navy',
                 )}
               >
@@ -154,7 +150,7 @@ export function BiggerPicture() {
           </div>
         </div>
 
-        <div className="relative mt-10">
+        <div className="fintellec-specular-card relative mt-10 rounded-3xl p-6 md:p-8">
           <div
             ref={chartRef}
             className="relative h-[280px] w-full touch-pan-y md:h-auto md:aspect-[1000/380]"

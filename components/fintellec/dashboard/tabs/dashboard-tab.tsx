@@ -92,17 +92,18 @@ export function DashboardTab() {
       {/* 1. Header Greeting & Top Actions */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <span className="font-mono text-xs font-bold uppercase tracking-widest text-teal">
+          <span className="font-mono text-xs font-bold uppercase tracking-widest text-violet">
             HELLO
           </span>
           <div className="flex items-center gap-2">
             <h1 className="text-3xl font-extrabold tracking-tight text-navy sm:text-4xl">
-              {user.name.split(' ')[0]} <span className="inline-block animate-wave">👋</span>
+              <span className="font-highlight text-teal">{user.name.split(' ')[0]}</span>{' '}
+              <span className="inline-block animate-wave">👋</span>
             </h1>
           </div>
           <p className="mt-1 text-sm text-steel">
             Here&apos;s how your money is doing today.{' '}
-            <span className="hidden sm:inline font-mono text-xs text-navy/70">
+            <span className="hidden sm:inline font-mono text-xs text-navy/70 tabular-nums">
               {user.balance > 0
                 ? `(₹${user.balance.toLocaleString('en-IN')} available — active liquid buffer)`
                 : `(Ready to track your first expense or configure your balance)`}
@@ -115,7 +116,7 @@ export function DashboardTab() {
           <button
             type="button"
             onClick={toggleHideBalance}
-            className="flex items-center gap-1.5 rounded-full border border-mint bg-white px-3.5 py-2 text-xs font-medium text-navy transition-all hover:border-teal hover:bg-aqua/60 shadow-2xs active:scale-95"
+            className="fintellec-specular-card flex items-center gap-1.5 rounded-full px-3.5 py-2 text-xs font-medium text-navy transition-all active:scale-95"
           >
             {user.hideBalance ? (
               <>
@@ -146,7 +147,7 @@ export function DashboardTab() {
 
       {/* Calibration Reminder if never completed */}
       {!user.hasCompletedOnboarding && (
-        <div className="flex items-center justify-between rounded-2xl border border-teal/40 bg-aqua/70 p-4">
+        <div className="fintellec-specular-card flex items-center justify-between rounded-2xl p-4">
           <div className="flex items-center gap-3">
             <Sparkles className="size-5 text-teal" />
             <div>
@@ -181,7 +182,7 @@ export function DashboardTab() {
             </div>
           </div>
           <div className="mt-3">
-            <div className="text-3xl font-extrabold tracking-tight text-bright font-sans">
+            <div className="text-3xl font-extrabold tracking-tight text-bright tabular-nums">
               {formatMoney(user.balance)}
             </div>
             <p className="mt-1 text-xs text-mint/70 font-mono">
@@ -191,40 +192,40 @@ export function DashboardTab() {
         </div>
 
         {/* Card 2: Monthly Expense */}
-        <div className="rounded-3xl border border-mint/80 bg-white/90 p-5 shadow-sm backdrop-blur-sm transition-transform hover:-translate-y-0.5">
+        <div className="fintellec-specular-card rounded-3xl p-5">
           <div className="flex items-center justify-between">
             <span className="font-mono text-[11px] font-semibold tracking-wider text-steel uppercase">
               MONTHLY EXPENSE
             </span>
-            <div className="flex size-8 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
+            <div className="flex size-8 items-center justify-center rounded-xl bg-emerald-500/15 text-emerald-500">
               <TrendingDown className="size-4" />
             </div>
           </div>
           <div className="mt-3">
-            <div className="text-3xl font-extrabold tracking-tight text-navy font-sans">
+            <div className="text-3xl font-extrabold tracking-tight text-navy tabular-nums">
               {formatMoney(user.monthlyExpense)}
             </div>
             <p className="mt-1 text-xs text-steel">
-              <span className="font-semibold text-emerald-600">{expensePct}%</span> of monthly income
+              <span className="font-semibold text-emerald-500 tabular-nums">{expensePct}%</span> of monthly income
             </p>
           </div>
         </div>
 
         {/* Card 3: Savings */}
-        <div className="rounded-3xl border border-mint/80 bg-white/90 p-5 shadow-sm backdrop-blur-sm transition-transform hover:-translate-y-0.5">
+        <div className="fintellec-specular-card rounded-3xl p-5">
           <div className="flex items-center justify-between">
             <span className="font-mono text-[11px] font-semibold tracking-wider text-steel uppercase">
               SAVINGS
             </span>
-            <div className="flex size-8 items-center justify-center rounded-xl bg-teal/10 text-teal">
+            <div className="flex size-8 items-center justify-center rounded-xl bg-teal/15 text-teal">
               <PiggyBank className="size-4" />
             </div>
           </div>
           <div className="mt-3">
-            <div className="text-3xl font-extrabold tracking-tight text-navy font-sans">
+            <div className="text-3xl font-extrabold tracking-tight text-navy tabular-nums">
               {formatMoney(user.savings)}
             </div>
-            <p className="mt-1 text-xs text-steel">
+            <p className="mt-1 text-xs text-steel tabular-nums">
               Target: ₹{(monthlyIncome * 0.2).toLocaleString('en-IN')}/mo
             </p>
           </div>
@@ -236,22 +237,22 @@ export function DashboardTab() {
             setIsIqModalOpen(true)
             sound.tick()
           }}
-          className="group cursor-pointer rounded-3xl border border-mint/80 bg-white/90 p-5 shadow-sm backdrop-blur-sm transition-all hover:border-teal hover:-translate-y-0.5"
+          className="fintellec-specular-card group cursor-pointer rounded-3xl p-5"
         >
           <div className="flex items-center justify-between">
-            <span className="font-mono text-[11px] font-semibold tracking-wider text-steel uppercase group-hover:text-purple-600 transition-colors">
+            <span className="font-mono text-[11px] font-semibold tracking-wider text-steel uppercase group-hover:text-teal transition-colors">
               FINANCIAL IQ
             </span>
-            <div className="flex size-8 items-center justify-center rounded-xl bg-purple-50 text-purple-600 border border-purple-200/50 transition-transform group-hover:scale-110">
+            <div className="flex size-8 items-center justify-center rounded-xl bg-purple-500/15 text-purple-500 border border-purple-400/30 transition-transform group-hover:scale-110">
               <Sparkles className="size-4" />
             </div>
           </div>
           <div className="mt-3">
-            <div className="flex items-baseline gap-1.5 text-3xl font-extrabold tracking-tight text-navy font-sans">
+            <div className="flex items-baseline gap-1.5 text-3xl font-extrabold tracking-tight text-navy tabular-nums">
               <span>{user.financialIq}</span>
               <span className="text-sm font-semibold text-steel">/100</span>
             </div>
-            <p className="mt-1 text-xs text-steel group-hover:text-purple-600 transition-colors">
+            <p className="mt-1 text-xs text-steel group-hover:text-teal transition-colors">
               Tap for factor breakdown →
             </p>
           </div>
@@ -261,7 +262,7 @@ export function DashboardTab() {
       {/* 3. Middle Section: Cashflow Trend & Budget Health */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Cashflow Trend Area Chart */}
-        <div className="rounded-3xl border border-mint/80 bg-white/90 p-6 shadow-sm lg:col-span-2">
+        <div className="fintellec-specular-card rounded-3xl p-6 lg:col-span-2">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <span className="font-mono text-[11px] font-bold uppercase tracking-wider text-steel">
@@ -367,7 +368,7 @@ export function DashboardTab() {
         </div>
 
         {/* Budget Health Gauge */}
-        <div className="flex flex-col justify-between rounded-3xl border border-mint/80 bg-white/90 p-6 shadow-sm">
+        <div className="fintellec-specular-card flex flex-col justify-between rounded-3xl p-6">
           <div>
             <span className="font-mono text-[11px] font-bold uppercase tracking-wider text-steel">
               BUDGET HEALTH
@@ -403,8 +404,8 @@ export function DashboardTab() {
               </svg>
 
               <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-                <span className="text-3xl font-extrabold tracking-tight text-navy">{healthPct}%</span>
-                <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-teal">
+                <span className="text-3xl font-extrabold tracking-tight text-navy tabular-nums">{healthPct}%</span>
+                <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-violet">
                   HEALTHY
                 </span>
               </div>
@@ -412,10 +413,10 @@ export function DashboardTab() {
           </div>
 
           <div className="rounded-2xl border border-mint/60 bg-aqua/50 p-3 text-center">
-            <p className="text-xs text-navy font-medium">
+            <p className="text-xs text-navy font-medium tabular-nums">
               You&apos;ve spent <span className="font-bold text-teal">₹{user.monthlyExpense.toLocaleString('en-IN')}</span> of your ₹{monthlyIncome.toLocaleString('en-IN')} monthly budget.
             </p>
-            <p className="mt-0.5 text-[11px] text-steel">
+            <p className="mt-0.5 text-[11px] text-steel tabular-nums">
               Burn rate: {expensePct}% consumed
             </p>
           </div>
@@ -425,7 +426,7 @@ export function DashboardTab() {
       {/* 4. Active Goal Collision Card & Live Ledger */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Goal Collision Alert Box */}
-        <div className="rounded-3xl border border-mint/80 bg-white/95 p-6 shadow-sm">
+        <div className="fintellec-specular-card rounded-3xl p-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               {delayedGoals.length > 0 ? (
@@ -473,7 +474,7 @@ export function DashboardTab() {
                 {goals.slice(0, 3).map((g) => (
                   <div key={g.id} className="flex items-center justify-between rounded-xl bg-aqua/40 p-2.5 text-xs border border-mint/60">
                     <span className="text-navy font-medium truncate">{g.name}</span>
-                    <span className={cn('font-mono font-semibold', g.delayMonths > 0 ? 'text-orange-600' : 'text-emerald-700')}>
+                    <span className={cn('font-mono font-semibold tabular-nums', g.delayMonths > 0 ? 'text-orange-500' : 'text-teal')}>
                       {g.delayMonths > 0 ? `+${g.delayMonths} Mo Delay` : 'On Track'}
                     </span>
                   </div>
@@ -496,7 +497,7 @@ export function DashboardTab() {
         </div>
 
         {/* Live Ledger / Recent Transactions (Operable & Clean) */}
-        <div className="rounded-3xl border border-mint/80 bg-white/90 p-6 shadow-sm lg:col-span-2">
+        <div className="fintellec-specular-card rounded-3xl p-6 lg:col-span-2">
           <div className="flex items-center justify-between">
             <div>
               <span className="font-mono text-[11px] font-bold uppercase tracking-wider text-steel">

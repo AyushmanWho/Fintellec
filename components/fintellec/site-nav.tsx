@@ -1,11 +1,13 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { ArrowUpRight, Menu, X, Volume2, VolumeX } from 'lucide-react'
+import { ArrowUpRight, Menu, X, Volume2, VolumeX, Sparkles } from 'lucide-react'
+import Link from 'next/link'
 import { cn } from '@/lib/utils'
 import { sound } from '@/lib/sound'
 import { CircadianToggle } from './circadian-toggle'
 import { useAuth } from './auth/auth-context'
+import { Wordmark } from './logo'
 
 
 
@@ -67,15 +69,18 @@ export function SiteNav() {
           )}
           style={inHeroTitle && !open ? { opacity: 0, pointerEvents: 'none', visibility: 'hidden' } : undefined}
         >
-          <img
-            src="/fintellec-logo-clean.png"
-            alt="Fintellec — Track Smarter. Spend Wiser."
-            className="h-10 w-auto object-contain sm:h-11"
-          />
+          <Wordmark className="px-1" />
         </a>
 
 
         <div className="flex items-center gap-2 md:gap-3">
+          <Link
+            href="/features-preview"
+            className="hidden items-center gap-1.5 rounded-full border border-violet/25 bg-violet-soft px-3 py-1.5 text-[11px] font-mono font-semibold text-violet transition-all hover:border-violet/50 md:flex"
+          >
+            <Sparkles className="size-3" />
+            8 features
+          </Link>
           <CircadianToggle />
           <button
             type="button"
@@ -135,7 +140,7 @@ export function SiteNav() {
               }
               sound.snap('high')
             }}
-            className="group hidden items-center gap-1.5 rounded-full bg-navy px-4 py-2 text-[13px] font-medium text-white transition-colors hover:bg-teal sm:inline-flex"
+            className="group hidden items-center gap-1.5 rounded-full bg-violet px-4 py-2 text-[13px] font-medium text-white shadow-[0_14px_30px_-16px_rgba(101,71,215,0.75)] transition-colors hover:bg-teal sm:inline-flex"
           >
             {isAuthenticated ? 'Live Dashboard' : 'Explore Fintellec'}
             <ArrowUpRight className="size-3.5 transition-transform group-hover:-translate-y-px group-hover:translate-x-px" aria-hidden />
@@ -171,7 +176,7 @@ export function SiteNav() {
                 }
                 sound.snap('high')
               }}
-              className="inline-flex w-full items-center justify-center gap-1.5 rounded-full bg-navy px-5 py-3 text-sm font-medium text-white shadow-xs"
+              className="inline-flex w-full items-center justify-center gap-1.5 rounded-full bg-violet px-5 py-3 text-sm font-medium text-white shadow-xs"
             >
               {isAuthenticated ? 'Open Cockpit' : 'Sign In with Google'} <ArrowUpRight className="size-4" aria-hidden />
             </button>

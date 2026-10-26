@@ -58,7 +58,7 @@ export function AddGoalModal() {
             <Target className="size-5" />
           </div>
           <div>
-            <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-teal">
+            <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-violet">
               COLLISION MATRIX ENGINE
             </span>
             <h2 className="text-xl font-extrabold text-navy">Add New Goal</h2>
@@ -175,4 +175,3 @@ export function AddGoalModal() {
     </div>
   )
 }
-

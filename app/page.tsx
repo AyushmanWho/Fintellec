@@ -19,6 +19,7 @@ import { AuthProvider, useAuth } from '@/components/fintellec/auth/auth-context'
 import { GoogleSignInModal } from '@/components/fintellec/auth/google-sign-in-modal'
 import { OnboardingModal } from '@/components/fintellec/auth/onboarding-modal'
 import { DashboardShell } from '@/components/fintellec/dashboard/dashboard-shell'
+import { MagneticSpotlight } from '@/components/fintellec/magnetic-spotlight'
 import { ArrowRight, LayoutDashboard } from 'lucide-react'
 import { sound } from '@/lib/sound'
 
@@ -78,6 +79,7 @@ export default function Page() {
   return (
     <AuthProvider>
       <CircadianProvider>
+        <MagneticSpotlight />
         <GoogleSignInModal />
         <OnboardingModal />
         <MainContent />

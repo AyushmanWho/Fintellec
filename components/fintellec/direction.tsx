@@ -27,7 +27,7 @@ function TrackVisual() {
       {tokens.map(({ Icon, delay }, i) => (
         <span
           key={i}
-          className="travel absolute left-0 top-0 -ml-[18px] -mt-[18px] grid size-9 place-items-center rounded-full border border-white bg-white/80 text-teal shadow-[0_10px_24px_-10px_rgba(6,53,104,0.45)] backdrop-blur"
+          className="travel absolute left-0 top-0 -ml-[18px] -mt-[18px] grid size-9 place-items-center rounded-full border border-violet/20 bg-violet-soft text-violet shadow-[0_10px_24px_-10px_rgba(101,71,215,0.45)] backdrop-blur"
           style={{ offsetPath: `path('${TRACK_PATH}')`, animationDelay: delay } as CSSProperties}
         >
           <Icon className="size-4" aria-hidden />
@@ -107,13 +107,13 @@ function SaveVisual() {
           <span
             key={i}
             aria-hidden
-            className="coin-in absolute grid size-11 place-items-center rounded-full border border-white text-sm font-medium text-teal shadow-[0_10px_24px_-10px_rgba(6,53,104,0.45)]"
+            className="coin-in absolute grid size-11 place-items-center rounded-full border border-violet/20 text-sm font-medium text-violet shadow-[0_10px_24px_-10px_rgba(101,71,215,0.45)]"
             style={
               {
                 '--fx': c.fx,
                 '--fy': c.fy,
                 animationDelay: c.delay,
-                background: 'radial-gradient(circle at 32% 28%, #fff 0%, #EAF9F7 45%, #B9F0E9 100%)',
+                background: 'radial-gradient(circle at 32% 28%, #fff 0%, #F1EEFF 45%, #D8D0FF 100%)',
               } as CSSProperties
             }
           >
@@ -157,7 +157,7 @@ function Stage({ n, title, heading, body, visual, extra, active, side, pos }: St
           side === 'right' ? 'md:left-[190px]' : 'md:right-[190px] md:text-right',
         )}
       >
-        <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-teal">
+        <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-violet">
           {n} — {title}
         </p>
         <h3 className="mt-3 text-balance text-3xl font-medium leading-[1.02] tracking-[-0.03em] text-navy md:text-4xl">
@@ -188,18 +188,14 @@ export function Direction() {
     <section
       id="how-it-works"
       aria-labelledby="direction-title"
-      className="relative scroll-mt-24 pb-24 pt-24 md:pt-36"
-      style={{
-        background:
-          'radial-gradient(65% 50% at 50% 0%, rgba(184, 242, 236, 0.32) 0%, transparent 65%), radial-gradient(60% 50% at 85% 60%, rgba(99, 220, 211, 0.18) 0%, transparent 70%), linear-gradient(180deg, #FFFFFF 0%, #F2FBF9 50%, #E8F7F4 100%)',
-      }}
+      className="fintellec-micro-grid relative scroll-mt-24 pb-24 pt-24 md:pt-36 transition-colors duration-500"
     >
       <div className="mx-auto max-w-[1400px] px-6 md:px-12">
         <h2
           id="direction-title"
           className="text-balance text-[clamp(2.6rem,6vw,5.5rem)] font-medium leading-[0.92] tracking-[-0.045em] text-navy max-w-4xl"
         >
-          Every rupee has a <span className="text-teal">direction.</span>
+          Every rupee has a <span className="font-highlight text-teal">direction.</span>
         </h2>
         <p className="mt-6 max-w-xl text-pretty text-steel md:text-lg">
           Three movements, one continuous flow — from knowing where money goes to arriving where you want it.
@@ -287,7 +283,7 @@ export function Direction() {
                   onClick={() => setBudget(b)}
                   className={cn(
                     'rounded-full border px-3 py-1.5 font-mono text-xs transition-colors',
-                    budget === b ? 'border-navy bg-navy text-white' : 'border-mint bg-white text-navy hover:border-teal',
+                    budget === b ? 'border-violet bg-violet text-white' : 'border-mint bg-white text-navy hover:border-teal',
                   )}
                 >
                   {`₹${b / 1000}k`}

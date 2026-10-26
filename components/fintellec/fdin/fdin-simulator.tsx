@@ -363,7 +363,7 @@ export function FdinSimulator() {
             className="text-balance text-[clamp(2.4rem,5.2vw,4.5rem)] font-medium leading-[0.96] tracking-[-0.04em] text-navy"
           >
             Real-time consequences.{' '}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal via-bright to-teal">
+            <span className="font-highlight text-teal">
               Zero judgment.
             </span>
           </h2>
@@ -771,7 +771,7 @@ function IphoneGlassSimulator({ config }: { config: ArchetypeConfig }) {
                   strokeWidth="2"
                   strokeDasharray="4 4"
                 />
-                <text x={pad.l + 6} y={criticalY - 6} fill="#EF4444" fontSize="9" fontFamily="monospace" fontWeight="600">
+                <text x={pad.l + 6} y={criticalY - 6} fill="#EF4444" fontSize="9" fontFamily="var(--font-nunito)" fontWeight="600">
                   SAFETY BUFFER ({inr(config.criticalBuffer)})
                 </text>
 
@@ -807,7 +807,7 @@ function IphoneGlassSimulator({ config }: { config: ArchetypeConfig }) {
                     textAnchor="middle"
                     fill="#52728A"
                     fontSize="10"
-                    fontFamily="monospace"
+                    fontFamily="var(--font-nunito)"
                   >
                     {d.month}
                   </text>

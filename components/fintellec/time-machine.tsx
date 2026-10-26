@@ -115,11 +115,7 @@ export function TimeMachine() {
     <section
       id="time-machine"
       aria-labelledby="time-machine-title"
-      className="relative scroll-mt-24 overflow-hidden py-24 md:py-36"
-      style={{
-        background:
-          'radial-gradient(75% 55% at 50% 30%, rgba(99, 220, 211, 0.22) 0%, transparent 70%), linear-gradient(180deg, #EAF8F5 0%, #F6FCFA 50%, #E4F7F3 100%)',
-      }}
+      className="fintellec-micro-grid relative scroll-mt-24 overflow-hidden py-24 md:py-36 transition-colors duration-500"
     >
       {/* Background ambient lighting */}
       <div
@@ -130,7 +126,7 @@ export function TimeMachine() {
       <div className="relative mx-auto max-w-[1400px] px-6 md:px-12">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full border border-teal/30 bg-teal/5 text-teal text-xs font-mono tracking-[0.22em] uppercase mb-4 shadow-xs">
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-violet/25 bg-violet-soft px-3.5 py-1 text-xs font-mono uppercase tracking-[0.22em] text-violet shadow-xs">
             <Clock className="size-3.5" />
             The Compounding Time Machine
           </div>
@@ -139,7 +135,7 @@ export function TimeMachine() {
             className="text-balance text-[clamp(2.4rem,5.4vw,4.8rem)] font-medium leading-[0.96] tracking-[-0.04em] text-navy"
           >
             Fast-forward your freedom by{' '}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal via-bright to-teal">
+            <span className="font-highlight text-teal">
               10 years.
             </span>
           </h2>
@@ -149,7 +145,7 @@ export function TimeMachine() {
         </div>
 
         {/* The Compounding Machine Canvas */}
-        <div className="mt-14 rounded-3xl border border-mint/90 bg-white/90 p-6 md:p-10 shadow-[0_25px_60px_-20px_rgba(0,51,101,0.25)] backdrop-blur-md">
+        <div className="fintellec-specular-card mt-14 rounded-3xl p-6 md:p-10">
           {/* Top Controls Grid: Monthly SIP Slider & Scrubber */}
           <div className="grid gap-8 lg:grid-cols-12 lg:items-center">
             {/* Monthly SIP Configuration (5 cols) */}
@@ -206,7 +202,7 @@ export function TimeMachine() {
                       onClick={() => handleYearChange(idx)}
                       className={`relative flex flex-col items-center justify-center rounded-2xl py-3 border transition-all duration-300 ${
                         isActive
-                          ? 'bg-navy text-white border-navy shadow-md scale-105'
+                          ? 'bg-violet text-white border-violet shadow-md scale-105'
                           : 'bg-white border-mint/80 text-steel hover:border-teal hover:text-navy'
                       }`}
                       style={isActive ? { boxShadow: `0 4px 14px -2px ${m.accentColor}40` } : undefined}

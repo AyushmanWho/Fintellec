@@ -19,7 +19,7 @@ export function InvestmentsTab() {
     <div className="space-y-8 pb-28 pt-2">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <span className="font-mono text-xs font-bold uppercase tracking-widest text-teal">
+          <span className="font-mono text-xs font-bold uppercase tracking-widest text-violet">
             SYSTEM ENGINE / APP / INVESTMENTS
           </span>
           <h1 className="text-3xl font-extrabold tracking-tight text-navy">

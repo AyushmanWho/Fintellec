@@ -167,7 +167,7 @@ export function GlassCoin() {
               fontSize="10.5"
               letterSpacing="4"
               fontWeight="600"
-              style={{ fontFamily: 'var(--font-geist-mono)' }}
+              style={{ fontFamily: 'var(--font-nunito)' }}
             >
               <textPath href={`#${id}-text`} textLength="930" lengthAdjust="spacing">
                 FINTELLEC · MONEY IN MOTION · TRACK · PLAN · SAVE · FINTELLEC · MONEY IN MOTION ·

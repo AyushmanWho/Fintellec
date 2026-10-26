@@ -45,8 +45,9 @@ export function useInView<T extends Element>(
 }
 
 /**
- * Calls `onProgress` every frame while the element is on screen with a 0–1 value:
+ * Calls `onProgress` on scroll while the element is in view with a 0–1 value:
  * 0 when the element's top reaches `anchor` of the viewport, 1 when its bottom does.
+ * Uses cached offsets and passive scroll listeners to eliminate layout thrashing.
  */
 export function useScrollProgress<T extends HTMLElement>(
   ref: RefObject<T | null>,
@@ -60,21 +61,48 @@ export function useScrollProgress<T extends HTMLElement>(
     if (!el) return
     let raf = 0
     let last = -1
-    const tick = () => {
-      raf = requestAnimationFrame(tick)
-      const rect = el.getBoundingClientRect()
-      const p = clamp((window.innerHeight * anchor - rect.top) / rect.height)
+    let cachedOffsetTop = 0
+    let cachedHeight = 0
+
+    const updateMetrics = () => {
+      let top = 0
+      let cur: HTMLElement | null = el
+      while (cur) {
+        top += cur.offsetTop
+        cur = cur.offsetParent as HTMLElement | null
+      }
+      cachedOffsetTop = top
+      cachedHeight = Math.max(1, el.offsetHeight)
+    }
+    updateMetrics()
+    window.addEventListener('resize', updateMetrics, { passive: true })
+
+    const update = () => {
+      raf = 0
+      const currentTop = cachedOffsetTop - window.scrollY
+      const p = clamp((window.innerHeight * anchor - currentTop) / cachedHeight)
       if (Math.abs(p - last) > 0.0005) {
         last = p
         cb.current(p)
       }
     }
+
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(update)
+    }
+
     const io = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting && !raf) raf = requestAnimationFrame(tick)
-        if (!entry.isIntersecting && raf) {
-          cancelAnimationFrame(raf)
-          raf = 0
+        if (entry.isIntersecting) {
+          updateMetrics()
+          update()
+          window.addEventListener('scroll', onScroll, { passive: true })
+        } else {
+          window.removeEventListener('scroll', onScroll)
+          if (raf) {
+            cancelAnimationFrame(raf)
+            raf = 0
+          }
         }
       },
       { rootMargin: '20% 0px 20% 0px' },
@@ -82,7 +110,9 @@ export function useScrollProgress<T extends HTMLElement>(
     io.observe(el)
     return () => {
       io.disconnect()
-      cancelAnimationFrame(raf)
+      window.removeEventListener('resize', updateMetrics)
+      window.removeEventListener('scroll', onScroll)
+      if (raf) cancelAnimationFrame(raf)
     }
   }, [ref, anchor])
 }

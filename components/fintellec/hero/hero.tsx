@@ -874,7 +874,7 @@ export function Hero() {
           <div ref={walletCopyRef} className="fintellec-wallet-reveal__copy">
             <p className="fintellec-wallet-reveal__eyebrow">MONEY, IN MOTION</p>
             <h1 className="fintellec-wallet-reveal__headline">
-              Every rupee has<br /><span>a place to go.</span>
+              Every rupee has<br /><span className="font-highlight">a place to go.</span>
             </h1>
           </div>
 
@@ -1126,7 +1126,7 @@ export function Hero() {
                     <g key={v}>
                       <line x1={scene.box.x0} x2={scene.box.x1} y1={y} y2={y} stroke="#003365" strokeOpacity={v === 0 ? 0.18 : 0.07} />
                       {v > 0 && (
-                        <text x={scene.box.x0} y={y - 7} fill="#52728a" fontSize="10" style={{ fontFamily: 'var(--font-geist-mono)' }}>
+                        <text x={scene.box.x0} y={y - 7} fill="#52728a" fontSize="10" style={{ fontFamily: 'var(--font-nunito)' }}>
                           {inrCompact(v)}
                         </text>
                       )}
@@ -1195,7 +1195,7 @@ export function Hero() {
                 </g>
               ))}
 
-              <g fill="#003365" fontSize="11" textAnchor="middle" style={{ fontFamily: 'var(--font-geist-mono)' }}>
+              <g fill="#003365" fontSize="11" textAnchor="middle" style={{ fontFamily: 'var(--font-nunito)' }}>
                 {DATA_INDICES.map((i) =>
                   i % labelEvery === 0 || i === 12 ? (
                     <text key={i} ref={(el) => { values.current[i] = el }} style={{ opacity: 0 }}>
@@ -1231,7 +1231,7 @@ export function Hero() {
                   <text ref={ringPct} fill="#003365" fontWeight="500" letterSpacing="-2">
                     0%
                   </text>
-                  <text ref={ringSub} fill="#00A99E" style={{ fontFamily: 'var(--font-geist-mono)' }}>
+                  <text ref={ringSub} fill="#00A99E" style={{ fontFamily: 'var(--font-nunito)' }}>
                     {`${inr(GOAL.saved)} of ${inr(GOAL.target)}`}
                   </text>
                 </g>
@@ -1254,7 +1254,7 @@ export function Hero() {
               data-cinematic-eyebrow
               className={cn(
                 'text-[11px] font-medium uppercase tracking-[0.32em] transition-all duration-700 ease-out',
-                isNight ? 'text-teal font-semibold' : 'text-teal',
+                isNight ? 'text-violet font-semibold' : 'text-violet',
                 alive ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0',
               )}
             >
@@ -1306,7 +1306,7 @@ export function Hero() {
             >
               <a
                 href="#how-it-works"
-                className="group inline-flex items-center gap-2 rounded-full bg-navy px-6 py-3.5 text-sm font-medium text-white shadow-[0_18px_40px_-18px_rgba(0,51,101,0.7)] transition-colors hover:bg-teal"
+                className="group inline-flex items-center gap-2 rounded-full bg-violet px-6 py-3.5 text-sm font-medium text-white shadow-[0_18px_40px_-18px_rgba(101,71,215,0.72)] transition-colors hover:bg-teal"
               >
                 Explore Fintellec
                 <ArrowUpRight className="size-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" aria-hidden />
@@ -1314,7 +1314,7 @@ export function Hero() {
               <button
                 type="button"
                 onClick={goToFlow}
-                className="group inline-flex items-center gap-2 text-sm font-medium text-navy underline-offset-4 hover:underline"
+                className="group inline-flex items-center gap-2 text-sm font-medium text-navy underline-offset-4 hover:text-violet hover:underline"
               >
                 Discover the experience
                 <ArrowDown className="size-4 transition-transform group-hover:translate-y-0.5" aria-hidden />

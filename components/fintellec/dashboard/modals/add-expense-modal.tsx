@@ -51,7 +51,7 @@ export function AddExpenseModal() {
         </button>
 
         <div>
-          <span className="font-mono text-xs font-bold uppercase tracking-widest text-teal">
+          <span className="font-mono text-xs font-bold uppercase tracking-widest text-violet">
             LIVE LEDGER ENTRY
           </span>
           <h2 className="text-xl font-extrabold text-navy mt-0.5">Log Expense & Collision Check</h2>

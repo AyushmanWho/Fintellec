@@ -151,11 +151,7 @@ export function Savings() {
     <section
       id="savings"
       aria-labelledby="savings-title"
-      className="relative scroll-mt-24 overflow-hidden py-24 md:py-36"
-      style={{
-        background:
-          'radial-gradient(80% 60% at 50% 50%, rgba(99, 220, 211, 0.28) 0%, transparent 72%), radial-gradient(50% 40% at 85% 20%, rgba(184, 242, 236, 0.4) 0%, transparent 70%), linear-gradient(180deg, #E8F7F4 0%, #D8F4EF 50%, #EAF8F5 100%)',
-      }}
+      className="fintellec-micro-grid relative scroll-mt-24 overflow-hidden py-24 md:py-36 transition-colors duration-500"
     >
       <div
         aria-hidden
@@ -166,13 +162,13 @@ export function Savings() {
           <GoalRing basePct={basePct} totalPct={totalPct} goal={goal} saved={saved} />
         </div>
 
-        <div className="md:col-span-5 md:col-start-8">
-          <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-teal">Savings goals</p>
+        <div className="fintellec-specular-card md:col-span-5 md:col-start-8 rounded-3xl p-7 md:p-9">
+          <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-violet">Savings goals</p>
           <h2
             id="savings-title"
-            className="mt-5 text-balance text-[clamp(2.6rem,5.2vw,4.75rem)] font-medium leading-[0.92] tracking-[-0.045em] text-navy"
+            className="mt-5 text-balance text-[clamp(2.4rem,4.6vw,4.25rem)] font-medium leading-[0.94] tracking-[-0.045em] text-navy"
           >
-            Make room for what <span className="text-teal">matters.</span>
+            Make room for what <span className="font-highlight text-teal">matters.</span>
           </h2>
 
           <div role="group" aria-label="Choose a goal" className="mt-10 flex flex-wrap gap-2">
@@ -185,7 +181,7 @@ export function Savings() {
                 className={cn(
                   'inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm transition-all',
                   selected === g.id
-                    ? 'border-navy bg-navy text-white shadow-xs'
+                    ? 'border-violet bg-violet text-white shadow-xs'
                     : 'border-mint bg-white/70 text-navy hover:border-teal hover:bg-white',
                 )}
               >

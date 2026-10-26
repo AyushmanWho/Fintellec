@@ -27,7 +27,7 @@ export function GoalsTab() {
       {/* Header */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <span className="font-mono text-xs font-bold uppercase tracking-widest text-teal">
+          <span className="font-mono text-xs font-bold uppercase tracking-widest text-violet">
             SYSTEM ENGINE / APP / GOALS
           </span>
           <h1 className="text-3xl font-extrabold tracking-tight text-navy">
@@ -229,7 +229,7 @@ export function GoalsTab() {
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           {/* Card A: The Delay Path */}
           <div className="rounded-3xl border border-teal/40 bg-aqua/50 p-5 shadow-xs">
-            <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-teal">
+            <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-violet">
               RECOMMENDED STRATEGY
             </span>
             <h3 className="mt-1 text-base font-bold text-navy">The 45-Day Delay Path</h3>

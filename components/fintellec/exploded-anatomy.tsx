@@ -133,12 +133,12 @@ export function ExplodedAnatomy() {
       ref={sectionRef}
       id="anatomy"
       aria-labelledby="anatomy-title"
-      className="relative overflow-hidden bg-[#001c38] text-white py-24 md:py-36 selection:bg-teal selection:text-navy"
+      className="relative overflow-hidden bg-[#100c24] text-white py-24 md:py-36 selection:bg-teal selection:text-navy"
     >
       {/* Ambient Apple Studio Lighting */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute left-1/2 top-1/3 -translate-x-1/2 -translate-y-1/2 w-[850px] aspect-square rounded-full bg-[radial-gradient(circle,rgba(0,169,158,0.22),rgba(99,220,211,0.06)_40%,transparent_70%)] blur-3xl"
+        className="pointer-events-none absolute left-1/2 top-1/3 -translate-x-1/2 -translate-y-1/2 w-[850px] aspect-square rounded-full bg-[radial-gradient(circle,rgba(101,71,215,0.24),rgba(99,220,211,0.06)_42%,transparent_70%)] blur-3xl"
       />
       <div
         aria-hidden="true"
@@ -153,7 +153,7 @@ export function ExplodedAnatomy() {
             className="text-balance text-[clamp(2.5rem,5.5vw,5rem)] font-medium leading-[0.94] tracking-[-0.04em] text-white"
           >
             The anatomy of a <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-bright via-mint to-teal">
+            <span className="font-highlight text-bright">
               frictionless rupee.
             </span>
           </h2>
@@ -271,7 +271,7 @@ export function ExplodedAnatomy() {
                 }}
               >
                 <div className="flex items-center justify-between">
-                  <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-teal">
+                  <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-violet">
                     FIN-1 NEURAL SILICON
                   </span>
                   <Cpu className="size-5 text-bright animate-pulse" />
