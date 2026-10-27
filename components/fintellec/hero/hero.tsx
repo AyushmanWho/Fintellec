@@ -971,7 +971,7 @@ export function Hero() {
           <div
             ref={walletCoinRef}
             onClick={handleWalletCoinClick}
-            className="fintellec-wallet-reveal__coin pointer-events-auto cursor-pointer select-none transition-[box-shadow] duration-200 hover:shadow-[0_0_0_6px_rgba(99,220,211,.65),0_0_55px_rgba(99,220,211,.45)]"
+            className="fintellec-wallet-reveal__coin pointer-events-auto cursor-pointer select-none transition-[box-shadow] duration-200 hover:shadow-[0_0_0_6px_rgba(203,213,225,.9),0_0_55px_rgba(255,255,255,.95),0_15px_35px_rgba(15,23,42,.22)]"
             aria-label="Fintellec rupee coin - click to pulse magnetic field"
             title="Click to pulse magnetic levitation field"
           >
