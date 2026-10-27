@@ -32,9 +32,9 @@
     "typescript": "5.7.3"
   },
   "pnpm": {
-    "onlyBuiltDependencies": [
-      "@firebase/util",
-      "protobufjs"
-    ]
+    "allowBuilds": {
+      "@firebase/util": true,
+      "protobufjs": true
+    }
   }
 }

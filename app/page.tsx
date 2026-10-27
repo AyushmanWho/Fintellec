@@ -55,7 +55,6 @@ function MainContent() {
         )}
 
         <SiteNav />
-        <DigitalCrown />
         <PulseHud />
         <main className="fintellec-main-bridge">
           <Hero />

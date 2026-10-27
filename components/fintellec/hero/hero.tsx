@@ -172,6 +172,10 @@ export function Hero() {
   const meterRef = useRef<HTMLDivElement>(null)
   const tileRefs = useRef<(HTMLDivElement | null)[]>([])
 
+  // 3D Coin Ring Cascade Refs (Pinterest-Inspired Masterpiece)
+  const coinRingStageRef = useRef<HTMLDivElement>(null)
+  const coinRingRefs = useRef<(HTMLDivElement | null)[]>([])
+
   const handleWalletCoinClick = (e: React.MouseEvent) => {
     e.stopPropagation()
     coinPulseRef.current = performance.now()
@@ -291,6 +295,63 @@ export function Hero() {
           const shadowScale = Math.max(0.38, 1 - drop * 0.52 - idleFloat * 0.02)
           coinShadowRef.current.style.opacity = String((0.85 - drop * 0.45) * magFade)
           coinShadowRef.current.style.transform = `translate3d(calc(-50% + ${curDistX * 6 * cursorInfluence}px), calc(-50% + ${dropY * 0.55}px), 0) scale(${shadowScale})`
+        }
+
+        // 1.1 3D COIN RING ARRAY CASCADE (Pinterest/Blender reference)
+        if (coinRingStageRef.current) {
+          const ringCount = 12
+          const isMob = scene?.mobile ?? false
+          const baseRadius = isMob ? 100 : 152
+          // As user scrolls, ring slightly expands before peeling off
+          const expand = smoothstep(0.04, 0.16, wP) * 35
+          const R = baseRadius + expand
+          
+          // Base 3D tilt angles (matching the isometric oblique perspective of the Blender render)
+          const baseTiltX = 58 + cursorTiltX * 0.4 - smoothstep(0.12, 0.30, wP) * 25
+          const baseTiltZ = -18 + cursorTiltY * 0.4
+          
+          // Continuous rotation speed: fast at rest, slows as user scrubs into the routing sequence
+          const spinSpeed = 0.75 * (1 - smoothstep(0.10, 0.28, wP) * 0.85)
+          const currentSpin = (t * spinSpeed) + (wP * 4.5)
+
+          // Overall ring visibility: fades out as coins complete their cascade into the ledger & wallet
+          const ringFade = 1 - smoothstep(0.48, 0.62, wP)
+          coinRingStageRef.current.style.opacity = String(ringFade * (1 - handoff))
+
+          for (let i = 0; i < ringCount; i++) {
+            const coinEl = coinRingRefs.current[i]
+            if (!coinEl) continue
+
+            const baseAngle = (i / ringCount) * Math.PI * 2
+            const angle = baseAngle + currentSpin
+
+            // Orbit ellipse coordinates in 3D
+            let x = Math.cos(angle) * R
+            let y = Math.sin(angle) * R * Math.cos(baseTiltX * (Math.PI / 180))
+            let z = Math.sin(angle) * R * Math.sin(baseTiltX * (Math.PI / 180))
+            let rotY = angle * (180 / Math.PI)
+            let rotX = baseTiltX * 0.4
+            let coinScale = 0.82 + (z / (R * 2)) * 0.35
+
+            // Cascade: Coins stream downward in a 3D spiral into the opening leather wallet!
+            const walletDropStart = 0.14 + (i / ringCount) * 0.16
+            const walletDropEnd = walletDropStart + 0.18
+            const dropP = clamp((wP - walletDropStart) / (walletDropEnd - walletDropStart))
+            if (dropP > 0) {
+              const ease = dropP * dropP * (3 - 2 * dropP)
+              // Converge x toward wallet center with gentle spiral
+              const spiral = Math.sin(dropP * Math.PI * 2 + i) * 20 * (1 - ease)
+              x = (x + spiral) * (1 - ease * 0.95)
+              y = y * (1 - ease) + (145 + (i % 3) * 8) * ease
+              z = z * (1 - ease) - ease * 85
+              coinScale = coinScale * (1 - ease * 0.65)
+              rotX = rotX * (1 - ease) + 30 * ease
+              rotY = rotY + ease * 180
+            }
+
+            coinEl.style.transform = `translate3d(calc(-50% + ${x.toFixed(1)}px), calc(-50% + ${y.toFixed(1)}px), ${z.toFixed(1)}px) rotateY(${rotY.toFixed(1)}deg) rotateX(${rotX.toFixed(1)}deg) scale(${coinScale.toFixed(3)})`
+            coinEl.style.zIndex = String(Math.round(z + 300))
+          }
         }
 
         // 2. Leather Wallet Body rests physically below coin, then glides in & swings its lid open in synchronization with the coin
@@ -664,11 +725,11 @@ export function Hero() {
         })
       }
 
-      // Cinematic palette transition: begin in Deep Navy for Scene 1, then reveal daytime mint as Scene 2 arrives
+      // Cinematic palette transition: in daylight mode, background is crisp white; in night mode, veil is deep navy
       const reveal = reduced ? 1 : clamp((heroP - 0.22) / 0.18)
       if (Math.abs(reveal - lastReveal) > 0.005) {
         if (cinematicVeil.current) {
-          cinematicVeil.current.style.opacity = String(0.94 * (1 - reveal))
+          cinematicVeil.current.style.opacity = isNight ? String(0.94 * (1 - reveal)) : '0'
         }
         // Cache headline elements once to avoid 240 DOM querySelector traversals per second
         if (headline.current && !headlineElements.current.primary) {
@@ -680,10 +741,10 @@ export function Hero() {
           }
         }
         const { primary, secondary, eyebrow, body } = headlineElements.current
-        if (primary) primary.style.color = `color-mix(in srgb, #FFFFFF ${(1 - reveal) * 100}%, #003365)`
-        if (secondary) secondary.style.color = `color-mix(in srgb, #63DCD3 ${(1 - reveal) * 100}%, #00A99E)`
-        if (eyebrow) eyebrow.style.color = `color-mix(in srgb, #63DCD3 ${(1 - reveal) * 100}%, #00A99E)`
-        if (body) body.style.color = `color-mix(in srgb, #B8F2EC ${(1 - reveal) * 100}%, #52728A)`
+        if (primary) primary.style.color = isNight ? `color-mix(in srgb, #FFFFFF ${(1 - reveal) * 100}%, #003365)` : '#003365'
+        if (secondary) secondary.style.color = '#00A99E'
+        if (eyebrow) eyebrow.style.color = '#00A99E'
+        if (body) body.style.color = '#52728A'
         lastReveal = reveal
       }
 
@@ -830,7 +891,7 @@ export function Hero() {
           style={{
             background: isNight
               ? 'radial-gradient(65% 65% at 65% 45%, rgba(99,220,211,0.18), transparent 70%), linear-gradient(180deg, #000B18 0%, #001326 100%)'
-              : 'radial-gradient(55% 55% at 70% 46%, rgba(99,220,211,0.26), transparent 70%), radial-gradient(45% 40% at 8% 100%, rgba(184,242,236,0.75), transparent 70%), linear-gradient(180deg, #EFFAFA 0%, #EFFAFA 100%)',
+              : '#FFFFFF',
           }}
         />
 
@@ -856,7 +917,7 @@ export function Hero() {
           aria-hidden
           className="pointer-events-none absolute inset-0 z-[1]"
           style={{
-            opacity: 0.94,
+            opacity: isNight ? 0.94 : 0,
             background:
               'radial-gradient(75% 45% at 50% 0%, rgba(0, 169, 158, 0.22) 0%, transparent 70%), radial-gradient(60% 50% at 85% 18%, rgba(99, 220, 211, 0.16) 0%, transparent 65%), radial-gradient(80% 60% at 50% 75%, rgba(0, 169, 158, 0.24) 0%, transparent 70%), linear-gradient(180deg, #001022 0%, #001e3b 28%, #002d54 58%, #001c38 88%, #001224 100%)',
             transition: reduced ? 'none' : 'opacity 120ms linear',
@@ -878,11 +939,31 @@ export function Hero() {
             </h1>
           </div>
 
+          {/* 3D Rupee Coin Ring Array (Pinterest-Inspired Blender Array) */}
+          <div
+            ref={coinRingStageRef}
+            className="fintellec-coin-ring-stage"
+            aria-hidden="true"
+          >
+            {Array.from({ length: 12 }).map((_, idx) => (
+              <div
+                key={idx}
+                ref={(el) => {
+                  coinRingRefs.current[idx] = el
+                }}
+                className="fintellec-ring-coin"
+              >
+                <span className="fintellec-ring-coin__symbol">₹</span>
+                <span className="fintellec-ring-coin__rim" />
+              </div>
+            ))}
+          </div>
+
 
           {/* Dynamic Contact Drop Shadow directly below coin */}
           <div
             ref={coinShadowRef}
-            className="pointer-events-none absolute left-1/2 top-[68.2%] z-[2] -translate-x-1/2 -translate-y-1/2 w-[clamp(110px,14vw,170px)] h-[22px] rounded-[100%] bg-[#001020]/95 blur-md will-change-transform"
+            className="pointer-events-none absolute left-1/2 top-[72.2%] z-[2] -translate-x-1/2 -translate-y-1/2 w-[clamp(110px,14vw,170px)] h-[22px] rounded-[100%] bg-navy/20 blur-md will-change-transform"
             aria-hidden="true"
           />
 

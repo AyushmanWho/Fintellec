@@ -22,7 +22,11 @@ export function SiteFooter() {
       <div className="mx-auto max-w-[1400px] px-6 py-12 md:px-12">
         <div className="flex flex-col gap-8 md:flex-row md:items-center md:justify-between">
           <a href="#top" aria-label="Back to top" className="w-fit rounded-full">
-            <Wordmark />
+            <img
+              src="/fintellec-logo-clean.png"
+              alt="Fintellec"
+              className="h-9 w-auto object-contain"
+            />
           </a>
           <nav aria-label="Footer">
             <ul className="flex flex-wrap gap-x-7 gap-y-3 text-sm font-medium text-navy/75">
