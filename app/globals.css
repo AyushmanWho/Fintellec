@@ -397,7 +397,7 @@ nav,
 
 /* Fintellec Wallet World — append after existing wallet-reveal CSS. */
 .fintellec-wallet-reveal{height:210svh;background:#FFFFFF;color:#001e3b;isolation:isolate;position:relative}
-.fintellec-wallet-reveal__stage{position:sticky;top:0;height:100svh;min-height:580px;overflow:hidden;perspective:1400px;isolation:isolate;background:#FFFFFF}
+.fintellec-wallet-reveal__stage{position:sticky;top:0;height:100svh;min-height:580px;overflow:visible;perspective:1400px;isolation:isolate;background:#FFFFFF}
 .fintellec-wallet-reveal__grain{position:absolute;inset:0;z-index:0;pointer-events:none;opacity:.03;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.25'/%3E%3C/svg%3E")}
 .fintellec-wallet-reveal__ambient{position:absolute;z-index:0;left:50%;top:68%;width:min(70vw,760px);aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle,rgba(203,213,225,.38),rgba(148,163,184,.1) 46%,transparent 70%);filter:blur(24px);pointer-events:none}
 
