@@ -135,7 +135,7 @@ function InteractiveWalletTile({
   )
 }
 
-const RING_COIN_COUNT = 16
+const RING_COIN_COUNT = 14
 const PARTICLES = 18
 const DOT_INDICES = Array.from({ length: 14 }, (_, i) => i)
 const DATA_INDICES = Array.from({ length: 12 }, (_, i) => i + 1)
@@ -305,8 +305,8 @@ export function Hero() {
           // Ellipse radii calibrated from user's red marker annotations:
           // Horizontal: coins at left edge ~15% and right edge ~83% of viewport → Rx ≈ 34% of w
           // Vertical: coins at top ~8% and bottom ~95% of viewport → Ry ≈ 43.5% of h
-          const Rx = isMob ? w * 0.42 : w * 0.34
-          const Ry = isMob ? h * 0.38 : h * 0.435
+          const Rx = isMob ? w * 0.42 : w * 0.44
+          const Ry = isMob ? h * 0.40 : h * 0.44
 
           // Gentle continuous rotation
           const spinSpeed = 0.45 * (1 - smoothstep(0.10, 0.28, wP) * 0.85)
@@ -317,7 +317,7 @@ export function Hero() {
           coinRingStageRef.current.style.opacity = String(ringFade * (1 - handoff))
 
           // Wallet center Y offset from stage center (stage top:50%, wallet top:~73% desktop)
-          const walletOffsetY = isMob ? h * 0.20 : h * 0.23
+          const walletOffsetY = isMob ? h * 0.24 : h * 0.28
 
           for (let i = 0; i < RING_COIN_COUNT; i++) {
             const coinEl = coinRingRefs.current[i]
@@ -874,7 +874,7 @@ export function Hero() {
       </p>
       <div
         ref={stageRef}
-        className="hero-stage sticky top-0 h-svh w-full overflow-hidden"
+        className="hero-stage sticky top-0 h-svh w-full overflow-visible"
         onPointerMove={(e) => {
           pointerRef.current = { x: e.clientX, y: e.clientY }
         }}
