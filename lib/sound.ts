@@ -172,22 +172,89 @@ class SoundManager {
 
   // 6.1 Metallic Silver Coin Clink
   public clink(pitch = 3400) {
+    this.coinImpact(0.4, pitch / 3400)
+  }
+
+  // 6.2 Realistic Metallic Silver Coin Impact (Synthesized multi-mode resonant ping + impact noise click)
+  public coinImpact(intensity = 0.5, pitchMultiplier = 1.0) {
     if (!this.enabled) return
     const ctx = this.getContext()
     if (!ctx) return
+
     try {
       const now = ctx.currentTime
-      const osc = ctx.createOscillator()
-      const gain = ctx.createGain()
-      osc.type = 'triangle'
-      osc.frequency.setValueAtTime(pitch, now)
-      osc.frequency.exponentialRampToValueAtTime(pitch * 0.7, now + 0.035)
-      gain.gain.setValueAtTime(0.04, now)
-      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.035)
-      osc.connect(gain)
-      gain.connect(ctx.destination)
-      osc.start(now)
-      osc.stop(now + 0.038)
+      const masterGain = ctx.createGain()
+      const vol = Math.max(0.01, Math.min(0.22, intensity * 0.16))
+      masterGain.gain.setValueAtTime(vol, now)
+      masterGain.connect(ctx.destination)
+
+      // Inharmonic flexural resonance modes of physical silver coin disc
+      // (2400Hz, 3150Hz, 4200Hz, 5600Hz) with natural jitter
+      const modes = [2400, 3150, 4200, 5600]
+      modes.forEach((freq, idx) => {
+        const osc = ctx.createOscillator()
+        const gain = ctx.createGain()
+        osc.type = 'sine'
+        const jitter = (Math.random() - 0.5) * 60
+        osc.frequency.setValueAtTime((freq + jitter) * pitchMultiplier, now)
+
+        const decay = 0.08 + idx * 0.025
+        gain.gain.setValueAtTime(0.12 / (idx + 1), now)
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + decay)
+
+        osc.connect(gain)
+        gain.connect(masterGain)
+        osc.start(now)
+        osc.stop(now + decay)
+      })
+
+      // Surface contact noise impulse (hard floor impact transient)
+      const bufferSize = Math.floor(ctx.sampleRate * 0.02) // 20ms click
+      const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate)
+      const data = buffer.getChannelData(0)
+      for (let i = 0; i < bufferSize; i++) {
+        data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufferSize * 0.25))
+      }
+      const noise = ctx.createBufferSource()
+      noise.buffer = buffer
+      const filter = ctx.createBiquadFilter()
+      filter.type = 'bandpass'
+      filter.frequency.setValueAtTime(1750 * pitchMultiplier, now)
+      filter.Q.setValueAtTime(3.0, now)
+
+      const noiseGain = ctx.createGain()
+      noiseGain.gain.setValueAtTime(0.15, now)
+      noiseGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.02)
+
+      noise.connect(filter)
+      filter.connect(noiseGain)
+      noiseGain.connect(masterGain)
+      noise.start(now)
+      noise.stop(now + 0.022)
+    } catch {}
+  }
+
+  // 6.3 Multi-Bounce Coin Clatter (Exponentially decaying gravity bounces)
+  public coinClatter(intensity = 0.5, pitchMultiplier = 1.0) {
+    if (!this.enabled) return
+    const ctx = this.getContext()
+    if (!ctx) return
+
+    try {
+      const now = ctx.currentTime
+      let bounceTime = now
+      let interval = 0.075
+      let amp = intensity
+
+      for (let i = 0; i < 5; i++) {
+        setTimeout(() => {
+          this.coinImpact(amp, pitchMultiplier * (1 + i * 0.03))
+        }, (bounceTime - now) * 1000)
+
+        interval *= 0.62 // Physics: successive bounce delta decreases exponentially
+        bounceTime += interval
+        amp *= 0.55
+      }
     } catch {}
   }
 
