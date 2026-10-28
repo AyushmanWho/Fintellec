@@ -44,11 +44,22 @@ const PERIMETER_MAP = [
   4    // Orbit 13 (334 deg, top right): [53, -95]
 ]
 
-// Hermite smoothstep
-const smoothstep = (min: number, max: number, value: number) => {
-  const x = Math.max(0, Math.min(1, (value - min) / (max - min)))
-  return x * x * (3 - 2 * x)
+const clamp = (v: number) => Math.max(0, Math.min(1, v))
+
+// Quintic Hermite Smootherstep: 0 initial & final velocity + 0 initial & final acceleration
+// Guarantees C2 buttery, organic smoothness with zero visual hitches
+const smootherstep = (min: number, max: number, value: number) => {
+  const u = clamp((value - min) / (max - min))
+  return u * u * u * (u * (u * 6 - 15) + 10)
 }
+
+// Cubic smoothstep for lightweight blends
+const smoothstep = (min: number, max: number, value: number) => {
+  const u = clamp((value - min) / (max - min))
+  return u * u * (3 - 2 * u)
+}
+
+const TOTAL_COINS = 68
 
 export function HeroCinematicIntro({
   onComplete,
@@ -64,30 +75,36 @@ export function HeroCinematicIntro({
   const startTimeRef = useRef(0)
   const rafRef = useRef(0)
   const soundClinksRef = useRef<{ [key: number]: boolean }>({})
+  const lastClinkTimeRef = useRef(0)
   const soundRupeeChimeRef = useRef(false)
 
-  // Seeded physical particles for the pour sequence (23 coins matching the Rupee glyph)
+  // Seeded physical particles: 68 coins in total
+  // Coins 0..22 = 23 Rupee Glyph Anchor Coins
+  // Coins 23..67 = 45 Ambient Cascade Coins that create the luxurious torrential shower
   const particlesRef = useRef(
-    Array.from({ length: 23 }, (_, i) => {
+    Array.from({ length: TOTAL_COINS }, (_, i) => {
       const fromLeft = i % 2 === 0
-      const stagger = 0.12 + (i * 0.024)
+      // Continuous staggered pour stream from t = 0.03 to 0.26
+      const stagger = 0.03 + (i * 0.0034) + (Math.random() * 0.012)
+      // Generous floor distribution spread across the bottom plane
+      const floorSpread = fromLeft
+        ? 0.18 + Math.random() * 0.44
+        : 0.38 + Math.random() * 0.44
+      const floorY = 0.72 + (Math.random() * 0.07 - 0.035)
+
       return {
         id: i,
         fromLeft,
         stagger,
-        // Floor landing target spread
-        floorX: (0.24 + Math.random() * 0.52),
-        floorY: 0.74 + (Math.random() * 0.04 - 0.02),
-        // Random tilt angle on landing
-        landRot: (Math.random() - 0.5) * 60,
-        // Current state
-        x: fromLeft ? 0.10 : 0.90,
-        y: 0.14,
-        vx: fromLeft ? (3.8 + Math.random() * 2.5) : (-3.8 - Math.random() * 2.5),
-        vy: 1.2 + Math.random() * 1.5,
-        rot: 0,
-        scale: 0.85,
-        alpha: 0
+        floorX: floorSpread,
+        floorY,
+        landRot: (Math.random() - 0.5) * 75,
+        bounceFreq: 22 + Math.random() * 8,
+        bounceHeight: 18 + Math.random() * 10,
+        swirlAngle: (i * 0.4) + Math.random() * 0.6,
+        swirlSpeed: 2.5 + Math.random() * 1.5,
+        // Relative size variation for natural physical realism
+        sizeFactor: 0.94 + Math.random() * 0.14
       }
     })
   )
@@ -113,7 +130,7 @@ export function HeroCinematicIntro({
 
   useEffect(() => {
     startTimeRef.current = performance.now()
-    const DURATION = 4800 // 4.8 seconds total cinematic experience
+    const DURATION = 5000 // 5.0 seconds opulent cinematic experience
 
     const animate = (now: number) => {
       const dt = now - startTimeRef.current
@@ -126,7 +143,7 @@ export function HeroCinematicIntro({
       const ctx = canvas.getContext('2d')
       if (!ctx) return
 
-      // DPR scaling for razor-sharp rendering on Retina/4K
+      // DPR scaling for razor-sharp rendering on Retina/4K displays
       const dpr = window.devicePixelRatio || 1
       if (canvas.width !== w * dpr || canvas.height !== h * dpr) {
         canvas.width = w * dpr
@@ -137,169 +154,210 @@ export function HeroCinematicIntro({
       ctx.clearRect(0, 0, w, h)
 
       // -----------------------------------------------------------
-      // PHASE 1: WINE GLASSES POURING COINS (t: 0.0 to 1.4s)
+      // PHASE 1: WINE GLASSES POURING COINS (t: 0.0 to 1.5s)
       // -----------------------------------------------------------
-      const pourPhase = smoothstep(0.0, 0.28, progress)
-      const glassesRetract = smoothstep(0.26, 0.36, progress)
-      const glassesAlpha = (1 - glassesRetract) * smoothstep(0.02, 0.08, progress)
+      const glassesRetract = smootherstep(0.25, 0.38, progress)
+      const glassesAlpha = (1 - glassesRetract) * smoothstep(0.01, 0.06, progress)
 
       if (glassesAlpha > 0.01) {
         ctx.save()
         ctx.globalAlpha = glassesAlpha
 
-        // 1. Left Crystal Wine Glass (tilts rightward into pour)
-        const leftTilt = smoothstep(0.05, 0.22, progress) * 54
-        const leftX = w * (0.09 - glassesRetract * 0.12)
-        const leftY = h * 0.16
-        drawCrystalGlass(ctx, leftX, leftY, leftTilt, false)
+        // Scale wine glasses to 1.35x to match the large silver coins
+        const glassScale = isMobile ? 1.05 : 1.35
 
-        // 2. Right Crystal Wine Glass (tilts leftward into pour)
-        const rightTilt = smoothstep(0.07, 0.24, progress) * -54
-        const rightX = w * (0.91 + glassesRetract * 0.12)
-        const rightY = h * 0.16
-        drawCrystalGlass(ctx, rightX, rightY, rightTilt, true)
+        // 1. Left Crystal Wine Glass (tilts rightward into lavish pour)
+        const leftTilt = smootherstep(0.04, 0.22, progress) * 58
+        const leftX = w * (0.07 - glassesRetract * 0.12)
+        const leftY = h * 0.15
+        drawCrystalGlass(ctx, leftX, leftY, leftTilt, false, glassScale)
+
+        // 2. Right Crystal Wine Glass (tilts leftward into lavish pour)
+        const rightTilt = smootherstep(0.05, 0.23, progress) * -58
+        const rightX = w * (0.93 + glassesRetract * 0.12)
+        const rightY = h * 0.15
+        drawCrystalGlass(ctx, rightX, rightY, rightTilt, true, glassScale)
 
         ctx.restore()
       }
 
       // -----------------------------------------------------------
-      // PHASE 2 & 3: COIN PHYSICS, ANTIGRAVITY & RUPEE TO ORBIT
+      // PHASE 2 & 3: COIN PHYSICS, ANTIGRAVITY LIFT & RUPEE TO ORBIT
       // -----------------------------------------------------------
-      const antigravityPhase = smoothstep(0.28, 0.52, progress)
-      const rupeeHold = smoothstep(0.50, 0.58, progress)
-      const orbitExpand = smoothstep(0.58, 0.82, progress)
-      const stageFade = smoothstep(0.86, 0.98, progress)
-
-      // Center of assembly
       const centerX = w * 0.5
       const centerY = h * 0.45
       const Rx = isMobile ? w * 0.42 : w * 0.44
       const Ry = isMobile ? h * 0.40 : h * 0.44
 
-      // Glyph scale dynamically calibrated to screen size
-      const glyphScale = isMobile ? 0.75 : Math.min(1.15, Math.max(0.85, w / 1100))
+      // Large coin diameter calibrated to match DOM ring coins (52px to 68px)
+      const baseCoinDiameter = isMobile ? 48 : Math.min(68, Math.max(54, w * 0.046))
+
+      // Glyph scale calibrated so the larger coins assemble into a bold, legible ₹ symbol
+      const glyphScale = isMobile ? 0.95 : Math.min(1.42, Math.max(1.10, w / 920))
+
+      const stageFade = smootherstep(0.86, 0.99, progress)
 
       particlesRef.current.forEach((p, idx) => {
-        let curX = p.x * w
-        let curY = p.y * h
-        let curAlpha = 1
-        let curScale = isMobile ? 26 : 30
-        let curRot = p.rot
+        const isGlyphCoin = idx < 23
+        const coinT = Math.max(0, progress - p.stagger)
 
-        // 1. Pouring physics (progress < 0.28)
-        if (progress < 0.32) {
-          const coinT = Math.max(0, progress - p.stagger)
-          if (coinT <= 0) {
-            curAlpha = 0
-          } else {
-            curAlpha = Math.min(1, coinT * 8)
-            // Parabolic fall trajectory from glass lip
-            const startX = p.fromLeft ? w * 0.11 : w * 0.89
-            const startY = h * 0.18
-            const targetFloorX = p.floorX * w
-            const targetFloorY = p.floorY * h
+        if (coinT <= 0) return
 
-            const fallProgress = Math.min(1, coinT / 0.16)
-            const easeFall = fallProgress * fallProgress
+        // --- 1. FALL & FLOOR BOUNCE TRAJECTORY ---
+        const startX = p.fromLeft ? w * 0.09 : w * 0.91
+        const startY = h * 0.16
+        const targetFloorX = p.floorX * w
+        const targetFloorY = p.floorY * h
 
-            curX = startX + (targetFloorX - startX) * fallProgress
-            curY = startY + (targetFloorY - startY) * easeFall
-            curRot = p.landRot * fallProgress
+        const fallU = Math.min(1, coinT / 0.17)
+        const easeFall = fallU * fallU // Natural gravity acceleration
 
-            // Gentle bounce on floor impact
-            if (fallProgress >= 1) {
-              const bounceT = Math.max(0, coinT - 0.16)
-              const bounce = Math.sin(bounceT * 28) * Math.max(0, 14 - bounceT * 45)
-              curY -= Math.max(0, bounce)
+        const fallX = startX + (targetFloorX - startX) * fallU
+        let fallY = startY + (targetFloorY - startY) * easeFall
+        let curRot = p.landRot * fallU
 
-              // Subtle metallic clink on initial floor impact
-              if (!soundClinksRef.current[idx]) {
-                soundClinksRef.current[idx] = true
-                if (idx % 3 === 0) {
-                  sound.clink(2800 + Math.random() * 800)
-                }
-              }
+        // Damped harmonic floor bounce
+        if (fallU >= 1) {
+          const bT = coinT - 0.17
+          const bounce = Math.sin(bT * p.bounceFreq) * Math.max(0, p.bounceHeight - bT * 48)
+          fallY -= Math.max(0, bounce)
+
+          // Metallic silver coin clink on floor contact (throttled to avoid sound clutter)
+          if (!soundClinksRef.current[idx]) {
+            soundClinksRef.current[idx] = true
+            const nowTime = performance.now()
+            if (nowTime - lastClinkTimeRef.current > 45 && (idx % 2 === 0)) {
+              lastClinkTimeRef.current = nowTime
+              sound.clink(2600 + Math.random() * 900)
             }
           }
         }
-        // 2. Antigravity Lift into Rupee Glyph (progress 0.28 -> 0.58)
-        else if (progress < 0.58) {
-          const floorX = p.floorX * w
-          const floorY = p.floorY * h
+
+        let curX = fallX
+        let curY = fallY
+        let curAlpha = Math.min(1, coinT * 7)
+        let curDiameter = baseCoinDiameter * p.sizeFactor
+
+        // --- 2. ANTIGRAVITY LIFT & MORPH STAGES ---
+        if (isGlyphCoin) {
+          // A. 23 Anchor Coins: Lift into Rupee Glyph
           const targetRupee = RUPEE_GLYPH_TARGETS[idx] || [0, 0]
           const rupeeX = centerX + targetRupee[0] * glyphScale
           const rupeeY = centerY + targetRupee[1] * glyphScale
 
-          const liftEase = smoothstep(0.28 + (idx * 0.005), 0.50 + (idx * 0.003), progress)
-          // Ease with natural spring deceleration
-          const spring = Math.sin(liftEase * Math.PI * 0.5)
+          // Quintic smootherstep lift (C2 smooth, 0 jerk)
+          const liftProgress = smootherstep(0.28 + (idx * 0.003), 0.50 + (idx * 0.002), progress)
 
-          curX = floorX + (rupeeX - floorX) * spring
-          curY = floorY + (rupeeY - floorY) * spring
-          curRot = p.landRot * (1 - spring)
-          curAlpha = 1
+          // Interpolate from floor to Rupee position
+          let activeX = targetFloorX + (rupeeX - targetFloorX) * liftProgress
+          let activeY = targetFloorY + (rupeeY - targetFloorY) * liftProgress
+          curRot = p.landRot * (1 - liftProgress)
 
           // Rupee crystallization shine & achievement chime
-          if (progress > 0.50) {
-            const shinePulse = Math.sin((progress - 0.50) / 0.08 * Math.PI)
-            curScale += shinePulse * 4
+          if (progress > 0.50 && progress < 0.60) {
+            const shinePulse = Math.sin(((progress - 0.50) / 0.10) * Math.PI)
+            curDiameter += shinePulse * 6
 
             if (!soundRupeeChimeRef.current) {
               soundRupeeChimeRef.current = true
               sound.chime()
             }
           }
-        }
-        // 3. Rupee Morphs into Orbit & Master Coin (progress 0.58 -> 0.86)
-        else {
-          const targetRupee = RUPEE_GLYPH_TARGETS[idx] || [0, 0]
-          const rupeeX = centerX + targetRupee[0] * glyphScale
-          const rupeeY = centerY + targetRupee[1] * glyphScale
 
-          const perimeterIdx = PERIMETER_MAP.indexOf(idx)
-          const isPerimeter = perimeterIdx !== -1
+          // B. Rupee Morphs into 14-Coin Orbit and Center Flare
+          if (progress >= 0.56) {
+            const perimeterIdx = PERIMETER_MAP.indexOf(idx)
+            const isPerimeter = perimeterIdx !== -1
 
-          if (isPerimeter) {
-            // Expand to the 14-coin wide red ellipse orbit!
-            const orbitAngle = perimeterIdx * (Math.PI * 2 / 14)
-            const targetOrbitX = centerX + Math.cos(orbitAngle) * Rx
-            const targetOrbitY = centerY + Math.sin(orbitAngle) * Ry
+            if (isPerimeter) {
+              // 14 perimeter coins expand out along the wide red ellipse orbit
+              const orbitAngle = perimeterIdx * ((Math.PI * 2) / 14)
+              const targetOrbitX = centerX + Math.cos(orbitAngle) * Rx
+              const targetOrbitY = centerY + Math.sin(orbitAngle) * Ry
 
-            const expandEase = smoothstep(0.58 + perimeterIdx * 0.008, 0.82, progress)
-            curX = rupeeX + (targetOrbitX - rupeeX) * expandEase
-            curY = rupeeY + (targetOrbitY - rupeeY) * expandEase
-            curScale = (isMobile ? 26 : 30) * (1 + expandEase * 0.12)
-            curAlpha = 1 - stageFade
+              const expandProgress = smootherstep(0.56 + perimeterIdx * 0.006, 0.82, progress)
+              activeX = rupeeX + (targetOrbitX - rupeeX) * expandProgress
+              activeY = rupeeY + (targetOrbitY - rupeeY) * expandProgress
+              curAlpha = 1 - stageFade
+            } else {
+              // 9 inner coins implode into center (0, 0) to ignite the central flare & master coin
+              const implodeProgress = smootherstep(0.56, 0.72, progress)
+              activeX = rupeeX + (centerX - rupeeX) * implodeProgress
+              activeY = rupeeY + (centerY - rupeeY) * implodeProgress
+              curDiameter = curDiameter * (1 - implodeProgress * 0.65)
+              curAlpha = 1 - implodeProgress
+            }
+          }
+
+          // Blending from fall position into active lift/morph position
+          if (progress < 0.32) {
+            const blendToLift = smoothstep(0.26, 0.32, progress)
+            curX = fallX + (activeX - fallX) * blendToLift
+            curY = fallY + (activeY - fallY) * blendToLift
           } else {
-            // 9 inner coins implode into center (0, 0) to spawn the Master Coin!
-            const implodeEase = smoothstep(0.58, 0.72, progress)
-            curX = rupeeX + (centerX - rupeeX) * implodeEase
-            curY = rupeeY + (centerY - rupeeY) * implodeEase
-            curScale = (isMobile ? 26 : 30) * (1 - implodeEase * 0.7)
-            curAlpha = (1 - implodeEase)
+            curX = activeX
+            curY = activeY
+          }
+        } else {
+          // C. 45 Ambient Cascade Coins:
+          // They fall in large numbers to create the lavish cascade, bounce,
+          // then gracefully float upward in zero-gravity and softly dissolve into the center
+          if (progress >= 0.28) {
+            const ambientLift = smootherstep(0.28 + ((idx % 12) * 0.004), 0.50, progress)
+            const swirlR = (1 - ambientLift) * (w * 0.22)
+            const swirlTheta = p.swirlAngle + progress * p.swirlSpeed
+            const ambTargetX = centerX + Math.cos(swirlTheta) * swirlR
+            const ambTargetY = centerY + Math.sin(swirlTheta) * (swirlR * 0.55)
+
+            const ambX = targetFloorX + (ambTargetX - targetFloorX) * ambientLift
+            const ambY = targetFloorY + (ambTargetY - targetFloorY) * ambientLift
+
+            const blend = smoothstep(0.28, 0.33, progress)
+            curX = fallX + (ambX - fallX) * blend
+            curY = fallY + (ambY - fallY) * blend
+
+            // Fade ambient coins softly as the ₹ symbol crystallizes
+            const ambientFade = 1 - smoothstep(0.42, 0.54, progress)
+            curAlpha *= ambientFade
           }
         }
 
         if (curAlpha > 0.01) {
-          drawMintedSilverCoin(ctx, curX, curY, curScale, curRot, curAlpha)
+          drawMintedSilverCoin(ctx, curX, curY, curDiameter, curRot, curAlpha)
         }
       })
 
       // -----------------------------------------------------------
-      // PHASE 4: CENTRAL SPECULAR BURST & LENS FLARE (progress 0.70 to 0.86)
+      // PHASE 4: CENTRAL SPECULAR BURST & LENS FLARE (progress 0.68 to 0.86)
       // -----------------------------------------------------------
-      if (progress > 0.68 && progress < 0.86) {
-        const flareP = (progress - 0.68) / 0.18
+      if (progress > 0.66 && progress < 0.86) {
+        const flareP = (progress - 0.66) / 0.20
         const flareAlpha = Math.sin(flareP * Math.PI)
         ctx.save()
-        ctx.globalAlpha = flareAlpha * 0.85
-        ctx.fillStyle = '#FFFFFF'
+        ctx.globalAlpha = flareAlpha * 0.90
+
+        // Soft radial glow
+        const flareGrad = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, 80 * flareP)
+        flareGrad.addColorStop(0, '#FFFFFF')
+        flareGrad.addColorStop(0.35, 'rgba(255, 255, 255, 0.8)')
+        flareGrad.addColorStop(0.7, 'rgba(203, 213, 225, 0.3)')
+        flareGrad.addColorStop(1, 'transparent')
+
+        ctx.fillStyle = flareGrad
         ctx.beginPath()
-        ctx.arc(centerX, centerY, 55 * flareP, 0, Math.PI * 2)
+        ctx.arc(centerX, centerY, 80 * flareP, 0, Math.PI * 2)
         ctx.fill()
-        ctx.strokeStyle = 'rgba(203, 213, 225, 0.8)'
-        ctx.lineWidth = 2
+
+        // Crisp 4-point lens star flash
+        ctx.strokeStyle = '#FFFFFF'
+        ctx.lineWidth = 2.4 * flareAlpha
+        ctx.beginPath()
+        ctx.moveTo(centerX - 90 * flareP, centerY)
+        ctx.lineTo(centerX + 90 * flareP, centerY)
+        ctx.moveTo(centerX, centerY - 90 * flareP)
+        ctx.lineTo(centerX, centerY + 90 * flareP)
         ctx.stroke()
+
         ctx.restore()
       }
 
@@ -315,11 +373,11 @@ export function HeroCinematicIntro({
     return () => {
       if (rafRef.current) cancelAnimationFrame(rafRef.current)
     }
-  }, [w, h, isMobile, onComplete])
+  }, [w, h, isMobile, onComplete, onIntroTick])
 
   if (isSkipped) return null
 
-  const isEnding = elapsed > 4400
+  const isEnding = elapsed > 4600
 
   return (
     <div
@@ -327,8 +385,8 @@ export function HeroCinematicIntro({
         isEnding ? 'opacity-0 pointer-events-none' : 'opacity-100'
       }`}
       style={{
-        backgroundColor: elapsed < 3300 ? '#FFFFFF' : 'transparent',
-        transition: 'background-color 700ms cubic-bezier(0.16, 1, 0.3, 1), opacity 500ms ease',
+        backgroundColor: elapsed < 3500 ? '#FFFFFF' : 'transparent',
+        transition: 'background-color 800ms cubic-bezier(0.16, 1, 0.3, 1), opacity 500ms ease',
       }}
     >
       <canvas
@@ -357,78 +415,81 @@ function drawCrystalGlass(
   x: number,
   y: number,
   tiltDeg: number,
-  isFlipped: boolean
+  isFlipped: boolean,
+  scale: number = 1.0
 ) {
   ctx.save()
   ctx.translate(x, y)
+  ctx.scale(scale * (isFlipped ? -1 : 1), scale)
   ctx.rotate((tiltDeg * Math.PI) / 180)
-  if (isFlipped) ctx.scale(-1, 1)
 
   // Crystal Glass Bowl & Stem Gradient
-  const grad = ctx.createLinearGradient(-35, 0, 35, 120)
-  grad.addColorStop(0, 'rgba(255, 255, 255, 0.85)')
-  grad.addColorStop(0.3, 'rgba(241, 245, 249, 0.35)')
-  grad.addColorStop(0.7, 'rgba(203, 213, 225, 0.25)')
-  grad.addColorStop(1, 'rgba(255, 255, 255, 0.9)')
+  const grad = ctx.createLinearGradient(-38, 0, 38, 130)
+  grad.addColorStop(0, 'rgba(255, 255, 255, 0.92)')
+  grad.addColorStop(0.3, 'rgba(241, 245, 249, 0.40)')
+  grad.addColorStop(0.7, 'rgba(203, 213, 225, 0.30)')
+  grad.addColorStop(1, 'rgba(255, 255, 255, 0.95)')
 
   // 1. Crystal Bowl
   ctx.beginPath()
-  ctx.moveTo(-32, 0)
-  ctx.bezierCurveTo(-34, 55, -18, 75, 0, 82)
-  ctx.bezierCurveTo(18, 75, 34, 55, 32, 0)
+  ctx.moveTo(-36, 0)
+  ctx.bezierCurveTo(-38, 60, -20, 82, 0, 90)
+  ctx.bezierCurveTo(20, 82, 38, 60, 36, 0)
   ctx.closePath()
   ctx.fillStyle = grad
   ctx.fill()
-  ctx.lineWidth = 2
+  ctx.lineWidth = 2.2
   ctx.strokeStyle = 'rgba(255, 255, 255, 0.95)'
   ctx.stroke()
 
   // 2. Silver Coins Inside Glass Bowl
   ctx.save()
-  const coinBowlGrad = ctx.createLinearGradient(-12, 26, 12, 54)
+  const coinBowlGrad = ctx.createLinearGradient(-15, 25, 15, 60)
   coinBowlGrad.addColorStop(0, '#FFFFFF')
-  coinBowlGrad.addColorStop(0.45, '#E2E8F0')
+  coinBowlGrad.addColorStop(0.4, '#F1F5F9')
+  coinBowlGrad.addColorStop(0.7, '#CBD5E1')
   coinBowlGrad.addColorStop(1, '#94A3B8')
+
   ctx.beginPath()
-  ctx.arc(0, 42, 14, 0, Math.PI * 2)
-  ctx.arc(-8, 30, 13, 0, Math.PI * 2)
-  ctx.arc(10, 34, 13, 0, Math.PI * 2)
+  ctx.arc(0, 48, 18, 0, Math.PI * 2)
+  ctx.arc(-10, 35, 17, 0, Math.PI * 2)
+  ctx.arc(12, 40, 17, 0, Math.PI * 2)
   ctx.fillStyle = coinBowlGrad
   ctx.fill()
-  ctx.lineWidth = 1.5
+  ctx.lineWidth = 1.6
   ctx.strokeStyle = '#FFFFFF'
   ctx.stroke()
   ctx.restore()
 
   // 3. Top Rim Ellipse
   ctx.beginPath()
-  ctx.ellipse(0, 0, 32, 8, 0, 0, Math.PI * 2)
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.95)'
-  ctx.lineWidth = 2.2
+  ctx.ellipse(0, 0, 36, 9, 0, 0, Math.PI * 2)
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.98)'
+  ctx.lineWidth = 2.4
   ctx.stroke()
 
   // 4. Elegant Stem
   ctx.beginPath()
-  ctx.moveTo(0, 82)
-  ctx.lineTo(0, 142)
-  ctx.lineWidth = 3
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)'
+  ctx.moveTo(0, 90)
+  ctx.lineTo(0, 155)
+  ctx.lineWidth = 3.2
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.92)'
   ctx.stroke()
 
   // 5. Circular Base
   ctx.beginPath()
-  ctx.ellipse(0, 142, 24, 5, 0, 0, Math.PI * 2)
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.8)'
+  ctx.ellipse(0, 155, 28, 6, 0, 0, Math.PI * 2)
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.85)'
   ctx.fill()
-  ctx.strokeStyle = 'rgba(203, 213, 225, 0.85)'
-  ctx.lineWidth = 1.5
+  ctx.strokeStyle = 'rgba(203, 213, 225, 0.90)'
+  ctx.lineWidth = 1.8
   ctx.stroke()
 
   // 6. Specular Highlight Caustic
   ctx.beginPath()
-  ctx.moveTo(-24, 15)
-  ctx.bezierCurveTo(-26, 45, -14, 65, 0, 72)
-  ctx.lineWidth = 3
+  ctx.moveTo(-28, 15)
+  ctx.bezierCurveTo(-30, 50, -16, 72, 0, 80)
+  ctx.lineWidth = 3.2
   ctx.strokeStyle = '#FFFFFF'
   ctx.stroke()
 
@@ -436,7 +497,7 @@ function drawCrystalGlass(
 }
 
 // -----------------------------------------------------------
-// DRAW REALISTIC MINTED SILVER RUPEE COIN
+// DRAW REALISTIC MINTED SILVER RUPEE COIN (Bold, High-Resolution Detail)
 // -----------------------------------------------------------
 function drawMintedSilverCoin(
   ctx: CanvasRenderingContext2D,
@@ -454,16 +515,16 @@ function drawMintedSilverCoin(
   const r = diameter * 0.5
 
   // 1. Soft Ambient Drop Shadow
-  ctx.shadowColor = 'rgba(15, 23, 42, 0.18)'
-  ctx.shadowBlur = 10
-  ctx.shadowOffsetY = 6
+  ctx.shadowColor = 'rgba(15, 23, 42, 0.22)'
+  ctx.shadowBlur = 12
+  ctx.shadowOffsetY = 7
 
-  // 2. Multi-stop Metallic Specular Radial Sheen
+  // 2. Multi-stop Metallic Specular Radial Sheen (Pure Silver Bullion)
   const coinGrad = ctx.createRadialGradient(-r * 0.35, -r * 0.35, r * 0.05, 0, 0, r)
   coinGrad.addColorStop(0, '#FFFFFF')
-  coinGrad.addColorStop(0.2, '#F1F5F9')
-  coinGrad.addColorStop(0.55, '#CBD5E1')
-  coinGrad.addColorStop(0.85, '#94A3B8')
+  coinGrad.addColorStop(0.18, '#F8FAFC')
+  coinGrad.addColorStop(0.48, '#E2E8F0')
+  coinGrad.addColorStop(0.78, '#94A3B8')
   coinGrad.addColorStop(1, '#64748B')
 
   ctx.beginPath()
@@ -471,27 +532,42 @@ function drawMintedSilverCoin(
   ctx.fillStyle = coinGrad
   ctx.fill()
 
-  // Reset shadow for crisp inner grooves
+  // Reset shadow for razor-sharp inner details
   ctx.shadowColor = 'transparent'
 
   // 3. Beveled Chrome Rim
-  ctx.lineWidth = 2
+  ctx.lineWidth = 2.4
   ctx.strokeStyle = '#FFFFFF'
   ctx.stroke()
 
-  // 4. Milled Inner Groove Ring
+  // 4. Micro-Milled Inner Groove Ring
   ctx.beginPath()
-  ctx.arc(0, 0, r * 0.82, 0, Math.PI * 2)
-  ctx.lineWidth = 0.8
+  ctx.arc(0, 0, r * 0.84, 0, Math.PI * 2)
+  ctx.lineWidth = 1.0
   ctx.strokeStyle = 'rgba(100, 116, 139, 0.45)'
   ctx.stroke()
 
-  // 5. Embossed Die-Cast ₹ Symbol
-  ctx.fillStyle = '#0F172A'
-  ctx.font = `bold ${Math.round(r * 1.05)}px "Times New Roman", Baskerville, serif`
+  // 5. Embossed Die-Cast ₹ Symbol with realistic metallic depth
+  ctx.save()
+  const fontSize = Math.round(r * 1.08)
+  ctx.font = `bold ${fontSize}px "Times New Roman", Baskerville, serif`
   ctx.textAlign = 'center'
   ctx.textBaseline = 'middle'
+
+  // Subtle bottom specular highlight bevel for 3D pressed look
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.75)'
+  ctx.fillText('₹', 0.5, 1.8)
+
+  // Crisp navy-slate pressed symbol
+  ctx.fillStyle = '#0a192f'
   ctx.fillText('₹', 0, 0.5)
+  ctx.restore()
+
+  // 6. Polished Diagonal Specular Light Glint
+  ctx.beginPath()
+  ctx.ellipse(-r * 0.3, -r * 0.3, r * 0.35, r * 0.16, -Math.PI / 4, 0, Math.PI * 2)
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.28)'
+  ctx.fill()
 
   ctx.restore()
 }

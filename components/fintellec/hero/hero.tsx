@@ -293,6 +293,16 @@ export function Hero() {
 
       if (introActiveRef.current && progress < 0.02) {
         const introP = introProgressRef.current
+        const isMob = scene?.mobile ?? false
+        const Rx = isMob ? w * 0.42 : w * 0.44
+        const Ry = isMob ? h * 0.40 : h * 0.44
+
+        // Resting cursor influence for smooth handoff
+        const mx = pointerRef.current?.x ?? (w * 0.5)
+        const my = pointerRef.current?.y ?? (h * 0.5)
+        const curDistX = clamp((mx - w * 0.5) / (w * 0.5))
+        const curDistY = clamp((my - h * 0.5) / (h * 0.5))
+        const idleFloat = Math.sin(t * 1.8) * 8
 
         // 1. Rupee Coin in 3D: Materializes from central lens flare (introP: 0.70 -> 0.86)
         if (walletCoinRef.current) {
@@ -305,9 +315,14 @@ export function Hero() {
             walletCoinRef.current.style.opacity = String(coinEnter)
             walletCoinRef.current.style.transform = `translate3d(-50%, -50%, 0) scale(${(coinEnter * springOvershoot).toFixed(3)})`
           } else {
-            const settle = smoothstep(0.86, 0.98, introP)
+            const blendRest = smoothstep(0.86, 0.98, introP)
+            const curYOff = idleFloat * blendRest
+            const curXOff = curDistX * 12 * blendRest
+            const tiltY = curDistX * 24 * blendRest
+            const tiltX = -curDistY * 20 * blendRest
+
             walletCoinRef.current.style.opacity = '1'
-            walletCoinRef.current.style.transform = `translate3d(-50%, -50%, 0) scale(${1 + (1 - settle) * 0.04})`
+            walletCoinRef.current.style.transform = `translate3d(calc(-50% + ${curXOff.toFixed(1)}px), calc(-50% + ${curYOff.toFixed(1)}px), 0) rotateY(${tiltY.toFixed(1)}deg) rotateX(${tiltX.toFixed(1)}deg) scale(1)`
           }
         }
 
@@ -325,13 +340,14 @@ export function Hero() {
         }
 
         // 2. Leather Wallet: Drops down from top (introP: 0.78 -> 0.96) with organic leather bounce
+        // Perfectly settles to resting Y offset (+35px) for 1:1 continuity
         if (walletBodyRef.current) {
           if (introP < 0.78) {
             walletBodyRef.current.style.opacity = '0'
             walletBodyRef.current.style.transform = 'translate3d(-50%, -100vh, 0)'
           } else {
             const dropP = smoothstep(0.78, 0.96, introP)
-            const bounceY = (1 - dropP) * -450 + (dropP < 1 ? Math.sin(dropP * Math.PI) * 14 : 0)
+            const bounceY = (1 - dropP) * -450 + (dropP < 1 ? Math.sin(dropP * Math.PI) * 14 : 0) + (dropP * 35)
             const walletScale = 0.92 + dropP * 0.08
             walletBodyRef.current.style.opacity = String(smoothstep(0.78, 0.88, introP))
             walletBodyRef.current.style.transform = `translate3d(-50%, calc(-50% + ${bounceY.toFixed(1)}px), 0) scale(${walletScale.toFixed(3)})`
@@ -358,9 +374,6 @@ export function Hero() {
             const ringIn = smoothstep(0.84, 0.98, introP)
             coinRingStageRef.current.style.opacity = String(ringIn)
 
-            const isMob = scene?.mobile ?? false
-            const Rx = isMob ? w * 0.42 : w * 0.44
-            const Ry = isMob ? h * 0.40 : h * 0.44
             const currentSpin = t * 0.45
 
             for (let i = 0; i < RING_COIN_COUNT; i++) {
