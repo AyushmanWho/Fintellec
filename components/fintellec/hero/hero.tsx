@@ -135,7 +135,7 @@ function InteractiveWalletTile({
   )
 }
 
-const RING_COIN_COUNT = 16
+const RING_COIN_COUNT = 14
 const PARTICLES = 18
 const DOT_INDICES = Array.from({ length: 14 }, (_, i) => i)
 const DATA_INDICES = Array.from({ length: 12 }, (_, i) => i + 1)
@@ -302,29 +302,28 @@ export function Hero() {
         if (coinRingStageRef.current) {
           const isMob = scene?.mobile ?? false
           
-          // Horizontal radius Rx: wide enough to frame the entire headline and wallet
+          // Horizontal radius Rx: precisely matching user\'s marked boundary (34% of screen width)
           const baseRx = isMob 
             ? Math.min(w * 0.44, 180) 
-            : Math.min(Math.max(w * 0.40, 420), 560)
+            : Math.min(Math.max(w * 0.34, 340), 520)
             
-          // Vertical radius Ry: tall enough to sweep above the headline and below the wallet
+          // Vertical radius Ry: reaching above headline eyebrow (10% vh) and below wallet (88% vh)
           const baseRy = isMob 
-            ? Math.min(h * 0.36, 260) 
-            : Math.min(Math.max(h * 0.37, 300), 380)
+            ? Math.min(h * 0.40, 270) 
+            : Math.min(Math.max(h * 0.455, 275), 410)
 
           // During scroll, ring subtly expands before sequential cascade into wallet
           const expand = smoothstep(0.04, 0.16, wP) * 35
           const Rx = baseRx + expand
           const Ry = baseRy + expand * 0.65
 
-          // 3D Oblique tilt angles:
-          // tiltX gives realistic perspective depth; cursorTilt adds mouse parallax
-          const baseTiltX = 22 + cursorTiltX * 0.35 - smoothstep(0.12, 0.30, wP) * 12
-          const baseTiltZ = -10 + cursorTiltY * 0.35
+          // 3D Tilt angles: upright symmetrical arch (as drawn with red marker), responsive to mouse parallax
+          const baseTiltX = 14 + cursorTiltX * 0.25 - smoothstep(0.12, 0.30, wP) * 8
+          const baseTiltZ = cursorTiltY * 0.25
 
-          // Continuous rotation speed: graceful pace at rest, slows as user scrubs into cascade
-          const spinSpeed = 0.55 * (1 - smoothstep(0.10, 0.28, wP) * 0.85)
-          const currentSpin = (t * spinSpeed) + (wP * 4.2)
+          // Continuous rotation speed
+          const spinSpeed = 0.50 * (1 - smoothstep(0.10, 0.28, wP) * 0.85)
+          const currentSpin = (t * spinSpeed) + (wP * 4.0)
 
           // Overall ring visibility
           const ringFade = 1 - smoothstep(0.48, 0.62, wP)
@@ -337,8 +336,8 @@ export function Hero() {
           const cosX = Math.cos(radX)
           const sinX = Math.sin(radX)
 
-          // Relative vertical distance from stage center (top: 48%) to wallet center (top: 73% desktop / 68% mobile):
-          const walletCenterY = isMob ? (h * (0.68 - 0.44)) : (h * (0.73 - 0.48))
+          // Relative vertical distance from stage center (top: 50%) to wallet center (top: 73% desktop / 68% mobile):
+          const walletCenterY = isMob ? (h * (0.68 - 0.48)) : (h * (0.73 - 0.50))
 
           for (let i = 0; i < RING_COIN_COUNT; i++) {
             const coinEl = coinRingRefs.current[i]
