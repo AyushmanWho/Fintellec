@@ -304,74 +304,70 @@ export function Hero() {
         const curDistY = clamp((my - h * 0.5) / (h * 0.5))
         const idleFloat = Math.sin(t * 1.8) * 8
 
-        // 1. Rupee Coin in 3D: Materializes from central lens flare (introP: 0.70 -> 0.86)
+        // 1. Rupee Master Coin: Takes over smoothly once canvas impact lands (introP >= 0.22)
         if (walletCoinRef.current) {
-          if (introP < 0.70) {
+          if (introP < 0.22) {
             walletCoinRef.current.style.opacity = '0'
             walletCoinRef.current.style.transform = 'translate3d(-50%, -50%, 0) scale(0)'
-          } else if (introP < 0.86) {
-            const coinEnter = smoothstep(0.70, 0.84, introP)
-            const springOvershoot = 1 + Math.sin(coinEnter * Math.PI) * 0.12
-            walletCoinRef.current.style.opacity = String(coinEnter)
-            walletCoinRef.current.style.transform = `translate3d(-50%, -50%, 0) scale(${(coinEnter * springOvershoot).toFixed(3)})`
           } else {
-            const blendRest = smoothstep(0.86, 0.98, introP)
+            const coinEnter = smoothstep(0.22, 0.35, introP)
+            const blendRest = smoothstep(0.60, 0.85, introP)
             const curYOff = idleFloat * blendRest
             const curXOff = curDistX * 12 * blendRest
             const tiltY = curDistX * 24 * blendRest
             const tiltX = -curDistY * 20 * blendRest
 
-            walletCoinRef.current.style.opacity = '1'
+            walletCoinRef.current.style.opacity = String(coinEnter)
             walletCoinRef.current.style.transform = `translate3d(calc(-50% + ${curXOff.toFixed(1)}px), calc(-50% + ${curYOff.toFixed(1)}px), 0) rotateY(${tiltY.toFixed(1)}deg) rotateX(${tiltX.toFixed(1)}deg) scale(1)`
           }
         }
 
-        // Contact shadow directly beneath coin
+        // Contact drop shadow directly beneath coin
         if (coinShadowRef.current) {
-          const shadowIn = smoothstep(0.72, 0.86, introP)
+          const shadowIn = smoothstep(0.22, 0.40, introP)
           coinShadowRef.current.style.opacity = String(shadowIn * 0.85)
           coinShadowRef.current.style.transform = `translate3d(-50%, 0, 0) scale(${shadowIn.toFixed(2)})`
         }
 
         if (magneticFieldRef.current) {
-          const magIn = smoothstep(0.74, 0.88, introP)
+          const magIn = smoothstep(0.25, 0.50, introP)
           magneticFieldRef.current.style.opacity = String(magIn * 0.7)
           magneticFieldRef.current.style.transform = `translate3d(-50%, 0, 0) scale(${magIn.toFixed(2)})`
         }
 
-        // 2. Leather Wallet: Drops down from top (introP: 0.78 -> 0.96) with organic leather bounce
-        // Perfectly settles to resting Y offset (+35px) for 1:1 continuity
+        // 2. Leather Wallet: Unfolds from behind coin (introP: 0.38 -> 0.70)
+        // Settles directly into resting Y offset (+35px) for 1:1 continuity
         if (walletBodyRef.current) {
-          if (introP < 0.78) {
+          if (introP < 0.38) {
             walletBodyRef.current.style.opacity = '0'
             walletBodyRef.current.style.transform = 'translate3d(-50%, -100vh, 0)'
           } else {
-            const dropP = smoothstep(0.78, 0.96, introP)
-            const bounceY = (1 - dropP) * -450 + (dropP < 1 ? Math.sin(dropP * Math.PI) * 14 : 0) + (dropP * 35)
-            const walletScale = 0.92 + dropP * 0.08
-            walletBodyRef.current.style.opacity = String(smoothstep(0.78, 0.88, introP))
+            const dropP = smoothstep(0.38, 0.70, introP)
+            const bounceY = (1 - dropP) * -340 + (dropP < 1 ? Math.sin(dropP * Math.PI) * 12 : 0) + (dropP * 35)
+            const walletScale = 0.90 + dropP * 0.10
+            walletBodyRef.current.style.opacity = String(smoothstep(0.38, 0.52, introP))
             walletBodyRef.current.style.transform = `translate3d(-50%, calc(-50% + ${bounceY.toFixed(1)}px), 0) scale(${walletScale.toFixed(3)})`
           }
         }
 
-        // 3. Headline copy: Slides down from top (introP: 0.82 -> 0.98) and awakens
+        // 3. Headline copy: Slides down and awakens (introP: 0.44 -> 0.76)
         if (walletCopyRef.current) {
-          if (introP < 0.82) {
+          if (introP < 0.44) {
             walletCopyRef.current.style.opacity = '0'
-            walletCopyRef.current.style.transform = 'translate3d(0, -32px, 0)'
+            walletCopyRef.current.style.transform = 'translate3d(0, -28px, 0)'
           } else {
-            const copyEnter = smoothstep(0.82, 0.98, introP)
+            const copyEnter = smoothstep(0.44, 0.76, introP)
             walletCopyRef.current.style.opacity = String(copyEnter)
-            walletCopyRef.current.style.transform = `translate3d(0, ${((1 - copyEnter) * -24).toFixed(1)}px, 0)`
+            walletCopyRef.current.style.transform = `translate3d(0, ${((1 - copyEnter) * -22).toFixed(1)}px, 0)`
           }
         }
 
-        // 4. 14 Revolving Coins Stage: Fades in seamlessly as intro canvas coins fade out (introP: 0.84 -> 0.98)
+        // 4. 14 Revolving Coins Stage: Takes over seamlessly from canvas shockwave (introP: 0.65 -> 0.88)
         if (coinRingStageRef.current) {
-          if (introP < 0.84) {
+          if (introP < 0.65) {
             coinRingStageRef.current.style.opacity = '0'
           } else {
-            const ringIn = smoothstep(0.84, 0.98, introP)
+            const ringIn = smoothstep(0.65, 0.88, introP)
             coinRingStageRef.current.style.opacity = String(ringIn)
 
             const currentSpin = t * 0.45
