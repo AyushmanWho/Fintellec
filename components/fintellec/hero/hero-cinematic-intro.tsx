@@ -127,8 +127,8 @@ export function HeroCinematicIntro({
       const perimeterIdx = isGlyphCoin ? PERIMETER_MAP.indexOf(i) : -1
       const isPerimeter = perimeterIdx !== -1
 
-      // Staggered ejection timeline (0.04s to 0.28s)
-      const stagger = 0.03 + (i * 0.0036) + (Math.random() * 0.012)
+      // Staggered ejection timeline: rapid pour so all 68 coins are airborne by t = 0.13
+      const stagger = 0.02 + (i * 0.0016) + (Math.random() * 0.008)
       const floorY = 0.73 + (Math.random() * 0.06 - 0.03)
 
       return {
@@ -185,7 +185,7 @@ export function HeroCinematicIntro({
   useEffect(() => {
     startTimeRef.current = performance.now()
     lastTimeRef.current = performance.now()
-    const DURATION = 5100 // 5.1s cinematic experience
+    const DURATION = 5600 // 5.6s timeline for complete physical fall & dramatic antigravity
 
     const animate = (now: number) => {
       const dt = Math.min(0.034, Math.max(0.001, (now - lastTimeRef.current) / 1000))
@@ -222,10 +222,10 @@ export function HeroCinematicIntro({
       const glyphScale = isMobile ? 0.95 : Math.min(1.42, Math.max(1.10, w / 920))
 
       // -----------------------------------------------------------
-      // PHASE 1: WINE GLASSES POURING COINS
+      // PHASE 1: WINE GLASSES POURING COINS (Fast pour so all coins fall completely)
       // -----------------------------------------------------------
-      const glassesRetract = smootherstep(0.25, 0.38, progress)
-      const glassesAlpha = (1 - glassesRetract) * smoothstep(0.01, 0.06, progress)
+      const glassesRetract = smootherstep(0.18, 0.32, progress)
+      const glassesAlpha = (1 - glassesRetract) * smoothstep(0.01, 0.05, progress)
 
       if (glassesAlpha > 0.01) {
         ctx.save()
@@ -233,13 +233,13 @@ export function HeroCinematicIntro({
         const glassScale = isMobile ? 1.05 : 1.35
 
         // Left Wine Glass tilts rightward (0 to 58 deg)
-        const leftTilt = smootherstep(0.04, 0.22, progress) * 58
+        const leftTilt = smootherstep(0.02, 0.12, progress) * 58
         const leftX = w * (0.07 - glassesRetract * 0.12)
         const leftY = h * 0.15
         drawCrystalGlass(ctx, leftX, leftY, leftTilt, false, glassScale)
 
         // Right Wine Glass tilts leftward (0 to -58 deg)
-        const rightTilt = smootherstep(0.05, 0.23, progress) * -58
+        const rightTilt = smootherstep(0.02, 0.12, progress) * -58
         const rightX = w * (0.93 + glassesRetract * 0.12)
         const rightY = h * 0.15
         drawCrystalGlass(ctx, rightX, rightY, rightTilt, true, glassScale)
@@ -247,15 +247,35 @@ export function HeroCinematicIntro({
         ctx.restore()
       }
 
+      // Ground Plane Specular Sheen (Grounded Floor where coins fall and rest)
+      const floorVisualAlpha = smoothstep(0.06, 0.18, progress) * (1 - smoothstep(0.38, 0.48, progress))
+      if (floorVisualAlpha > 0.01) {
+        ctx.save()
+        ctx.globalAlpha = floorVisualAlpha * 0.35
+        const floorGrad = ctx.createRadialGradient(centerX, h * 0.74, 40, centerX, h * 0.74, w * 0.44)
+        floorGrad.addColorStop(0, 'rgba(203, 213, 225, 0.45)')
+        floorGrad.addColorStop(0.5, 'rgba(226, 232, 240, 0.18)')
+        floorGrad.addColorStop(1, 'transparent')
+        ctx.fillStyle = floorGrad
+        ctx.beginPath()
+        ctx.ellipse(centerX, h * 0.74, w * 0.44, 18, 0, 0, Math.PI * 2)
+        ctx.fill()
+        ctx.restore()
+      }
+
       // -----------------------------------------------------------
       // REAL RIGID-BODY PHYSICS INTEGRATION (GRAVITY, DRAG, RESTITUTION, SPRINGS)
       // -----------------------------------------------------------
-      const GRAVITY = 2500 // px/s^2 real gravitational acceleration
-      const AIR_DRAG = 0.0003
-      const FRICTION = 0.24
+      const GRAVITY = 3100 // Strong authoritative gravity: all coins hit floor quickly and settle
+      const AIR_DRAG = 0.00025
+      const FRICTION = 0.28
 
-      const isAntigravityActive = progress >= 0.28
-      const isMorphActive = progress >= 0.56
+      // Key Milestones:
+      // progress < 0.38: Complete fall, multiple bounces, and resting on floor plane
+      // progress >= 0.38: Antigravity lifts resting coins off the floor
+      // progress >= 0.62: Rupee glyph morphs into 14-coin orbit and 9-coin center implosion
+      const isAntigravityActive = progress >= 0.38
+      const isMorphActive = progress >= 0.62
       const stageFade = smootherstep(0.86, 0.99, progress)
 
       coinsRef.current.forEach((coin) => {
@@ -373,13 +393,13 @@ export function HeroCinematicIntro({
                 const orbitAngle = coin.perimeterIdx * ((Math.PI * 2) / 14)
                 const targetOrbitX = centerX + Math.cos(orbitAngle) * Rx
                 const targetOrbitY = centerY + Math.sin(orbitAngle) * Ry
-                const morphU = smootherstep(0.56 + coin.perimeterIdx * 0.006, 0.82, progress)
+                const morphU = smootherstep(0.62 + coin.perimeterIdx * 0.005, 0.84, progress)
                 targetX = rupeeTargetX + (targetOrbitX - rupeeTargetX) * morphU
                 targetY = rupeeTargetY + (targetOrbitY - rupeeTargetY) * morphU
                 coin.alpha = 1 - stageFade
               } else {
                 // 9 inner coins implode into center (0, 0)
-                const implodeU = smootherstep(0.56, 0.72, progress)
+                const implodeU = smootherstep(0.62, 0.74, progress)
                 targetX = rupeeTargetX + (centerX - rupeeTargetX) * implodeU
                 targetY = rupeeTargetY + (centerY - rupeeTargetY) * implodeU
                 coin.alpha = 1 - implodeU
@@ -407,7 +427,7 @@ export function HeroCinematicIntro({
             coin.yaw *= Math.pow(0.04, dt)
 
             // Rupee crystallization shine & achievement chime
-            if (progress > 0.50 && progress < 0.60) {
+            if (progress > 0.54 && progress < 0.64) {
               if (!soundRupeeChimeRef.current) {
                 soundRupeeChimeRef.current = true
                 sound.chime()
@@ -415,12 +435,12 @@ export function HeroCinematicIntro({
             }
           } else {
             // 45 Ambient Coins: Lift upward in microgravity, swirl gently and dissolve
-            const ambientFade = 1 - smoothstep(0.40, 0.54, progress)
+            const ambientFade = 1 - smoothstep(0.44, 0.58, progress)
             coin.alpha = ambientFade
 
             const swirlSpeed = 3.2
             const swirlTheta = (coin.id * 0.4) + progress * swirlSpeed
-            const vortexR = (1 - smoothstep(0.28, 0.54, progress)) * (w * 0.22)
+            const vortexR = (1 - smoothstep(0.38, 0.58, progress)) * (w * 0.22)
             const ambTargetX = centerX + Math.cos(swirlTheta) * vortexR
             const ambTargetY = centerY + Math.sin(swirlTheta) * (vortexR * 0.5)
 
@@ -501,7 +521,7 @@ export function HeroCinematicIntro({
 
   if (isSkipped) return null
 
-  const isEnding = elapsed > 4700
+  const isEnding = elapsed > 5200
 
   return (
     <div
@@ -509,8 +529,8 @@ export function HeroCinematicIntro({
         isEnding ? 'opacity-0 pointer-events-none' : 'opacity-100'
       }`}
       style={{
-        backgroundColor: elapsed < 3500 ? '#FFFFFF' : 'transparent',
-        transition: 'background-color 800ms cubic-bezier(0.16, 1, 0.3, 1), opacity 500ms ease',
+        backgroundColor: elapsed < 4000 ? '#FFFFFF' : 'transparent',
+        transition: 'background-color 900ms cubic-bezier(0.16, 1, 0.3, 1), opacity 500ms ease',
       }}
     >
       <canvas
