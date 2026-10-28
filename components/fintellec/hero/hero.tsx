@@ -161,6 +161,9 @@ export function Hero() {
   const pointerRef = useRef<{ x: number; y: number } | null>(null)
   const ripplesRef = useRef<{ x: number; y: number; time: number }[]>([])
 
+
+
+
   // Wallet Chapter Refs
   const walletWorldRef = useRef<HTMLDivElement>(null)
   const walletCopyRef = useRef<HTMLDivElement>(null)
@@ -180,6 +183,7 @@ export function Hero() {
   const handleWalletCoinClick = (e: React.MouseEvent) => {
     e.stopPropagation()
     coinPulseRef.current = performance.now()
+    sound.coinImpact(0.7, 1.1)
     sound.snap('high')
   }
 
@@ -338,8 +342,14 @@ export function Hero() {
             x += curDistX * 8 * cursorInfluence
             y += curDistY * 5 * cursorInfluence
 
-            // Each coin slowly rotates on its own Y axis as it orbits
+            // Each coin rotates continuously on its Y axis as it orbits
             let selfRotY = angle * (180 / Math.PI)
+
+            // Dynamic 3D tilt: coins pitch and roll tangentially along the orbital path, exposing their 3D milled reeded rim
+            const pitch = Math.sin(angle * 2) * 15
+            const roll = Math.cos(angle) * 8
+            let rotX = pitch
+            let rotZ = roll
 
             // Cascade into wallet on scroll
             const walletDropStart = 0.12 + (i / RING_COIN_COUNT) * 0.15
@@ -354,20 +364,24 @@ export function Hero() {
               x = x * (1 - ease) + (targetX + spiral) * ease
               y = y * (1 - ease) + targetY * ease
               coinScale = coinScale * (1 - ease * 0.6)
-              selfRotY += ease * 200
+              selfRotY += ease * 240
+              rotX = pitch * (1 - ease) + ease * 360
+              rotZ = roll * (1 - ease)
             }
 
-            coinEl.style.transform = `translate3d(calc(-50% + ${x.toFixed(1)}px), calc(-50% + ${y.toFixed(1)}px), 0px) rotateY(${selfRotY.toFixed(1)}deg) scale(${coinScale.toFixed(3)})`
+            coinEl.style.transform = `translate3d(calc(-50% + ${x.toFixed(1)}px), calc(-50% + ${y.toFixed(1)}px), 0px) rotateY(${selfRotY.toFixed(1)}deg) rotateX(${rotX.toFixed(1)}deg) rotateZ(${rotZ.toFixed(1)}deg) scale(${coinScale.toFixed(3)})`
             coinEl.style.zIndex = String(depth > 0 ? 4 : 2)
           }
         }
 
-        // 2. Leather Wallet Body rests physically below coin, then swings its lid open in synchronization with the coin
+        // 2. Leather Wallet Body rests physically below coin, then glides in & swings its lid open in synchronization with the coin
+        const walletIn = smoothstep(0.0, 0.18, wP)
         const walletOpen = smoothstep(0.14, 0.35, wP)
         if (walletBodyRef.current) {
           const walletFade = 1 - smoothstep(0.79, 0.91, wP)
-          walletBodyRef.current.style.opacity = String(walletFade)
-          walletBodyRef.current.style.transform = `translate3d(-50%, calc(-50% - ${walletOpen * 12}px), 0) scale(${1.0 + walletOpen * 0.04})`
+          const baseVisibility = 0.88 + walletIn * 0.12
+          walletBodyRef.current.style.opacity = String(baseVisibility * walletFade)
+          walletBodyRef.current.style.transform = `translate3d(-50%, calc(-50% + ${(1 - walletIn) * 35 - walletOpen * 12}px), 0) scale(${0.92 + walletIn * 0.08 + walletOpen * 0.04})`
         }
         if (walletLidRef.current) {
           const lidAngle = walletOpen * (1 - handoff)
@@ -959,8 +973,25 @@ export function Hero() {
                 }}
                 className="fintellec-ring-coin"
               >
-                <span className="fintellec-ring-coin__symbol">₹</span>
-                <span className="fintellec-ring-coin__rim" />
+                {/* Front Face (Obverse) */}
+                <div className="fintellec-ring-coin__face fintellec-ring-coin__face--front">
+                  <span className="fintellec-ring-coin__symbol">₹</span>
+                  <span className="fintellec-ring-coin__rim" />
+                </div>
+
+                {/* 3D Reeded Edge Layers for Palpable Thickness */}
+                <div className="fintellec-ring-coin__edge fintellec-ring-coin__edge--1" />
+                <div className="fintellec-ring-coin__edge fintellec-ring-coin__edge--2" />
+                <div className="fintellec-ring-coin__edge fintellec-ring-coin__edge--3" />
+
+                {/* Back Face (Reverse Die Seal) */}
+                <div className="fintellec-ring-coin__face fintellec-ring-coin__face--back">
+                  <div className="fintellec-ring-coin__back-pattern">
+                    <span className="fintellec-ring-coin__back-star">✦</span>
+                    <span className="fintellec-ring-coin__back-text">FINTELLEC</span>
+                  </div>
+                  <span className="fintellec-ring-coin__rim" />
+                </div>
               </div>
             ))}
           </div>
@@ -973,16 +1004,38 @@ export function Hero() {
             aria-hidden="true"
           />
 
-          {/* 3D Rupee Coin (Clickable for Magnetic Pulse) */}
+          {/* 3D Master Rupee Coin (Clickable for Magnetic Pulse) */}
           <div
             ref={walletCoinRef}
             onClick={handleWalletCoinClick}
-            className="fintellec-wallet-reveal__coin pointer-events-auto cursor-pointer select-none transition-[box-shadow] duration-200 hover:shadow-[0_0_0_6px_rgba(203,213,225,.9),0_0_55px_rgba(255,255,255,.95),0_15px_35px_rgba(15,23,42,.22)]"
+            className="fintellec-wallet-reveal__coin pointer-events-auto cursor-pointer select-none"
             aria-label="Fintellec rupee coin - click to pulse magnetic field"
             title="Click to pulse magnetic levitation field"
           >
-            <span>₹</span>
-            <small>FINTELLEC</small>
+            {/* Front Face (Obverse) */}
+            <div className="fintellec-master-coin__face fintellec-master-coin__face--front">
+              <div className="fintellec-master-coin__rim-groove" />
+              <span className="fintellec-master-coin__glyph">₹</span>
+              <small className="fintellec-master-coin__label">FINTELLEC</small>
+              <div className="fintellec-master-coin__sheen" />
+            </div>
+
+            {/* 3D Milled Reeding Edge Extrusions for Cylinder Depth */}
+            <div className="fintellec-master-coin__edge fintellec-master-coin__edge--1" />
+            <div className="fintellec-master-coin__edge fintellec-master-coin__edge--2" />
+            <div className="fintellec-master-coin__edge fintellec-master-coin__edge--3" />
+            <div className="fintellec-master-coin__edge fintellec-master-coin__edge--4" />
+
+            {/* Back Face (Reverse Proof Die) */}
+            <div className="fintellec-master-coin__face fintellec-master-coin__face--back">
+              <div className="fintellec-master-coin__rim-groove" />
+              <div className="fintellec-master-coin__reverse-mark">
+                <span className="fintellec-master-coin__star">✦</span>
+                <span className="fintellec-master-coin__rev-title">PROOF BULLION</span>
+                <span className="fintellec-master-coin__rev-sub">· 999 FINE SILVER ·</span>
+              </div>
+              <div className="fintellec-master-coin__sheen" />
+            </div>
           </div>
 
           {/* Leather Wallet Body with 3D opening lid */}
@@ -1435,6 +1488,8 @@ export function Hero() {
             </div>
           ))}
         </div>
+
+
 
       </div>
     </section>
