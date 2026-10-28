@@ -135,6 +135,7 @@ function InteractiveWalletTile({
   )
 }
 
+const RING_COIN_COUNT = 16
 const PARTICLES = 18
 const DOT_INDICES = Array.from({ length: 14 }, (_, i) => i)
 const DATA_INDICES = Array.from({ length: 12 }, (_, i) => i + 1)
@@ -297,60 +298,92 @@ export function Hero() {
           coinShadowRef.current.style.transform = `translate3d(calc(-50% + ${curDistX * 6 * cursorInfluence}px), calc(-50% + ${dropY * 0.55}px), 0) scale(${shadowScale})`
         }
 
-        // 1.1 3D COIN RING ARRAY CASCADE (Pinterest/Blender reference)
+        // 1.1 3D COIN RING ARRAY CASCADE (Revolving around headline text, wallet, and main coin)
         if (coinRingStageRef.current) {
-          const ringCount = 12
           const isMob = scene?.mobile ?? false
-          const baseRadius = isMob ? 100 : 152
-          // As user scrolls, ring slightly expands before peeling off
-          const expand = smoothstep(0.04, 0.16, wP) * 35
-          const R = baseRadius + expand
           
-          // Base 3D tilt angles (matching the isometric oblique perspective of the Blender render)
-          const baseTiltX = 58 + cursorTiltX * 0.4 - smoothstep(0.12, 0.30, wP) * 25
-          const baseTiltZ = -18 + cursorTiltY * 0.4
-          
-          // Continuous rotation speed: fast at rest, slows as user scrubs into the routing sequence
-          const spinSpeed = 0.75 * (1 - smoothstep(0.10, 0.28, wP) * 0.85)
-          const currentSpin = (t * spinSpeed) + (wP * 4.5)
+          // Horizontal radius Rx: wide enough to frame the entire headline and wallet
+          const baseRx = isMob 
+            ? Math.min(w * 0.44, 180) 
+            : Math.min(Math.max(w * 0.40, 420), 560)
+            
+          // Vertical radius Ry: tall enough to sweep above the headline and below the wallet
+          const baseRy = isMob 
+            ? Math.min(h * 0.36, 260) 
+            : Math.min(Math.max(h * 0.37, 300), 380)
 
-          // Overall ring visibility: fades out as coins complete their cascade into the ledger & wallet
+          // During scroll, ring subtly expands before sequential cascade into wallet
+          const expand = smoothstep(0.04, 0.16, wP) * 35
+          const Rx = baseRx + expand
+          const Ry = baseRy + expand * 0.65
+
+          // 3D Oblique tilt angles:
+          // tiltX gives realistic perspective depth; cursorTilt adds mouse parallax
+          const baseTiltX = 22 + cursorTiltX * 0.35 - smoothstep(0.12, 0.30, wP) * 12
+          const baseTiltZ = -10 + cursorTiltY * 0.35
+
+          // Continuous rotation speed: graceful pace at rest, slows as user scrubs into cascade
+          const spinSpeed = 0.55 * (1 - smoothstep(0.10, 0.28, wP) * 0.85)
+          const currentSpin = (t * spinSpeed) + (wP * 4.2)
+
+          // Overall ring visibility
           const ringFade = 1 - smoothstep(0.48, 0.62, wP)
           coinRingStageRef.current.style.opacity = String(ringFade * (1 - handoff))
 
-          for (let i = 0; i < ringCount; i++) {
+          const radZ = baseTiltZ * (Math.PI / 180)
+          const cosZ = Math.cos(radZ)
+          const sinZ = Math.sin(radZ)
+          const radX = baseTiltX * (Math.PI / 180)
+          const cosX = Math.cos(radX)
+          const sinX = Math.sin(radX)
+
+          // Relative vertical distance from stage center (top: 48%) to wallet center (top: 73% desktop / 68% mobile):
+          const walletCenterY = isMob ? (h * (0.68 - 0.44)) : (h * (0.73 - 0.48))
+
+          for (let i = 0; i < RING_COIN_COUNT; i++) {
             const coinEl = coinRingRefs.current[i]
             if (!coinEl) continue
 
-            const baseAngle = (i / ringCount) * Math.PI * 2
+            const baseAngle = (i / RING_COIN_COUNT) * Math.PI * 2
             const angle = baseAngle + currentSpin
 
-            // Orbit ellipse coordinates in 3D
-            let x = Math.cos(angle) * R
-            let y = Math.sin(angle) * R * Math.cos(baseTiltX * (Math.PI / 180))
-            let z = Math.sin(angle) * R * Math.sin(baseTiltX * (Math.PI / 180))
-            let rotY = angle * (180 / Math.PI)
-            let rotX = baseTiltX * 0.4
-            let coinScale = 0.82 + (z / (R * 2)) * 0.35
+            // Base 2D ellipse around stage center
+            const x0 = Math.cos(angle) * Rx
+            const y0 = Math.sin(angle) * Ry
 
-            // Cascade: Coins stream downward in a 3D spiral into the opening leather wallet!
-            const walletDropStart = 0.14 + (i / ringCount) * 0.16
-            const walletDropEnd = walletDropStart + 0.18
+            // Rotate in XY plane along tiltZ
+            const x1 = x0 * cosZ - y0 * sinZ
+            const y1 = x0 * sinZ + y0 * cosZ
+
+            // Tilt in 3D along tiltX:
+            let x = x1
+            let y = y1 * cosX
+            let z = y1 * sinX // positive at bottom (closer), negative at top (further away)
+
+            let rotY = angle * (180 / Math.PI) + 90
+            let rotX = baseTiltX * 0.5
+            let coinScale = 0.88 + (z / (Ry * 1.6)) * 0.26
+
+            // Cascade: Coins stream inward and downward in a 3D spiral into the opening leather wallet!
+            const walletDropStart = 0.12 + (i / RING_COIN_COUNT) * 0.15
+            const walletDropEnd = walletDropStart + 0.16
             const dropP = clamp((wP - walletDropStart) / (walletDropEnd - walletDropStart))
             if (dropP > 0) {
               const ease = dropP * dropP * (3 - 2 * dropP)
-              // Converge x toward wallet center with gentle spiral
-              const spiral = Math.sin(dropP * Math.PI * 2 + i) * 20 * (1 - ease)
-              x = (x + spiral) * (1 - ease * 0.95)
-              y = y * (1 - ease) + (145 + (i % 3) * 8) * ease
-              z = z * (1 - ease) - ease * 85
+              const walletTargetX = ((i % 5) - 2) * 14
+              const walletTargetY = walletCenterY + ((i % 3) - 1) * 6
+              const spiral = Math.sin(dropP * Math.PI * 2 + i) * 26 * (1 - ease)
+
+              x = x * (1 - ease) + (walletTargetX + spiral) * ease
+              y = y * (1 - ease) + walletTargetY * ease
+              z = z * (1 - ease) - ease * 110
               coinScale = coinScale * (1 - ease * 0.65)
               rotX = rotX * (1 - ease) + 30 * ease
-              rotY = rotY + ease * 180
+              rotY = rotY + ease * 220
             }
 
             coinEl.style.transform = `translate3d(calc(-50% + ${x.toFixed(1)}px), calc(-50% + ${y.toFixed(1)}px), ${z.toFixed(1)}px) rotateY(${rotY.toFixed(1)}deg) rotateX(${rotX.toFixed(1)}deg) scale(${coinScale.toFixed(3)})`
-            coinEl.style.zIndex = String(Math.round(z + 300))
+            coinEl.style.zIndex = String(Math.round(z + 200))
           }
         }
 
@@ -939,13 +972,13 @@ export function Hero() {
             </h1>
           </div>
 
-          {/* 3D Rupee Coin Ring Array (Pinterest-Inspired Blender Array) */}
+          {/* 3D Rupee Coin Ring Array (Revolving around text, wallet, and main coin) */}
           <div
             ref={coinRingStageRef}
             className="fintellec-coin-ring-stage"
             aria-hidden="true"
           >
-            {Array.from({ length: 12 }).map((_, idx) => (
+            {Array.from({ length: RING_COIN_COUNT }).map((_, idx) => (
               <div
                 key={idx}
                 ref={(el) => {

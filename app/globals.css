@@ -402,19 +402,20 @@ nav,
 .fintellec-wallet-reveal__ambient{position:absolute;z-index:0;left:50%;top:68%;width:min(70vw,760px);aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle,rgba(203,213,225,.38),rgba(148,163,184,.1) 46%,transparent 70%);filter:blur(24px);pointer-events:none}
 
 /* ======================================================== */
-/* 3D COIN RING ARRAY (PINTEREST BLENDER CASCADE)           */
+/* 3D COIN RING ARRAY (AROUND TEXT, MAIN COIN & WALLET)     */
 /* ======================================================== */
 .fintellec-coin-ring-stage {
   position: absolute;
   left: 50%;
-  top: 71%;
+  top: 48%;
   transform: translate(-50%, -50%);
-  width: min(75vw, 550px);
-  height: min(75vw, 550px);
-  perspective: 1200px;
+  width: 100%;
+  height: 100%;
+  perspective: 1400px;
   transform-style: preserve-3d;
   pointer-events: none;
   z-index: 3;
+  overflow: visible;
   will-change: transform, opacity;
 }
 
@@ -422,16 +423,17 @@ nav,
   position: absolute;
   left: 50%;
   top: 50%;
-  width: clamp(50px, 5.2vw, 70px);
+  width: clamp(50px, 4.8vw, 68px);
   aspect-ratio: 1;
   border-radius: 50%;
   /* Minted silver bullion metallic core */
   background: radial-gradient(circle at 35% 28%, #FFFFFF 0%, #F1F5F9 22%, #CBD5E1 58%, #94A3B8 86%, #64748B 100%);
   border: 2px solid #FFFFFF;
   box-shadow: 
-    0 0 0 1.5px rgba(203, 213, 225, 0.9),
-    0 10px 24px rgba(15, 23, 42, 0.18),
-    0 0 20px rgba(255, 255, 255, 0.8),
+    0 0 0 1.5px rgba(203, 213, 225, 0.95),
+    0 12px 28px -4px rgba(15, 23, 42, 0.22),
+    0 4px 10px rgba(15, 23, 42, 0.12),
+    0 0 20px rgba(255, 255, 255, 0.85),
     inset 0 1.5px 3px rgba(255, 255, 255, 0.95),
     inset 0 -1.5px 3px rgba(15, 23, 42, 0.25);
   display: flex;
@@ -439,9 +441,9 @@ nav,
   justify-content: center;
   color: #0f172a;
   font-family: var(--font-baskerville), serif;
-  font-size: clamp(22px, 2.4vw, 30px);
+  font-size: clamp(22px, 2.3vw, 30px);
   font-weight: 700;
-  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.95), 0 -1px 1px rgba(15, 23, 42, 0.4);
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.95), 0 -1px 1px rgba(15, 23, 42, 0.45);
   transform-style: preserve-3d;
   backface-visibility: visible;
   will-change: transform, opacity;
@@ -454,7 +456,7 @@ nav,
   position: absolute;
   inset: 5px;
   border-radius: 50%;
-  border: 1px dashed rgba(100, 116, 139, 0.45);
+  border: 1px dashed rgba(100, 116, 139, 0.5);
   box-shadow: inset 0 0 4px rgba(255, 255, 255, 0.5);
   pointer-events: none;
 }
@@ -464,7 +466,7 @@ nav,
   position: absolute;
   inset: 0;
   border-radius: 50%;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.55) 0%, transparent 45%, rgba(148, 163, 184, 0.35) 100%);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, transparent 45%, rgba(148, 163, 184, 0.35) 100%);
   pointer-events: none;
 }
 
@@ -511,7 +513,7 @@ nav,
 .fintellec-wallet-reveal__scroll-meter{position:absolute;z-index:10;bottom:25px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:14px;color:#003365;font:10px var(--font-nunito);font-weight:900;letter-spacing:.16em;opacity:.74}
 .fintellec-wallet-reveal__scroll-meter i{display:block;width:72px;height:2px;background:linear-gradient(90deg,#00A99E,#63DCD3)}
 @media(max-width:760px){.fintellec-wallet-reveal__tile{width:clamp(162px,29vw,210px);min-height:166px;padding:14px 12px;border-radius:18px}.fintellec-wallet-reveal__tile h2{font-size:14px}.fintellec-wallet-reveal__tile p{font-size:9px}}
-@media(max-width:640px){.fintellec-wallet-reveal{height:230svh}.fintellec-wallet-reveal__stage{min-height:520px}.fintellec-wallet-reveal__copy{top:16%;padding-inline:18px}.fintellec-wallet-reveal__headline{font-size:clamp(36px,10vw,54px);letter-spacing:-.045em}.fintellec-wallet-reveal__coin,.fintellec-wallet-reveal__wallet{top:68%}.fintellec-wallet-reveal__wallet{width:76vw;height:46vw}.fintellec-wallet-reveal__tile{left:50%;top:69%;width:min(74vw,270px);min-height:150px;padding:14px 16px}.fintellec-wallet-reveal__tile h2{font-size:17px}.fintellec-wallet-reveal__tile p{font-size:10px}.fintellec-wallet-reveal__scroll-meter{bottom:18px}}
+@media(max-width:640px){.fintellec-wallet-reveal{height:230svh}.fintellec-wallet-reveal__stage{min-height:520px}.fintellec-wallet-reveal__copy{top:16%;padding-inline:18px}.fintellec-wallet-reveal__headline{font-size:clamp(36px,10vw,54px);letter-spacing:-.045em}.fintellec-wallet-reveal__coin,.fintellec-wallet-reveal__wallet{top:68%}.fintellec-coin-ring-stage{top:44%}.fintellec-wallet-reveal__wallet{width:76vw;height:46vw}.fintellec-wallet-reveal__tile{left:50%;top:69%;width:min(74vw,270px);min-height:150px;padding:14px 16px}.fintellec-wallet-reveal__tile h2{font-size:17px}.fintellec-wallet-reveal__tile p{font-size:10px}.fintellec-wallet-reveal__scroll-meter{bottom:18px}}
 @media(prefers-reduced-motion:reduce){.fintellec-wallet-reveal{height:auto;min-height:100svh}.fintellec-wallet-reveal__stage{position:relative;min-height:100svh}.fintellec-wallet-reveal__wallet{display:block!important;opacity:1!important;transform:translate3d(-50%,-50%,0)!important}.fintellec-wallet-reveal__wallet-lid{transform:rotateX(-35deg)!important}.fintellec-wallet-reveal__coin,.fintellec-wallet-reveal__tile,.fintellec-wallet-reveal__bloom,.fintellec-wallet-reveal__transition{display:none!important}.fintellec-wallet-reveal__copy{opacity:1!important;transform:none!important}}
 
 
