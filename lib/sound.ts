@@ -170,6 +170,27 @@ class SoundManager {
     this.tick(2200)
   }
 
+  // 6.1 Metallic Silver Coin Clink
+  public clink(pitch = 3400) {
+    if (!this.enabled) return
+    const ctx = this.getContext()
+    if (!ctx) return
+    try {
+      const now = ctx.currentTime
+      const osc = ctx.createOscillator()
+      const gain = ctx.createGain()
+      osc.type = 'triangle'
+      osc.frequency.setValueAtTime(pitch, now)
+      osc.frequency.exponentialRampToValueAtTime(pitch * 0.7, now + 0.035)
+      gain.gain.setValueAtTime(0.04, now)
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.035)
+      osc.connect(gain)
+      gain.connect(ctx.destination)
+      osc.start(now)
+      osc.stop(now + 0.038)
+    } catch {}
+  }
+
   // 7. Coin Airborne Toss Chime
   public coinToss() {
     if (!this.enabled) return

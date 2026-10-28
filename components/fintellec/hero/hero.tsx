@@ -10,6 +10,7 @@ import { sound } from '@/lib/sound'
 import { useCircadian } from '../circadian-context'
 import { GlassCoin } from './glass-coin'
 import { Wallet } from './wallet'
+import { HeroCinematicIntro } from './hero-cinematic-intro'
 import { buildScenes, sceneAt, GOAL, GRAPH_MAX, GRAPH_MONTHS, GRAPH_VALUES, KEYS, type SceneSet } from './scene'
 
 // Hermite cubic smoothstep for buttery, organic S-curve transitions
@@ -161,6 +162,32 @@ export function Hero() {
   const pointerRef = useRef<{ x: number; y: number } | null>(null)
   const ripplesRef = useRef<{ x: number; y: number; time: number }[]>([])
 
+  // Cinematic Opening Hook State (Wine Glass coin pour -> Antigravity Rupee -> Orbit)
+  const [introActive, setIntroActive] = useState(!reduced)
+  const introActiveRef = useRef(!reduced)
+  const introProgressRef = useRef(0)
+
+  useEffect(() => {
+    introActiveRef.current = introActive
+  }, [introActive])
+
+  const handleIntroTick = (p: number) => {
+    introProgressRef.current = p
+  }
+
+  const handleIntroComplete = () => {
+    introActiveRef.current = false
+    setIntroActive(false)
+  }
+
+  const handleReplayIntro = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+    introProgressRef.current = 0
+    introActiveRef.current = true
+    setIntroActive(true)
+    sound.snap('high')
+  }
+
   // Wallet Chapter Refs
   const walletWorldRef = useRef<HTMLDivElement>(null)
   const walletCopyRef = useRef<HTMLDivElement>(null)
@@ -246,6 +273,12 @@ export function Hero() {
     let lastHeadlineVisible = true
 
     const render = (progress: number, t: number) => {
+      // Automatically dismiss intro if user starts scrolling down
+      if (progress > 0.015 && introActiveRef.current) {
+        introActiveRef.current = false
+        setIntroActive(false)
+      }
+
       // ----------------------------------------------------
       // CHAPTER 1: WALLET REVEAL (0.00 to 0.28 of total progress)
       // ----------------------------------------------------
@@ -258,7 +291,95 @@ export function Hero() {
         walletWorldRef.current.style.opacity = String(1 - handoff)
       }
 
-      if (isWalletActive) {
+      if (introActiveRef.current && progress < 0.02) {
+        const introP = introProgressRef.current
+
+        // 1. Rupee Coin in 3D: Materializes from central lens flare (introP: 0.70 -> 0.86)
+        if (walletCoinRef.current) {
+          if (introP < 0.70) {
+            walletCoinRef.current.style.opacity = '0'
+            walletCoinRef.current.style.transform = 'translate3d(-50%, -50%, 0) scale(0)'
+          } else if (introP < 0.86) {
+            const coinEnter = smoothstep(0.70, 0.84, introP)
+            const springOvershoot = 1 + Math.sin(coinEnter * Math.PI) * 0.12
+            walletCoinRef.current.style.opacity = String(coinEnter)
+            walletCoinRef.current.style.transform = `translate3d(-50%, -50%, 0) scale(${(coinEnter * springOvershoot).toFixed(3)})`
+          } else {
+            const settle = smoothstep(0.86, 0.98, introP)
+            walletCoinRef.current.style.opacity = '1'
+            walletCoinRef.current.style.transform = `translate3d(-50%, -50%, 0) scale(${1 + (1 - settle) * 0.04})`
+          }
+        }
+
+        // Contact shadow directly beneath coin
+        if (coinShadowRef.current) {
+          const shadowIn = smoothstep(0.72, 0.86, introP)
+          coinShadowRef.current.style.opacity = String(shadowIn * 0.85)
+          coinShadowRef.current.style.transform = `translate3d(-50%, 0, 0) scale(${shadowIn.toFixed(2)})`
+        }
+
+        if (magneticFieldRef.current) {
+          const magIn = smoothstep(0.74, 0.88, introP)
+          magneticFieldRef.current.style.opacity = String(magIn * 0.7)
+          magneticFieldRef.current.style.transform = `translate3d(-50%, 0, 0) scale(${magIn.toFixed(2)})`
+        }
+
+        // 2. Leather Wallet: Drops down from top (introP: 0.78 -> 0.96) with organic leather bounce
+        if (walletBodyRef.current) {
+          if (introP < 0.78) {
+            walletBodyRef.current.style.opacity = '0'
+            walletBodyRef.current.style.transform = 'translate3d(-50%, -100vh, 0)'
+          } else {
+            const dropP = smoothstep(0.78, 0.96, introP)
+            const bounceY = (1 - dropP) * -450 + (dropP < 1 ? Math.sin(dropP * Math.PI) * 14 : 0)
+            const walletScale = 0.92 + dropP * 0.08
+            walletBodyRef.current.style.opacity = String(smoothstep(0.78, 0.88, introP))
+            walletBodyRef.current.style.transform = `translate3d(-50%, calc(-50% + ${bounceY.toFixed(1)}px), 0) scale(${walletScale.toFixed(3)})`
+          }
+        }
+
+        // 3. Headline copy: Slides down from top (introP: 0.82 -> 0.98) and awakens
+        if (walletCopyRef.current) {
+          if (introP < 0.82) {
+            walletCopyRef.current.style.opacity = '0'
+            walletCopyRef.current.style.transform = 'translate3d(0, -32px, 0)'
+          } else {
+            const copyEnter = smoothstep(0.82, 0.98, introP)
+            walletCopyRef.current.style.opacity = String(copyEnter)
+            walletCopyRef.current.style.transform = `translate3d(0, ${((1 - copyEnter) * -24).toFixed(1)}px, 0)`
+          }
+        }
+
+        // 4. 14 Revolving Coins Stage: Fades in seamlessly as intro canvas coins fade out (introP: 0.84 -> 0.98)
+        if (coinRingStageRef.current) {
+          if (introP < 0.84) {
+            coinRingStageRef.current.style.opacity = '0'
+          } else {
+            const ringIn = smoothstep(0.84, 0.98, introP)
+            coinRingStageRef.current.style.opacity = String(ringIn)
+
+            const isMob = scene?.mobile ?? false
+            const Rx = isMob ? w * 0.42 : w * 0.44
+            const Ry = isMob ? h * 0.40 : h * 0.44
+            const currentSpin = t * 0.45
+
+            for (let i = 0; i < RING_COIN_COUNT; i++) {
+              const coinEl = coinRingRefs.current[i]
+              if (!coinEl) continue
+              const baseAngle = (i / RING_COIN_COUNT) * Math.PI * 2
+              const angle = baseAngle + currentSpin
+              const x = Math.cos(angle) * Rx
+              const y = Math.sin(angle) * Ry
+              const depth = Math.sin(angle)
+              const coinScale = 0.86 + depth * 0.14
+              const selfRotY = angle * (180 / Math.PI)
+
+              coinEl.style.transform = `translate3d(calc(-50% + ${x.toFixed(1)}px), calc(-50% + ${y.toFixed(1)}px), 0px) rotateY(${selfRotY.toFixed(1)}deg) scale(${coinScale.toFixed(3)})`
+              coinEl.style.zIndex = String(depth > 0 ? 4 : 2)
+            }
+          }
+        }
+      } else if (isWalletActive) {
         // 1. Rupee Coin in 3D: Levitates with cursor tilt at rest, rotates continuously, tilts naturally, then drops into wallet
         const mx = pointerRef.current?.x ?? (w * 0.5)
         const my = pointerRef.current?.y ?? (h * 0.5)
@@ -1438,6 +1559,35 @@ export function Hero() {
           ))}
         </div>
 
+        {/* ==================================================== */}
+        {/* CINEMATIC HOOK INTRO (Wine Glass Coin Pour -> ₹ -> Orbit) */}
+        {/* ==================================================== */}
+        {introActive && (
+          <HeroCinematicIntro
+            w={scene?.w ?? (typeof window !== 'undefined' ? window.innerWidth : 1440)}
+            h={scene?.h ?? (typeof window !== 'undefined' ? window.innerHeight : 900)}
+            isMobile={scene?.mobile ?? false}
+            onIntroTick={handleIntroTick}
+            onComplete={handleIntroComplete}
+            onSkip={handleIntroComplete}
+          />
+        )}
+
+        {/* Replay Cinematic Hook Button */}
+        {!introActive && (
+          <button
+            type="button"
+            onClick={handleReplayIntro}
+            className="pointer-events-auto absolute bottom-6 right-6 z-20 flex items-center gap-1.5 rounded-full border border-navy/10 bg-white/75 px-3.5 py-1.5 text-[11px] font-medium tracking-wide text-steel shadow-sm backdrop-blur-md transition-all hover:bg-white/95 hover:text-navy hover:shadow active:scale-95 cursor-pointer dark:bg-navy/70 dark:border-white/10 dark:text-slate-300"
+            title="Replay cinematic hook intro"
+            aria-label="Replay cinematic intro"
+          >
+            <svg className="size-3 text-teal" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            <span>Replay Intro</span>
+          </button>
+        )}
 
       </div>
     </section>
