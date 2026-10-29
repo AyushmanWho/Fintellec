@@ -330,9 +330,7 @@
 .fintellec-wallet-reveal__headline span{color:#00A99E;background:linear-gradient(135deg,#00A99E 0%,#07877F 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
 .fintellec-wallet-reveal__hint{position:absolute;top:39%;left:0;right:0;margin:0;text-align:center;font-size:14px;color:#B8F2EC}
 .fintellec-wallet-reveal__hint span{color:#63DCD3;margin-left:8px}
-.fintellec-wallet-reveal__coin{position:absolute;z-index:3;left:50%;top:68%;width:clamp(132px,19vw,214px);aspect-ratio:1;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:#003365;background:radial-gradient(circle at 32% 25%,#EFFAFA 0,#B8F2EC 27%,#63DCD3 65%,#00A99E 100%);border:5px double #EFFAFA;box-shadow:0 0 0 4px rgba(99,220,211,.5),0 0 48px rgba(99,220,211,.34),inset 0 0 0 7px rgba(0,51,101,.12);backface-visibility:visible;will-change:transform,opacity}
-.fintellec-wallet-reveal__coin span{font-family:var(--font-baskerville);font-size:clamp(65px,8vw,94px);line-height:1}
-.fintellec-wallet-reveal__coin small{font-size:9px;letter-spacing:.22em;font-weight:900}
+/* Cleaned legacy coin block */
 .fintellec-wallet-reveal__wallet{position:absolute;z-index:2;left:50%;top:68%;width:clamp(220px,34vw,390px);height:clamp(140px,22vw,230px);opacity:0;transform:translate(-50%,-50%);transform-style:preserve-3d;will-change:transform,opacity}
 .fintellec-wallet-reveal__wallet-inside{position:absolute;inset:4% 3% 12%;border-radius:28px;background:linear-gradient(135deg,#B8F2EC,#00A99E 55%,#003365);box-shadow:inset 0 12px 22px rgba(0,51,101,.28)}
 .fintellec-wallet-reveal__wallet-body{position:absolute;inset:25% 0 0;border-radius:24px 24px 34px 34px;background:linear-gradient(145deg,#52728A 0%,#003365 45%,#00264d 100%);border:1px solid rgba(184,242,236,.55);box-shadow:0 28px 70px rgba(0,0,0,.32),inset 0 1px 0 rgba(239,250,250,.4);display:flex;align-items:center;justify-content:center;overflow:hidden}
@@ -419,46 +417,38 @@ nav,
   will-change: transform, opacity;
 }
 
-/* 3D Physical Bullion Orbiting Coins */
+/* 3D Minted Bullion Orbiting Rupee Coins */
 .fintellec-ring-coin {
   position: absolute;
   left: 50%;
   top: 50%;
-  width: clamp(52px, 5vw, 70px);
+  width: clamp(52px, 5.2vw, 72px);
   aspect-ratio: 1;
-  transform-style: preserve-3d;
-  perspective: 1200px;
-  will-change: transform, opacity;
-  user-select: none;
-  filter: drop-shadow(0 14px 22px rgba(15, 23, 42, 0.28));
-}
-
-/* Base face container */
-.fintellec-ring-coin__face {
-  position: absolute;
-  inset: 0;
   border-radius: 50%;
   transform-style: preserve-3d;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
+  will-change: transform, opacity;
+  user-select: none;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow:
-    inset 0 1.5px 3px rgba(255, 255, 255, 0.95),
-    inset 0 -1.5px 3px rgba(15, 23, 42, 0.3),
-    0 0 16px rgba(255, 255, 255, 0.6);
-}
-
-/* Front Face: Silver Bullion Die-Cast */
-.fintellec-ring-coin__face--front {
-  transform: translateZ(2.5px);
-  background: radial-gradient(circle at 35% 28%, #FFFFFF 0%, #F1F5F9 24%, #CBD5E1 58%, #94A3B8 86%, #64748B 100%);
+  /* Luminous silver bullion metallic core */
+  background: radial-gradient(circle at 35% 25%, #FFFFFF 0%, #F8FAFC 22%, #E2E8F0 48%, #CBD5E1 72%, #94A3B8 90%, #64748B 100%);
   border: 2px solid #FFFFFF;
+  /* 3D Cylindrical Extruded Rim Depth */
+  box-shadow:
+    0 1px 0 #CBD5E1,
+    0 2px 0 #94A3B8,
+    0 3px 0 #64748B,
+    0 4px 0 #475569,
+    0 5px 1px rgba(15, 23, 42, 0.28),
+    0 14px 28px -4px rgba(15, 23, 42, 0.25),
+    0 0 20px rgba(255, 255, 255, 0.85),
+    inset 0 1.5px 3px rgba(255, 255, 255, 0.95),
+    inset 0 -1.5px 3px rgba(15, 23, 42, 0.3);
 }
 
-/* Micro-milled dashed ring on front face */
-.fintellec-ring-coin__face--front::before {
+/* Micro-milled coin inner groove ring */
+.fintellec-ring-coin::before {
   content: "";
   position: absolute;
   inset: 5px;
@@ -468,84 +458,16 @@ nav,
   pointer-events: none;
 }
 
-/* Rupee Glyph */
+/* 3D Embossed Rupee Symbol */
 .fintellec-ring-coin__symbol {
   position: relative;
   font-family: var(--font-baskerville), serif;
-  font-size: clamp(23px, 2.4vw, 32px);
+  font-size: clamp(24px, 2.5vw, 34px);
   font-weight: 700;
   color: #0f172a;
   text-shadow: 0 1px 1px rgba(255, 255, 255, 0.95), 0 -1px 1px rgba(15, 23, 42, 0.5);
-  transform: translateZ(2px);
-}
-
-/* Back Face: Minted Reverse Emblem */
-.fintellec-ring-coin__face--back {
-  transform: rotateY(180deg) translateZ(2.5px);
-  background: radial-gradient(circle at 35% 28%, #FFFFFF 0%, #E2E8F0 26%, #CBD5E1 60%, #94A3B8 86%, #475569 100%);
-  border: 2px solid #FFFFFF;
-}
-
-.fintellec-ring-coin__face--back::before {
-  content: "";
-  position: absolute;
-  inset: 5px;
-  border-radius: 50%;
-  border: 1px dashed rgba(71, 85, 105, 0.55);
-  box-shadow: inset 0 0 3px rgba(255, 255, 255, 0.6);
+  transform: translateZ(3px);
   pointer-events: none;
-}
-
-.fintellec-ring-coin__back-pattern {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 2px;
-  transform: translateZ(2px);
-}
-
-.fintellec-ring-coin__back-star {
-  font-size: clamp(14px, 1.4vw, 18px);
-  color: #007f73;
-  line-height: 1;
-  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.9);
-}
-
-.fintellec-ring-coin__back-text {
-  font-family: var(--font-nunito), sans-serif;
-  font-size: clamp(6.5px, 0.65vw, 8px);
-  font-weight: 900;
-  letter-spacing: 0.18em;
-  color: #334155;
-  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.8);
-}
-
-/* 3D Cylindrical Edge Extrusions (Milled Reeding Ridges) */
-.fintellec-ring-coin__edge {
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  pointer-events: none;
-  background: #94A3B8;
-  border: 2px dashed rgba(51, 65, 85, 0.75);
-  box-shadow: 0 0 0 1px rgba(203, 213, 225, 0.85);
-}
-
-.fintellec-ring-coin__edge--1 {
-  transform: translateZ(1.2px);
-  background: #CBD5E1;
-}
-
-.fintellec-ring-coin__edge--2 {
-  transform: translateZ(0px);
-  background: #94A3B8;
-  box-shadow: 0 0 0 1.5px rgba(148, 163, 184, 0.95);
-}
-
-.fintellec-ring-coin__edge--3 {
-  transform: translateZ(-1.2px);
-  background: #64748B;
 }
 
 /* Metallic specular reflection sweep */
@@ -553,80 +475,78 @@ nav,
   position: absolute;
   inset: 0;
   border-radius: 50%;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.7) 0%, transparent 45%, rgba(148, 163, 184, 0.4) 100%);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.7) 0%, transparent 45%, rgba(148, 163, 184, 0.35) 100%);
   pointer-events: none;
-  transform: translateZ(3px);
 }
 
 .fintellec-wallet-reveal__copy{position:absolute;z-index:2;top:15%;left:0;right:0;padding:0 24px;text-align:center;will-change:transform,opacity}
 .fintellec-wallet-reveal__eyebrow{margin:0 0 18px;text-align:center;font-family:var(--font-nunito);font-size:11px;font-weight:800;letter-spacing:.3em;color:#007f73}
 .fintellec-wallet-reveal__headline{margin:0 auto;max-width:1100px;text-align:center;font-family:var(--font-baskerville);font-size:clamp(2.4rem,6.2vw,5.6rem);font-weight:500;line-height:1.06;letter-spacing:-.04em;color:#0a192f;background:linear-gradient(180deg,#05101e 0%,#0a192f 40%,#0e2a47 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
 .fintellec-wallet-reveal__headline span{display:inline-block;padding-bottom:0.12em;color:#007f73;background:linear-gradient(135deg,#00a896 0%,#007f73 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-/* 3D Master Rupee Coin Medallion with Cylinder Extrusion & Die Faces */
+/* 3D Master Rupee Coin Medallion */
 .fintellec-wallet-reveal__coin {
   position: absolute;
   z-index: 4;
   left: 50%;
   top: 71%;
-  width: clamp(134px, 17vw, 208px);
+  width: clamp(140px, 18vw, 216px);
   aspect-ratio: 1;
   border-radius: 50%;
   transform-style: preserve-3d;
   perspective: 1200px;
-  backface-visibility: visible;
   will-change: transform, opacity;
-  filter: drop-shadow(0 28px 50px rgba(15, 23, 42, 0.28));
-  transition: filter 300ms ease;
-}
-
-.fintellec-wallet-reveal__coin:hover {
-  filter: drop-shadow(0 32px 60px rgba(15, 23, 42, 0.35)) drop-shadow(0 0 25px rgba(255, 255, 255, 0.7));
-}
-
-.fintellec-master-coin__face {
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  transform-style: preserve-3d;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-  border: 5px double #FFFFFF;
-}
-
-.fintellec-master-coin__face--front {
-  transform: translateZ(4px);
+  color: #0f172a;
+  /* Radiant silver bullion die-cast core */
   background: radial-gradient(circle at 32% 23%, #FFFFFF 0%, #F8FAFC 18%, #E2E8F0 42%, #CBD5E1 68%, #94A3B8 88%, #64748B 100%);
+  border: 5px double #FFFFFF;
+  /* Substantial 3D Cylindrical Coin Edge Extrusion */
   box-shadow:
-    0 0 0 4px rgba(203, 213, 225, 0.85),
-    0 0 40px rgba(255, 255, 255, 0.9),
-    inset 0 2.5px 5px rgba(255, 255, 255, 0.95),
-    inset 0 0 0 7px rgba(71, 85, 105, 0.16),
-    inset 0 -3px 6px rgba(15, 23, 42, 0.2);
+    0 1px 0 #CBD5E1,
+    0 2px 0 #CBD5E1,
+    0 3px 0 #94A3B8,
+    0 4px 0 #94A3B8,
+    0 5px 0 #64748B,
+    0 6px 0 #475569,
+    0 7px 0 #334155,
+    0 8px 2px rgba(15, 23, 42, 0.3),
+    0 26px 60px -10px rgba(15, 23, 42, 0.3),
+    0 0 45px rgba(255, 255, 255, 0.9),
+    inset 0 3px 6px rgba(255, 255, 255, 0.95),
+    inset 0 0 0 8px rgba(71, 85, 105, 0.16),
+    inset 0 -4px 7px rgba(15, 23, 42, 0.22);
+  transition: box-shadow 300ms ease;
+  user-select: none;
 }
 
-.fintellec-master-coin__face--back {
-  transform: rotateY(180deg) translateZ(4px);
-  background: radial-gradient(circle at 32% 23%, #FFFFFF 0%, #F1F5F9 20%, #CBD5E1 50%, #94A3B8 78%, #475569 100%);
+.fintellec-wallet-reveal__coin:hover {
   box-shadow:
-    0 0 0 4px rgba(203, 213, 225, 0.85),
-    0 0 40px rgba(255, 255, 255, 0.9),
-    inset 0 2.5px 5px rgba(255, 255, 255, 0.95),
-    inset 0 0 0 7px rgba(71, 85, 105, 0.16),
-    inset 0 -3px 6px rgba(15, 23, 42, 0.2);
+    0 1px 0 #CBD5E1,
+    0 2px 0 #CBD5E1,
+    0 3px 0 #94A3B8,
+    0 4px 0 #94A3B8,
+    0 5px 0 #64748B,
+    0 6px 0 #475569,
+    0 7px 0 #334155,
+    0 9px 2px rgba(15, 23, 42, 0.35),
+    0 32px 75px -8px rgba(15, 23, 42, 0.38),
+    0 0 60px rgba(255, 255, 255, 1),
+    inset 0 3px 6px rgba(255, 255, 255, 0.95),
+    inset 0 0 0 8px rgba(71, 85, 105, 0.2),
+    inset 0 -4px 7px rgba(15, 23, 42, 0.25);
 }
 
-/* Micro-milled beaded groove ring */
-.fintellec-master-coin__rim-groove {
+/* Micro-milled coin inner groove ring */
+.fintellec-master-coin__groove {
   position: absolute;
   inset: 10px;
   border-radius: 50%;
-  border: 1px dashed rgba(71, 85, 105, 0.4);
-  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.7), 0 1px 2px rgba(255, 255, 255, 0.9);
+  border: 1px dashed rgba(71, 85, 105, 0.38);
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.75), 0 1px 2px rgba(255, 255, 255, 0.9);
   pointer-events: none;
   transform: translateZ(2px);
 }
@@ -635,12 +555,13 @@ nav,
 .fintellec-master-coin__glyph {
   position: relative;
   font-family: var(--font-baskerville), serif;
-  font-size: clamp(64px, 8vw, 92px);
+  font-size: clamp(68px, 8.5vw, 96px);
   line-height: 1;
   color: #0f172a;
-  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.95), 0 -1px 2px rgba(15, 23, 42, 0.6);
-  transform: translateZ(12px);
-  filter: drop-shadow(0 4px 8px rgba(15, 23, 42, 0.32));
+  text-shadow: 0 2px 2px rgba(255, 255, 255, 0.95), 0 -1.5px 2px rgba(15, 23, 42, 0.65);
+  transform: translateZ(8px);
+  filter: drop-shadow(0 4px 8px rgba(15, 23, 42, 0.35));
+  pointer-events: none;
 }
 
 .fintellec-master-coin__label {
@@ -651,85 +572,20 @@ nav,
   letter-spacing: 0.28em;
   color: #334155;
   text-shadow: 0 1px 1px rgba(255, 255, 255, 0.9);
-  transform: translateZ(8px);
-}
-
-/* Reverse die mark */
-.fintellec-master-coin__reverse-mark {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  transform: translateZ(8px);
-}
-
-.fintellec-master-coin__star {
-  font-size: clamp(26px, 3.2vw, 36px);
-  color: #007f73;
-  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.9);
-  line-height: 1;
-}
-
-.fintellec-master-coin__rev-title {
-  font-family: var(--font-nunito), sans-serif;
-  font-size: clamp(8px, 0.9vw, 10px);
-  font-weight: 900;
-  letter-spacing: 0.28em;
-  color: #1e293b;
-  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.85);
-  margin-top: 6px;
-}
-
-.fintellec-master-coin__rev-sub {
-  font-family: var(--font-nunito), sans-serif;
-  font-size: clamp(7px, 0.75vw, 8.5px);
-  font-weight: 800;
-  letter-spacing: 0.2em;
-  color: #64748b;
-  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.85);
-  margin-top: 2px;
-}
-
-/* Master coin cylindrical milled edge rings */
-.fintellec-master-coin__edge {
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  pointer-events: none;
-  background: #94A3B8;
-  border: 2px dashed rgba(51, 65, 85, 0.75);
-  box-shadow: 0 0 0 2px rgba(203, 213, 225, 0.85);
-}
-
-.fintellec-master-coin__edge--1 {
-  transform: translateZ(2px);
-  background: #CBD5E1;
-}
-
-.fintellec-master-coin__edge--2 {
-  transform: translateZ(0px);
-  background: #94A3B8;
-}
-
-.fintellec-master-coin__edge--3 {
-  transform: translateZ(-2px);
-  background: #64748B;
-}
-
-.fintellec-master-coin__edge--4 {
-  transform: translateZ(-4px);
-  background: #475569;
-}
-
-/* Specular sweep */
-.fintellec-master-coin__sheen {
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.65) 0%, transparent 40%, rgba(148, 163, 184, 0.35) 100%);
-  pointer-events: none;
   transform: translateZ(6px);
+  pointer-events: none;
 }
+
+/* Metallic specular reflection sweep */
+.fintellec-master-coin__rim {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.65) 0%, transparent 40%, rgba(148, 163, 184, 0.3) 100%);
+  pointer-events: none;
+  transform: translateZ(4px);
+}
+
 .fintellec-wallet-reveal__wallet{position:absolute;z-index:3;left:50%;top:73%;width:clamp(238px,35vw,405px);height:clamp(154px,22vw,248px);opacity:0;transform:translate3d(-50%,70px,0);transform-style:preserve-3d;transform-origin:50% 55%;will-change:transform,opacity;filter:drop-shadow(0 35px 42px rgba(0,0,0,.28))}
 .fintellec-wallet-reveal__wallet-inside{position:absolute;inset:1% 3% 9%;border-radius:28px 28px 34px 34px;background:linear-gradient(145deg,#B8F2EC 0%,#63DCD3 42%,#00A99E 68%,#003365 100%);box-shadow:inset 0 12px 28px rgba(0,51,101,.32),0 0 30px rgba(99,220,211,.15);overflow:hidden}
 .fintellec-wallet-reveal__wallet-inside:before{content:"";position:absolute;inset:12px;border:1px solid rgba(239,250,250,.56);border-radius:20px 20px 25px 25px}
